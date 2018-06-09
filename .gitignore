@@ -3,3 +3,4 @@ config.ini
 venv*
 *.egg-info
 filmlog/files/*
+database/users.sql
