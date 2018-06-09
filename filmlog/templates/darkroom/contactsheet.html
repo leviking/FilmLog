@@ -89,7 +89,7 @@
 <div class="card">
   <div class="card-header">Upload Contact Sheet</div>
   <div class="card-body">
-    {% include 'form_errors.html' %}
+    {{ form_errors(form) }}
     <form role="form" class="form-horizontal"
       action="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}/contactsheet"
       method="POST",

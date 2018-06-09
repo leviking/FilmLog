@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 
-{{ form_errors(form) }}
-
 {% block content %}
 <h1 class="page-header">Login</h1>
 <div class="card">
   <div class="card-body">
+    {{ form_errors(form) }}
     <form role="form" class="form-horizontal"
       action="/login"
       method="POST">
