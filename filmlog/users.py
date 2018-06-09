@@ -129,5 +129,5 @@ def register():
                     username = form.username.data)
         else:
             app.logger.info('User registration form has invalid data')
-            flash("Looks like your password doesn't match")
+            flash("Looks like you did something wrong.")
     return render_template('users/register.html', form=form)
