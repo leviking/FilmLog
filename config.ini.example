@@ -14,5 +14,5 @@ user_files=files
 thumbnail_size=480
 
 [recaptcha]
-public_key = "abcd"
-private_key = "abcd"
+public_key = abcd
+private_key = abcd
