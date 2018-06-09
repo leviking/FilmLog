@@ -20,7 +20,7 @@ app.secret_key = config.get('session','secret_key')
 
 #app.server_name = config.get('session', 'server_name')
 
-app.config['TESTING'] = config.get('app','testing')
+app.config['TESTING'] = config.getboolean('app','testing')
 
 #UPLOAD_FOLDER = config.get('files','upload_folder')
 user_files = os.path.join(os.path.abspath(os.path.dirname(__file__)),
