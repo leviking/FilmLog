@@ -1,12 +1,12 @@
 from flask import request, render_template, redirect, url_for, flash, abort
 from sqlalchemy.sql import select, text, func
-import os, re
+import os, re, string, random
 from flask_login import LoginManager, login_user, logout_user, UserMixin
 
 # Forms
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, RecaptchaField
 from wtforms import Form, StringField, PasswordField, validators
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length
 
 from werkzeug.security import generate_password_hash, \
      check_password_hash
@@ -16,6 +16,10 @@ from filmlog import database
 from filmlog import functions
 
 engine = database.engine
+
+### Functions
+def generate_registration_code(size=64, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 ### Classes
 class User(UserMixin):
@@ -38,6 +42,14 @@ class LoginForm(FlaskForm):
     username = StringField('Username', validators=[validators.input_required()])
     password = PasswordField('Password', validators=[validators.input_required()])
 
+class RegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[validators.input_required(), Length(min=1,max=64)])
+    #email = StringField('Email', validators=[validators.input_required(), Length(min=1,max=256)])
+    password = PasswordField('Password', validators=[validators.input_required(),
+        validators.EqualTo('password2', message='Passwords must match')])
+    password2 = PasswordField('Re-Enter Password', validators=[validators.input_required()])
+    recaptcha = RecaptchaField()
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
@@ -54,19 +66,68 @@ def unauthorized():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        qry = text("""SELECT userID, password FROM Users
-                WHERE username = :username""")
-        user = engine.execute(qry, username=username).fetchone()
-        if user:
-            if check_password_hash(user.password, password):
-                login_user(User(user.userID), remember=True)
-                return redirect("/")
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            username = form.username.data
+            password = form.password.data
+            qry = text("""SELECT userID, password FROM Users
+                    WHERE username = :username""")
+            user = engine.execute(qry, username=username).fetchone()
+            if user:
+                if check_password_hash(user.password, password):
+                    login_user(User(user.userID), remember=True)
+                    return redirect("/")
     return render_template('users/login.html', form=form)
 
 @app.route('/logout', methods=['GET'])
 def logout():
     logout_user()
     return redirect("/")
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            #qry = text("""(SELECT 1 from UsersUnverified WHERE username=:username)
+            #    UNION
+            #    (SELECT 1 FROM UsersUnverified WHERE email=:email)""")
+            #unverified_users = engine.execute(qry,
+            #    username=form.username.data,
+            #    email=form.email.data).fetchall()
+            #qry = text("""(SELECT 1 from Users WHERE username=:username)
+            #    UNION
+            #    (SELECT 1 FROM Users WHERE email=:email)""")
+            #users = engine.execute(qry,
+            #    username=form.username.data,
+            #    email=form.email.data).fetchall()
+
+            qry = text("""(SELECT 1 from UsersUnverified WHERE username=:username)""")
+            unverified_users = engine.execute(qry,
+                username=form.username.data).fetchall()
+            qry = text("""(SELECT 1 from Users WHERE username=:username)""")
+            users = engine.execute(qry,
+                username=form.username.data).fetchall()
+            if len(unverified_users) > 0 or len(users) > 0:
+                flash("User already exists")
+            else:
+                #qry = text("""INSERT INTO UsersUnverified
+                #    (username, email, password, registrationCode)
+                #    VALUES (:username, :email, :password, :registrationCode)""")
+                #engine.execute(qry,
+                #    username=form.username.data,
+                #    email=form.email.data,
+                #    password=generate_password_hash(form.password.data),
+                #    registrationCode=generate_registration_code())
+                qry = text("""INSERT INTO Users
+                    (username, password)
+                    VALUES (:username, :password)""")
+                engine.execute(qry,
+                    username=form.username.data,
+                    password=generate_password_hash(form.password.data))
+                return render_template("users/post_registration.html",
+                    username = form.username.data)
+        else:
+            app.logger.info('User registration form has invalid data')
+            flash("Looks like your password doesn't match")
+    return render_template('users/register.html', form=form)

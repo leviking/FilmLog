@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{{ form_errors(form) }}
+
+{% for field in form.errors %}
+{% for error in form.errors[field] %}
+    <div class="alert alert-error">
+        <strong>Error!</strong> {{error}}
+    </div>
+{% endfor %}
+{% endfor %}
+
+{% for field, errors in form.errors.iteritems() %}
+<div class="alert alert-error">
+    {{ form[field].label }}: {{ ', '.join(errors) }}
+</div>
+{% endfor %}
+
+{% block content %}
+<h1 class="page-header">Register</h1>
+<div class="card">
+  <div class="card-body">
+    <form role="form" class="form-horizontal"
+      action="/register"
+      method="POST">
+      {{ form.csrf_token }}
+      <div class="form-group">
+        <div class="col-sm-3">
+          {{ form.username.label }}
+          {{ form.username(size=24) }}
+        </div>
+        <div class="col-sm-3">
+          {{ form.password.label }}
+          {{ form.password(size=32) }}
+        </div>
+        <div class="col-sm-3">
+          {{ form.password2.label }}
+          {{ form.password2(size=32) }}
+        </div>
+        <div class="col-sm-3">
+          {{ form.recaptcha.label }}
+          {{ form.recaptcha }}
+        </div>
+      </div>
+      <div class="button-bar">
+        <button class="btn btn-success" action="submit">Register</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

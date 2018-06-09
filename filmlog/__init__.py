@@ -20,6 +20,8 @@ app.secret_key = config.get('session','secret_key')
 
 #app.server_name = config.get('session', 'server_name')
 
+app.config['TESTING'] = config.get('app','testing')
+
 #UPLOAD_FOLDER = config.get('files','upload_folder')
 user_files = os.path.join(os.path.abspath(os.path.dirname(__file__)),
     config.get('files', 'user_files'))
@@ -28,6 +30,9 @@ user_files = os.path.join(os.path.abspath(os.path.dirname(__file__)),
 app.config['ALLOWED_EXTENSIONS'] = set(['jpg', 'jpeg'])
 app.config['UPLOAD_FOLDER'] = user_files
 app.config['THUMBNAIL_SIZE'] = config.get('files', 'thumbnail_size')
+
+app.config['RECAPTCHA_PUBLIC_KEY'] = config.get('recaptcha','public_key')
+app.config['RECAPTCHA_PRIVATE_KEY'] = config.get('recaptcha','private_key')
 
 # Global CSRF Protection
 csrf = CSRFProtect(app)

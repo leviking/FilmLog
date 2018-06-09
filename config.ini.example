@@ -1,5 +1,9 @@
+[app]
+testing=False
+
 [session]
 secret_key = FILLMEIN
+server_name="filmlog"
 
 [database]
 url=mysql+mysqldb://user:pass@host/db?charset=utf
@@ -9,3 +13,6 @@ pool_recycle=3600
 user_files=files
 thumbnail_size=480
 
+[recaptcha]
+public_key = "abcd"
+private_key = "abcd"
