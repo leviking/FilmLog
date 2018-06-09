@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>{{ camera.name }} <small class="text-muted">{{ camera.filmSize }}</small></h1>
+
+  <h3>Lenses</h3>
+  <ul>
+  {% for lens in camera_lenses %}
+    <li>{{ lens.name }}</li>
+  {% endfor %}
+  </ul>
+
+
+  <div class="card">
+    <div class="card-header">Edit Camera</div>
+    <div class="card-body">
+      {{ form_errors(camera_form) }}
+      <form role="form" class="form-horizontal"
+        action="/gear/camera/{{ camera.cameraID }}"
+        method="POST">
+        {{ camera_form.csrf_token }}
+        <div class="form-group">
+          <div class="col-sm-4">
+            {{ camera_form.name.label }}
+            {{ camera_form.name(class="form-control", placeholder="Minolta X-700") }}
+          </div>
+          <div class="col-sm-4">
+            {{ camera_form.filmSize.label }}
+            {{ camera_form.filmSize(class="form-control") }}
+          </div>
+          <div class="col-sm-4">
+              {{ camera_form.lenses.label }}
+              {{ camera_form.lenses(class="form-control list-unstyled") }}
+          </div>
+        </div>
+
+        <div class="button-bar">
+          <button class="btn btn-success" name="button" action="submit" value="editCamera">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+{% endblock %}

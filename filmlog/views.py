@@ -15,6 +15,7 @@ from filmlog import app
 from filmlog import database
 from filmlog.functions import next_id, result_to_dict, get_film_details, \
     optional_choices, zero_to_none, get_film_types
+from filmlog.classes import MultiCheckboxField
 from filmlog import users, filmstock, darkroom, files, stats, gear, help
 engine = database.engine
 
@@ -66,10 +67,6 @@ def get_filters(connection):
         userID = userID).fetchall()
 
 ## Form Objects
-class MultiCheckboxField(SelectMultipleField):
-    widget = widgets.ListWidget(prefix_label=False)
-    option_widget = widgets.CheckboxInput()
-
 class BinderForm(FlaskForm):
     name = StringField('Name',
         validators=[DataRequired(), Length(min=1, max=64)])
