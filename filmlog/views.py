@@ -103,7 +103,7 @@ class FilmForm(FlaskForm):
         validators=[NumberRange(min=0,max=65535),
                     DataRequired()])
 
-    development = StringField('File No.',
+    development = StringField('Development',
         validators=[Optional(), Length(min=1, max=255)],
         filters = [lambda x: x or None])
     notes = TextAreaField('Notes',
