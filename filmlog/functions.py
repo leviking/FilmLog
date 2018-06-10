@@ -1,6 +1,9 @@
 from filmlog import app, abort
+from flask import flash
 from sqlalchemy.sql import text
 from flask_login import current_user
+from sqlalchemy.exc import IntegrityError
+
 
 # Functions
 def result_to_dict(result_set):
@@ -62,8 +65,16 @@ def optional_choices(name, choices):
         new_choices.append(row)
     return new_choices
 
-
 def zero_to_none(value):
     if value == 0:
         return None
     return value
+
+# Try an insert (really could be any query),
+# catch the error and provide info.
+# An error causes an implicit rollback.
+def insert(connection, qry, item, **args):
+    try:
+         connection.execute(qry, args)
+    except IntegrityError:
+        flash(item + " of the same name already exists.")

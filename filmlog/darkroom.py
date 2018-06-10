@@ -16,7 +16,7 @@ from filmlog import database
 from filmlog import functions
 from filmlog import files
 
-from filmlog.functions import optional_choices, zero_to_none
+from filmlog.functions import optional_choices, zero_to_none, insert
 
 engine = database.engine
 
@@ -187,7 +187,7 @@ def prints(binderID, projectID, filmID):
                     VALUES (:printID, :filmID, :exposureNumber, :userID, :paperID,
                     :paperFilterID, :enlargerLensID, :fileID, :aperture, :headHeight, :exposureTime,
                     :printType, :size, :notes)""")
-                connection.execute(qry,
+                insert(connection, qry, "Print",
                     printID = nextPrintID,
                     filmID = filmID,
                     userID = userID,

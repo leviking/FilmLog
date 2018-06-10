@@ -13,7 +13,7 @@ from werkzeug.security import generate_password_hash, \
 
 from filmlog import app
 from filmlog import database
-from filmlog import functions
+#from filmlog.functions import insert
 
 engine = database.engine
 

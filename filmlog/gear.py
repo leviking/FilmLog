@@ -13,7 +13,7 @@ from wtforms import widgets
 
 from filmlog import app
 from filmlog import database
-from filmlog.functions import next_id
+from filmlog.functions import next_id, insert
 from filmlog.classes import MultiCheckboxField
 
 engine = database.engine
@@ -88,7 +88,7 @@ def gear():
             nextCameraID = next_id(connection, 'cameraID', 'Cameras')
             qry = text("""INSERT INTO Cameras
                 (cameraID, userID, name, filmSize) VALUES (:cameraID, :userID, :name, :filmSize)""")
-            connection.execute(qry,
+            insert(connection, qry, "Camera",
                 cameraID = nextCameraID,
                 userID = int(current_user.get_id()),
                 name = camera_form.name.data,
@@ -101,7 +101,7 @@ def gear():
             qry = text("""INSERT INTO Filters
                 (userID, filterID, name, code, factor, ev)
                 VALUES (:userID, :filterID, :name, :code, :factor, :ev)""")
-            connection.execute(qry,
+            insert(connection, qry, "Filters",
                 userID = userID,
                 filterID = nextFilterID,
                 name = filter_form.name.data,
@@ -123,7 +123,7 @@ def gear():
             qry = text("""INSERT INTO Lenses
                 (lensID, userID, name)
                 VALUES (:lensID, :userID, :name)""")
-            connection.execute(qry,
+            insert(connection, qry, "Lens",
                 lensID = nextLensID,
                 userID = userID,
                 name = camera_lens_form.name.data)
@@ -141,7 +141,7 @@ def gear():
             qry = text("""INSERT INTO EnlargerLenses
                 (enlargerLensID, userID, name)
                 VALUES (:enlargerLensID, :userID, :name)""")
-            connection.execute(qry,
+            insert(connection, qry, "Enlarger Lens",
                 enlargerLensID = nextEnlargerLensID,
                 userID = userID,
                 name = enlarger_lens_form.name.data)

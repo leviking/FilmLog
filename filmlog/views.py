@@ -1,4 +1,5 @@
-from flask import request, render_template, redirect, url_for, Response, session, abort, send_from_directory
+from flask import request, render_template, redirect, url_for, Response, \
+    session, abort, flash, send_from_directory
 from sqlalchemy.sql import select, text, func
 import os, re
 
@@ -14,9 +15,10 @@ from wtforms import widgets
 from filmlog import app
 from filmlog import database
 from filmlog.functions import next_id, result_to_dict, get_film_details, \
-    optional_choices, zero_to_none, get_film_types
+    optional_choices, zero_to_none, get_film_types, insert
 from filmlog.classes import MultiCheckboxField
 from filmlog import users, filmstock, darkroom, files, stats, gear, help
+
 engine = database.engine
 
 ## Functions
@@ -190,7 +192,8 @@ def binders():
             nextBinderID = next_id(connection, 'binderID', 'Binders')
             qry = text("""INSERT INTO Binders
                 (binderID, userID, name) VALUES (:binderID, :userID, :name)""")
-            result = connection.execute(qry,
+            insert(connection, qry,
+                "Binder",
                 binderID = nextBinderID,
                 userID = userID,
                 name = form.name.data)
@@ -225,7 +228,7 @@ def projects(binderID):
             qry = text("""INSERT INTO Projects
                 (projectID, binderID, userID, name)
                 VALUES (:projectID, :binderID, :userID, :name)""")
-            result = connection.execute(qry,
+            insert(connection, qry, "Project",
                 projectID = nextProjectID,
                 binderID = binderID,
                 userID = userID,
@@ -272,7 +275,7 @@ def project(binderID, projectID):
                 VALUES (:userID, :filmID, :projectID, :cameraID, :title, UPPER(:fileNo),
                         :fileDate, :filmTypeID, :iso, :loaded, :unloaded,
                         :developed, :development, :notes)""")
-            result = connection.execute(qry,
+            insert(connection, qry, "Film",
                 userID = userID,
                 filmID = nextFilmID,
                 projectID = projectID,
@@ -493,7 +496,7 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
             qry = text("""INSERT INTO Exposures
                 (userID, filmID, exposureNumber, lensID, shutter, aperture, filmTypeID, iso, metering, flash, subject, development, notes)
                 VALUES (:userID, :filmID, :exposureNumber, :lensID, :shutter, :aperture, :filmTypeID, :shotISO, :metering, :flash, :subject, :development, :notes)""")
-            result = connection.execute(qry,
+            insert(connection, qry, "Exposure",
                 userID = userID,
                 filmID = filmID,
                 exposureNumber = form.exposureNumber.data,
@@ -512,7 +515,7 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                 (userID, filmID, exposureNumber, filterID)
                 VALUES (:userID, :filmID, :exposureNumber, :filterID)""")
             for filterID in form.filters.data:
-                connection.execute(qry,
+                insert(connection, qry, "Filter",
                     userID = userID,
                     filmID = filmID,
                     exposureNumber = form.exposureNumber.data,
@@ -562,7 +565,7 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                 (userID, filmID, exposureNumber, filterID)
                 VALUES (:userID, :filmID, :exposureNumber, :filterID)""")
             for filterID in request.form.getlist('filters'):
-                connection.execute(qry,
+                insert(connection, qry, "Filter",
                     userID = userID,
                     filmID = filmID,
                     exposureNumber = request.form['exposureNumber'],

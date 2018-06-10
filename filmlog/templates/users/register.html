@@ -2,20 +2,6 @@
 
 {{ form_errors(form) }}
 
-{% for field in form.errors %}
-{% for error in form.errors[field] %}
-    <div class="alert alert-error">
-        <strong>Error!</strong> {{error}}
-    </div>
-{% endfor %}
-{% endfor %}
-
-{% for field, errors in form.errors.iteritems() %}
-<div class="alert alert-error">
-    {{ form[field].label }}: {{ ', '.join(errors) }}
-</div>
-{% endfor %}
-
 {% block content %}
 <h1 class="page-header">Register</h1>
 <div class="card">
