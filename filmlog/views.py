@@ -15,7 +15,7 @@ from wtforms import widgets
 from filmlog import app
 from filmlog import database
 from filmlog.functions import next_id, result_to_dict, get_film_details, \
-    optional_choices, zero_to_none, get_film_types, insert
+    optional_choices, zero_to_none, get_film_types, insert, delete
 from filmlog.classes import MultiCheckboxField
 from filmlog import users, filmstock, darkroom, files, stats, gear, help
 

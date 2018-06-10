@@ -78,3 +78,16 @@ def insert(connection, qry, item, **args):
          connection.execute(qry, args)
     except IntegrityError:
         flash(item + " of the same name already exists.")
+
+# Attempt a delete (or really any query),
+# catch the error and provide info.
+# An error causes an implicty rollback.
+# Delete exceptions will typically be if there
+# are foreign key relationships that do not
+# have cascading deletes.
+def delete(connection, qry, item, **args):
+    try:
+         connection.execute(qry, args)
+    except IntegrityError:
+        flash("Cannot delete " + item +
+            ". Could be you may have stuff that depends on it.")

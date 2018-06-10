@@ -13,7 +13,7 @@ from wtforms import widgets
 
 from filmlog import app
 from filmlog import database
-from filmlog.functions import next_id, insert
+from filmlog.functions import next_id, insert, delete
 from filmlog.classes import MultiCheckboxField
 
 engine = database.engine
@@ -113,7 +113,7 @@ def gear():
             qry = text("""DELETE FROM Filters
                 WHERE userID = :userID
                 AND filterID = :filterID""")
-            connection.execute(qry,
+            delete(connection, qry, "Filter",
                 userID = userID,
                 filterID = int(request.form['filterID']))
 
@@ -131,7 +131,7 @@ def gear():
             qry = text("""DELETE FROM Lenses
                 WHERE userID = :userID
                 AND lensID = :lensID""")
-            connection.execute(qry,
+            delete(connection, qry, "Lens",
                 userID = userID,
                 lensID = int(request.form['lensID']))
 
