@@ -216,6 +216,7 @@ CREATE TABLE EnlargerLenses(
     name VARCHAR(64) NOT NULL,
     PRIMARY KEY (enlargerLensID, userID),
     UNIQUE KEY user_name_uq (userID, name),
+    KEY userID_idx (userID),
     CONSTRAINT EnlargerLenses_Users_fk FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
