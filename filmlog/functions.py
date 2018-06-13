@@ -66,7 +66,7 @@ def optional_choices(name, choices):
     return new_choices
 
 def zero_to_none(value):
-    if value == 0:
+    if value == 0 or value == '0':
         return None
     return value
 

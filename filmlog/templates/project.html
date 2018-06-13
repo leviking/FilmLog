@@ -20,7 +20,11 @@
               <td>{{ film.fileNo }}</td>
               <td>{{ film.exposures }}</td>
               <td>{{ film.camera }}</td>
-              <td>{{ film.brand }} {{ film.filmName }} at {{ film.iso }}</td>
+              <td>
+                {% if film.brand %}
+                  {{ film.brand }} {{ film.filmName }} at {{ film.iso }}
+                {% endif %}
+              </td>
               <td>{{ film.fileDate|to_date }}</td>
           </tr>
       {% else %}

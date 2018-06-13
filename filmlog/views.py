@@ -84,7 +84,7 @@ class FilmForm(FlaskForm):
         validators=[DataRequired(), Length(min=1, max=32)])
 
     filmTypeID = SelectField('Film',
-        validators=[DataRequired()],
+        validators=[Optional()],
         coerce=int)
     cameraID = SelectField('Camera',
         validators=[DataRequired()],
@@ -101,7 +101,7 @@ class FilmForm(FlaskForm):
 
     shotISO = IntegerField('Shot ISO',
         validators=[NumberRange(min=0,max=65535),
-                    DataRequired()])
+                    Optional()])
 
     development = StringField('Development',
         validators=[Optional(), Length(min=1, max=255)],
@@ -112,7 +112,7 @@ class FilmForm(FlaskForm):
 
     def populate_select_fields(self, connection):
         self.connection = connection
-        self.filmTypeID.choices = get_film_types(connection)
+        self.filmTypeID.choices = optional_choices("None", get_film_types(connection))
         self.cameraID.choices = get_cameras(connection)
 
 class ExposureForm(FlaskForm):
@@ -147,15 +147,15 @@ class ExposureForm(FlaskForm):
         validators=[Optional(), Length(max=255)],
         filters = [lambda x: x or None])
     filmTypeID = SelectField('Film',
-        validators=[DataRequired()],
+        validators=[Optional()],
         coerce=int)
     shotISO = IntegerField('Shot ISO',
         validators=[NumberRange(min=0,max=65535),
-                    DataRequired()])
+                    Optional()])
 
     def populate_select_fields(self, connection, cameraID):
         self.connection = connection
-        self.filmTypeID.choices = get_film_types(connection)
+        self.filmTypeID.choices = optional_choices("None", get_film_types(connection))
         self.lensID.choices = optional_choices("None", get_lenses(connection, cameraID))
         self.filters.choices = get_filters(connection)
 
@@ -283,8 +283,8 @@ def project(binderID, projectID):
                 title = form.title.data,
                 fileNo = form.fileNo.data,
                 fileDate = form.fileDate.data,
-                filmTypeID = form.filmTypeID.data,
-                iso = form.shotISO.data,
+                filmTypeID = zero_to_none(form.filmTypeID.data),
+                iso = zero_to_none(form.shotISO.data),
                 loaded = form.loaded.data,
                 unloaded = form.unloaded.data,
                 developed = form.developed.data,
@@ -295,8 +295,8 @@ def project(binderID, projectID):
         exposures,
         Cameras.name AS camera
         FROM Films
-        JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
-        JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
+        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
         JOIN Cameras ON Cameras.cameraID = Films.cameraID
         WHERE projectID = :projectID ORDER BY fileDate""")
     films = connection.execute(qry, projectID=projectID).fetchall()
@@ -361,8 +361,8 @@ def film(binderID, projectID, filmID):
                     title = form.title.data,
                     fileNo = form.fileNo.data,
                     fileDate = form.fileDate.data,
-                    filmTypeID = form.filmTypeID.data,
-                    iso = form.shotISO.data,
+                    filmTypeID = zero_to_none(form.filmTypeID.data),
+                    iso = zero_to_none(form.shotISO.data),
                     loaded = form.loaded.data,
                     unloaded = form.unloaded.data,
                     developed = form.developed.data,
@@ -503,8 +503,8 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                 lensID = zero_to_none(form.lensID.data),
                 shutter = encode_shutter(form.shutter.data),
                 aperture = form.aperture.data,
-                filmTypeID = form.filmTypeID.data,
-                shotISO = form.shotISO.data,
+                filmTypeID = zero_to_none(form.filmTypeID.data),
+                shotISO = zero_to_none(form.shotISO.data),
                 metering = zero_to_none(form.metering.data),
                 flash = form.flash.data,
                 subject = form.subject.data,
@@ -545,8 +545,8 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                 lensID = zero_to_none(form.lensID.data),
                 shutter = encode_shutter(form.shutter.data),
                 aperture = form.aperture.data,
-                filmTypeID = form.filmTypeID.data,
-                shotISO = form.shotISO.data,
+                filmTypeID = zero_to_none(form.filmTypeID.data),
+                shotISO = zero_to_none(form.shotISO.data),
                 metering = zero_to_none(form.metering.data),
                 flash = form.flash.data,
                 subject = form.subject.data,
