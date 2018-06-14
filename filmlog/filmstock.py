@@ -32,7 +32,7 @@ class FilmStockForm(FlaskForm):
                  ('4x5', '4x5'),
                  ('8x10', '8x10')])
     qty = IntegerField('Qty',
-        validators=[NumberRange(min=1,max=65535),
+        validators=[NumberRange(min=-32768,max=32767),
                     DataRequired()])
 
     def populate_select_fields(self, connection):
@@ -92,15 +92,14 @@ def filmstock():
             if request.form.get('filmTypeID') != '':
                 if qty != '':
                     qty = int(qty)
-                    if qty > 0:
-                        qry = text("""REPLACE INTO FilmStock
-                            (filmTypeID, filmSize, userID, qty)
-                            VALUES (:filmTypeID, :filmSize, :userID, :qty)""")
-                        result = connection.execute(qry,
-                            filmTypeID=form.filmTypeID.data,
-                            filmSize=form.filmSize.data,
-                            qty=form.qty.data,
-                            userID = userID)
+                    qry = text("""REPLACE INTO FilmStock
+                        (filmTypeID, filmSize, userID, qty)
+                        VALUES (:filmTypeID, :filmSize, :userID, :qty)""")
+                    result = connection.execute(qry,
+                        filmTypeID=form.filmTypeID.data,
+                        filmSize=form.filmSize.data,
+                        qty=form.qty.data,
+                        userID = userID)
     qry = text("""SELECT FilmStock.filmTypeID AS filmTypeID, filmSize, qty,
         FilmBrands.brand AS brand, FilmTypes.name AS type, iso
         FROM FilmStock

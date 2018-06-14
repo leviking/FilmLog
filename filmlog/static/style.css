@@ -4,6 +4,11 @@
   margin-right: 4px;
 }
 
+.filmStockNegative{
+  color: #bb0000;
+  font-weight: bold;
+}
+
 .table-striped-by-two tr:nth-child(4n+1) {
   background-color: #f9f9f9;
 }
@@ -11,7 +16,6 @@
 .table-striped-by-two tr:nth-child(4n+4) {
   background-color: #f9f9f9;
 }
-
 
 /* Special div to make alignment work for printing, particularly large format
    sheets where the information for each exposure is varied resulting in a

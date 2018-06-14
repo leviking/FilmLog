@@ -16,7 +16,11 @@
               <th></th>
           </tr>
     {% for film in stock %}
-      <tr>
+      <tr
+        {% if film.qty < 0 %}
+        class="filmStockNegative"
+        {% endif %}
+      >
         <td>{{ film.brand }} {{ film.type }}</td>
         <td>{{ film.iso }}</td>
         <td>{{ film.filmSize }}</td>

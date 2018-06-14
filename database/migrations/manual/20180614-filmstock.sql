@@ -1,0 +1,2 @@
+ALTER TABLE FilmStock 
+MODIFY COLUMN qty smallint NOT NULL DEFAULT '0';
