@@ -16,7 +16,7 @@ from filmlog import app
 from filmlog import database
 from filmlog.functions import next_id, result_to_dict, get_film_details, \
     optional_choices, zero_to_none, get_film_types, get_film_sizes, \
-    decrement_film_stock, insert, delete
+    insert, delete
 from filmlog.classes import MultiCheckboxField
 from filmlog import users, filmstock, darkroom, files, stats, gear, help
 
@@ -68,6 +68,28 @@ def get_filters(connection):
         WHERE userID = :userID""")
     return connection.execute(qry,
         userID = userID).fetchall()
+
+# Blindly Decrement Film Stock. If the film does not exist, the UPDATE
+# won't do anything. This is currently by design since if a user isn't
+# tracking a particular film, no sense in cluttering up the Film Stock.
+# We only want to decrement films that are being tracked.
+def auto_decrement_film_stock(connection, filmTypeID, filmSizeID):
+    userID = current_user.get_id()
+    qry = text("""SELECT 1 FROM UserPreferences
+        WHERE userID = :userID
+        AND autoUpdateFilmStock = 'Yes'""")
+    result = connection.execute(qry,
+        userID = userID).fetchone()
+    if result:
+        app.logger.debug("Decrementing Film Stock")
+        qry = text("""UPDATE FilmStock SET qty = qty - 1
+            WHERE userID = :userID
+            AND filmTypeID = :filmTypeID
+            AND filmSizeID = :filmSizeID""")
+        connection.execute(qry,
+            userID = userID,
+            filmTypeID = filmTypeID,
+            filmSizeID = filmSizeID)
 
 ## Form Objects
 class BinderForm(FlaskForm):
@@ -315,7 +337,7 @@ def project(binderID, projectID):
                 AND format = 'Roll'""")
             format = connection.execute(qry, filmSizeID = form.filmSizeID.data).fetchone()
             if format and filmTypeID:
-                decrement_film_stock(connection, filmTypeID, filmSizeID)
+                auto_decrement_film_stock(connection, filmTypeID, filmSizeID)
 
     qry = text("""SELECT filmID, title, fileNo, fileDate,
         Films.iso AS iso, brand, FilmTypes.name AS filmName,
@@ -537,7 +559,7 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                 AND format = 'Sheet'""")
             format = connection.execute(qry, filmSizeID = form.filmSizeID.data).fetchone()
             if format and filmTypeID:
-                decrement_film_stock(connection, filmTypeID, filmSizeID)
+                auto_decrement_film_stock(connection, filmTypeID, filmSizeID)
 
         if request.form['button'] == 'updateExposure':
             qry = text("""UPDATE Exposures

@@ -7,6 +7,12 @@ CREATE TABLE Users (
     UNIQUE username_uq (username)
 ) ENGINE='InnoDB';
 
+CREATE TABLE UserPreferences (
+    userID INT UNSIGNED NOT NULL PRIMARY KEY,
+    autoUpdateFilmStock ENUM('Yes', 'No') DEFAULT 'Yes',
+    CONSTRAINT userprefs_userID_fk FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE='InnoDB';
+
 CREATE TABLE UsersUnverified(
     userUnverifiedID INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     username varchar(64) NOT NULL,
@@ -140,6 +146,7 @@ CREATE TABLE Exposures(
     filmID INT UNSIGNED NOT NULL,
     exposureNumber TINYINT UNSIGNED NOT NULL,
     filmTypeID SMALLINT UNSIGNED DEFAULT NULL,
+    filmSizeID TINYINT UNSIGNED DEFAULT NULL,
     lensID SMALLINT UNSIGNED DEFAULT NULL,
     iso SMALLINT UNSIGNED DEFAULT NULL,
     shutter SMALLINT DEFAULT NULL,
@@ -156,7 +163,8 @@ CREATE TABLE Exposures(
     KEY userID_idx (userID),
     CONSTRAINT Exposures_filmTypeID_fk FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Exposures_Films_fk FOREIGN KEY (userID, filmID) REFERENCES Films (userID, filmID) ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT Exposures_Lenses_fk FOREIGN KEY (userID, lensID) REFERENCES Lenses (userID, lensID) ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT Exposures_Lenses_fk FOREIGN KEY (userID, lensID) REFERENCES Lenses (userID, lensID) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT Exposures_filmSizeID_fk FOREIGN KEY (filmSizeID) REFERENCES FilmSizes (filmSizeID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
 CREATE TABLE Filters(
@@ -346,6 +354,14 @@ CREATE TRIGGER ExposureCountDecrement
             UPDATE Films SET exposures = exposures - 1
             WHERE filmID = OLD.filmID
             AND userID = OLD.userID;
+        END;
+//
+
+CREATE TRIGGER CreateDefaultUserPreferences
+    AFTER INSERT ON Users
+        FOR EACH ROW
+        BEGIN
+            INSERT INTO UserPreferences (userID) VALUES (NEW.userID);
         END;
 //
 

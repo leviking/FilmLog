@@ -68,3 +68,20 @@ UPDATE Exposures SET filmSizeID = 7 WHERE filmID IN
 ALTER TABLE Exposures 
     ADD CONSTRAINT Exposures_filmSizeID_fk FOREIGN KEY (filmSizeID) REFERENCES FilmSizes (filmSizeID) ON DELETE RESTRICT ON UPDATE CASCADE;
 
+
+
+CREATE TABLE UserPreferences (
+    userID INT UNSIGNED NOT NULL PRIMARY KEY,
+    autoUpdateFilmStock ENUM('Yes', 'No') DEFAULT 'Yes',
+    CONSTRAINT userprefs_userID_fk FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE='InnoDB';
+
+DELIMITER //
+CREATE TRIGGER CreateDefaultUserPreferences
+    AFTER INSERT ON Users
+        FOR EACH ROW
+        BEGIN
+            INSERT INTO UserPreferences (userID) VALUES (NEW.userID);
+        END;
+//
+DELIMITER ;

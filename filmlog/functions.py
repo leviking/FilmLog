@@ -67,23 +67,6 @@ def get_film_details(connection, binderID, projectID, filmID):
 
     return film
 
-# Blindly Decrement Film Stock. If the film does not exist, the UPDATE
-# won't do anything. This is currently by design since if a user isn't
-# tracking a particular film, no sense in cluttering up the Film Stock.
-# We only want to decrement films that are being tracked.
-def decrement_film_stock(connection, filmTypeID, filmSizeID):
-    userID = current_user.get_id()
-    app.logger.debug("Decrementing Film Stock")
-
-    qry = text("""UPDATE FilmStock SET qty = qty - 1
-        WHERE userID = :userID
-        AND filmTypeID = :filmTypeID
-        AND filmSizeID = :filmSizeID""")
-    connection.execute(qry,
-        userID = userID,
-        filmTypeID = filmTypeID,
-        filmSizeID = filmSizeID)
-
 def optional_choices(name, choices):
     new_choices = [(0, name)]
     for row in choices:

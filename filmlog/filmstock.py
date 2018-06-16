@@ -13,8 +13,7 @@ from wtforms import widgets
 
 from filmlog import app
 from filmlog import database
-from filmlog.functions import get_film_types, get_film_sizes, \
-    decrement_film_stock
+from filmlog.functions import get_film_types, get_film_sizes
 
 engine = database.engine
 
