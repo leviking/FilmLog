@@ -156,7 +156,7 @@ CREATE TABLE Exposures(
     stability ENUM('Handheld', 'Tripod') DEFAULT NULL,
     subject VARCHAR(128) DEFAULT NULL,
     development VARCHAR(255) DEFAULT NULL,
-    notes VARCHAR(255) DEFAULT NULL,
+    notes TEXT DEFAULT NULL,
     PRIMARY KEY (userID, filmID, exposureNumber),
     KEY filmTypeID_idx (filmTypeID),
     KEY lensID_idx (lensID),

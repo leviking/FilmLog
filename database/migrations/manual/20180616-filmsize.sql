@@ -85,3 +85,5 @@ CREATE TRIGGER CreateDefaultUserPreferences
         END;
 //
 DELIMITER ;
+
+ALTER TABLE Exposures MODIFY COLUMN notes TEXT DEFAULT NULL;

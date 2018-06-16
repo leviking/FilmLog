@@ -163,7 +163,7 @@ class ExposureForm(FlaskForm):
         validators=[Optional()])
 
     notes = TextAreaField('Notes',
-        validators=[Optional(), Length(max=255)],
+        validators=[Optional()],
         filters = [lambda x: x or None])
 
     # Extra info for sheets
@@ -426,6 +426,8 @@ def film(binderID, projectID, filmID):
                     + '/films/' + str(filmID))
             else:
                 film = get_film_details(connection, binderID, projectID, filmID)
+                print "HERE"
+                app.logger.debug("FilmTypeID: %s", film.filmTypeID)
                 return render_template('film/edit-film.html',
                     form=form,
                     binderID=binderID,
@@ -490,6 +492,7 @@ def film(binderID, projectID, filmID):
             film=film)
     else:
         print_view = False
+        app.logger.debug("filmSizeType: %s", film.filmSizeType)
         if film.filmSizeType == 'Small':
             template = 'film/35mm.html'
         if film.filmSizeType == 'Medium':

@@ -22,7 +22,14 @@
         <th>File No</th><td>{{ film.fileNo }}</td>
       </tr>
       <tr>
-        <th>Film</th><td>{{ film.brand }} {{ film.filmName }}</td>
+        <th>Film</th>
+        <td>
+          {% if film.filmName %}
+            {{ film.brand }} {{ film.filmName }}
+          {% else %}
+            Unknown
+          {% endif %}
+        </td>
         <th>Size</th><td> {{ film.size }}</td>
         <th>ISO</th><td>{{ film.filmISO }}, shot at {{ film.shotISO }}</td>
       </tr>

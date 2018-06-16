@@ -47,8 +47,8 @@ def get_film_details(connection, binderID, projectID, filmID):
         FROM Films
         JOIN Projects ON Projects.projectID = Films.projectID
         JOIN Binders ON Binders.binderID = Projects.binderID
-        JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
-        JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
+        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
         JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
         LEFT JOIN Cameras ON Cameras.cameraID = Films.cameraID
         WHERE Films.projectID = :projectID
