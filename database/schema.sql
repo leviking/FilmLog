@@ -72,12 +72,13 @@ CREATE TABLE FilmTypes (
 CREATE TABLE FilmStock(
     userID INT UNSIGNED NOT NULL,
     filmTypeID SMALLINT UNSIGNED NOT NULL,
-    filmSize ENUM('35mm 24', '35mm 36', '35mm Hand Roll', '35mm 100\' Bulk Roll', '35mm Hand Rolled', '120', '220', '4x5', '8x10') NOT NULL,
+    filmSizeID TINYINT UNSIGNED NOT NULL,
     qty SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-    PRIMARY KEY (userID, filmTypeID, filmSize),
+    PRIMARY KEY (userID, filmTypeID, filmSizeID),
     KEY filmtypeID_fk (filmTypeID),
     CONSTRAINT FilmStock_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT FilmSTock_filmTypeID_fk FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT FilmStock_filmTypeID_fk FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
+    ADD CONSTRAINT FilmStock_filmSizeID_fk FOREIGN KEY (filmSizeID) REFERENCES FilmSizes (filmSizeID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
 CREATE TABLE Binders(

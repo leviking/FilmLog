@@ -28,12 +28,19 @@ def get_film_types(connection):
         ORDER BY brand, name""")
     return connection.execute(qry).fetchall()
 
+def get_film_sizes(connection):
+    qry = text("""SELECT filmSizeID, size
+        FROM FilmSizes""")
+    return connection.execute(qry).fetchall()
+
 def get_film_details(connection, binderID, projectID, filmID):
     userID = current_user.get_id()
 
     qry = text("""SELECT filmID, Films.projectID, Projects.name AS project, brand,
         FilmTypes.name AS filmName, FilmTypes.iso AS filmISO,
-        Films.iso AS shotISO, fileNo, fileDate, filmSize, title,
+        Films.iso AS shotISO, fileNo, fileDate, FilmSizes.size AS size,
+        Films.filmSizeID AS filmSizeID,
+        FilmSizes.type AS filmSizeType, title,
         FilmTypes.filmTypeID AS filmTypeID, loaded, unloaded, developed, development,
         Cameras.name AS camera,
         Cameras.cameraID AS cameraID, notes
@@ -42,6 +49,7 @@ def get_film_details(connection, binderID, projectID, filmID):
         JOIN Binders ON Binders.binderID = Projects.binderID
         JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
         JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
         LEFT JOIN Cameras ON Cameras.cameraID = Films.cameraID
         WHERE Films.projectID = :projectID
         AND filmID = :filmID
@@ -58,6 +66,23 @@ def get_film_details(connection, binderID, projectID, filmID):
         abort(404)
 
     return film
+
+# Blindly Decrement Film Stock. If the film does not exist, the UPDATE
+# won't do anything. This is currently by design since if a user isn't
+# tracking a particular film, no sense in cluttering up the Film Stock.
+# We only want to decrement films that are being tracked.
+def decrement_film_stock(connection, filmTypeID, filmSizeID):
+    userID = current_user.get_id()
+    app.logger.debug("Decrementing Film Stock")
+
+    qry = text("""UPDATE FilmStock SET qty = qty - 1
+        WHERE userID = :userID
+        AND filmTypeID = :filmTypeID
+        AND filmSizeID = :filmSizeID""")
+    connection.execute(qry,
+        userID = userID,
+        filmTypeID = filmTypeID,
+        filmSizeID = filmSizeID)
 
 def optional_choices(name, choices):
     new_choices = [(0, name)]

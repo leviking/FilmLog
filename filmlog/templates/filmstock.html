@@ -8,7 +8,7 @@
               <th>Film</th>
               <th>ISO</th>
               <th>Size</th>
-              {% if size == '35mm' or size == '120' or size == '220' %}
+              {% if type == 'Miniature' or type == 'Small' or type == 'Medium' %}
                 <th>Rolls</th>
               {% else %}
                 <th>Sheets</th>
@@ -20,10 +20,13 @@
         {% if film.qty < 0 %}
         class="filmStockNegative"
         {% endif %}
+        {% if film.qty == 0 %}
+        class="filmStockZero"
+        {% endif %}
       >
         <td>{{ film.brand }} {{ film.type }}</td>
         <td>{{ film.iso }}</td>
-        <td>{{ film.filmSize }}</td>
+        <td>{{ film.size }}</td>
         <td>{{ film.qty }}</td>
         <td class="text-right">
           <form role="form" class="form-horizontal"
@@ -33,7 +36,7 @@
             <button name="button" value="increment" action="submit" class="btn btn-sm btn-primary">Increment</button>
             <button name="button" value="decrement" action="submit" class="btn btn-sm btn-danger">Decrement</button>
             <input type="hidden" name="filmTypeID" value="{{ film.filmTypeID }}" >
-            <input type="hidden" name="filmSize" value="{{ film.filmSize }}" >
+            <input type="hidden" name="filmSizeID" value="{{ film.filmSizeID }}" >
           </form>
         </td>
       </tr>
@@ -63,8 +66,8 @@
             {{ form.filmTypeID(class="form-control") }}
           </div>
           <div class="col-sm-2">
-            {{ form.filmSize.label }}
-            {{ form.filmSize(class="form-control") }}
+            {{ form.filmSizeID.label }}
+            {{ form.filmSizeID(class="form-control") }}
           </div>
           <div class="col-sm-2">
             {{ form.qty.label }}

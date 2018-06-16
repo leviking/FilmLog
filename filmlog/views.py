@@ -15,7 +15,8 @@ from wtforms import widgets
 from filmlog import app
 from filmlog import database
 from filmlog.functions import next_id, result_to_dict, get_film_details, \
-    optional_choices, zero_to_none, get_film_types, insert, delete
+    optional_choices, zero_to_none, get_film_types, get_film_sizes, \
+    decrement_film_stock, insert, delete
 from filmlog.classes import MultiCheckboxField
 from filmlog import users, filmstock, darkroom, files, stats, gear, help
 
@@ -86,6 +87,9 @@ class FilmForm(FlaskForm):
     filmTypeID = SelectField('Film',
         validators=[Optional()],
         coerce=int)
+    filmSizeID = SelectField('Film Size',
+        validators=[DataRequired()],
+        coerce=int)
     cameraID = SelectField('Camera',
         validators=[DataRequired()],
         coerce=int)
@@ -113,6 +117,7 @@ class FilmForm(FlaskForm):
     def populate_select_fields(self, connection):
         self.connection = connection
         self.filmTypeID.choices = optional_choices("None", get_film_types(connection))
+        self.filmSizeID.choices = get_film_sizes(connection)
         self.cameraID.choices = get_cameras(connection)
 
 class ExposureForm(FlaskForm):
@@ -149,6 +154,9 @@ class ExposureForm(FlaskForm):
     filmTypeID = SelectField('Film',
         validators=[Optional()],
         coerce=int)
+    filmSizeID = SelectField('Film Size',
+        validators=[Optional()],
+        coerce=int)
     shotISO = IntegerField('Shot ISO',
         validators=[NumberRange(min=0,max=65535),
                     Optional()])
@@ -156,6 +164,7 @@ class ExposureForm(FlaskForm):
     def populate_select_fields(self, connection, cameraID):
         self.connection = connection
         self.filmTypeID.choices = optional_choices("None", get_film_types(connection))
+        self.filmSizeID.choices = optional_choices("None", get_film_sizes(connection))
         self.lensID.choices = optional_choices("None", get_lenses(connection, cameraID))
         self.filters.choices = get_filters(connection)
 
@@ -268,12 +277,17 @@ def project(binderID, projectID):
 
     if request.method == 'POST':
         if form.validate_on_submit():
+            filmTypeID = zero_to_none(form.filmTypeID.data)
+            filmSizeID = form.filmSizeID.data
+
             nextFilmID = next_id(connection, 'filmID', 'Films')
             qry = text("""INSERT INTO Films
-                (userID, filmID, projectID, cameraID, title, fileNo, fileDate, filmTypeID, iso,
-                 loaded, unloaded, developed, development, notes)
-                VALUES (:userID, :filmID, :projectID, :cameraID, :title, UPPER(:fileNo),
-                        :fileDate, :filmTypeID, :iso, :loaded, :unloaded,
+                (userID, filmID, projectID, cameraID, title, fileNo, fileDate,
+                filmTypeID, filmSizeID, iso, loaded, unloaded, developed,
+                development, notes)
+                VALUES (:userID, :filmID, :projectID, :cameraID, :title,
+                        UPPER(:fileNo), :fileDate, :filmTypeID, :filmSizeID,
+                        :iso, :loaded, :unloaded,
                         :developed, :development, :notes)""")
             insert(connection, qry, "Film",
                 userID = userID,
@@ -283,20 +297,34 @@ def project(binderID, projectID):
                 title = form.title.data,
                 fileNo = form.fileNo.data,
                 fileDate = form.fileDate.data,
-                filmTypeID = zero_to_none(form.filmTypeID.data),
+                filmTypeID = filmTypeID,
+                filmSizeID = filmSizeID,
                 iso = zero_to_none(form.shotISO.data),
                 loaded = form.loaded.data,
                 unloaded = form.unloaded.data,
                 developed = form.developed.data,
                 development = form.development.data,
                 notes = form.notes.data)
+
+            # Decrement the logged film from the film stock if the film
+            # type was provided and it is a roll film.
+            # If it's sheet film, we decrement only when need sheets
+            # are added.
+            qry = text("""SELECT 1 FROM FilmSizes
+                WHERE filmSizeID = :filmSizeID
+                AND format = 'Roll'""")
+            format = connection.execute(qry, filmSizeID = form.filmSizeID.data).fetchone()
+            if format and filmTypeID:
+                decrement_film_stock(connection, filmTypeID, filmSizeID)
+
     qry = text("""SELECT filmID, title, fileNo, fileDate,
         Films.iso AS iso, brand, FilmTypes.name AS filmName,
-        exposures,
+        FilmSizes.size AS size, exposures,
         Cameras.name AS camera
         FROM Films
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
         LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
         JOIN Cameras ON Cameras.cameraID = Films.cameraID
         WHERE projectID = :projectID ORDER BY fileDate""")
     films = connection.execute(qry, projectID=projectID).fetchall()
@@ -343,6 +371,7 @@ def film(binderID, projectID, filmID):
                         fileNo = :fileNo,
                         fileDate = :fileDate,
                         filmTypeID = :filmTypeID,
+                        filmSizeID = :filmSizeID,
                         cameraID = :cameraID,
                         iso = :iso,
                         loaded = :loaded,
@@ -362,6 +391,7 @@ def film(binderID, projectID, filmID):
                     fileNo = form.fileNo.data,
                     fileDate = form.fileDate.data,
                     filmTypeID = zero_to_none(form.filmTypeID.data),
+                    filmSizeID = form.filmSizeID.data,
                     iso = zero_to_none(form.shotISO.data),
                     loaded = form.loaded.data,
                     unloaded = form.unloaded.data,
@@ -419,13 +449,13 @@ def film(binderID, projectID, filmID):
 
     if request.args.get('print'):
         print_view = True
-        if film.filmSize == '35mm':
+        if film.filmSizeType == 'Small':
             template = 'film/35mm-print.html'
-        if film.filmSize == '120':
+        if film.filmSizeType == 'Medium':
             template = 'film/120-print.html'
-        if film.filmSize == '4x5':
+        if film.size == '4x5':
             template = 'film/lf-print.html'
-        if film.filmSize == '8x10':
+        if film.size == '8x10':
             template = 'film/lf-print.html'
     elif request.args.get('edit'):
         film = get_film_details(connection, binderID, projectID, filmID)
@@ -438,13 +468,13 @@ def film(binderID, projectID, filmID):
             film=film)
     else:
         print_view = False
-        if film.filmSize == '35mm':
+        if film.filmSizeType == 'Small':
             template = 'film/35mm.html'
-        if film.filmSize == '120':
+        if film.filmSizeType == 'Medium':
             template = 'film/120.html'
-        if film.filmSize == '4x5':
+        if film.size == '4x5':
             template = 'film/lf.html';
-        if film.filmSize == '8x10':
+        if film.size == '8x10':
             template = 'film/lf.html';
 
     form = ExposureForm()
@@ -466,32 +496,11 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
-    # Check this is a valid film to show
-    qry = text("""SELECT filmID, Films.projectID, Projects.name AS project, brand,
-        FilmTypes.name AS filmName, FilmTypes.iso AS filmISO,
-        Films.iso AS shotISO, fileNo, fileDate, filmSize, title,
-        loaded, unloaded, developed, development, Cameras.name AS camera,
-        Cameras.cameraID AS cameraID, notes
-        FROM Films
-        JOIN Projects ON Projects.projectID = Films.projectID
-        JOIN Binders ON Binders.binderID = Projects.binderID
-        JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
-        JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
-        LEFT JOIN Cameras ON Cameras.cameraID = Films.cameraID
-        WHERE Films.projectID = :projectID
-        AND filmID = :filmID
-        AND Projects.binderID = :binderID
-        AND Binders.userID = :userID""")
-    film = connection.execute(qry,
-        projectID=projectID,
-        binderID=binderID,
-        filmID=filmID,
-        userID=userID).fetchone()
-    if film is None:
-        abort(404)
 
     if request.method == 'POST':
         form = ExposureForm()
+        filmSizeID = zero_to_none(form.filmSizeID.data)
+
         if request.form['button'] == 'addExposure':
             qry = text("""INSERT INTO Exposures
                 (userID, filmID, exposureNumber, lensID, shutter, aperture, filmTypeID, iso, metering, flash, subject, development, notes)
@@ -521,6 +530,15 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                     exposureNumber = form.exposureNumber.data,
                     filterID = filterID)
 
+            # Decrement the logged film from the film stock if the film
+            # type was provided and it is a sheet.
+            qry = text("""SELECT 1 FROM FilmSizes
+                WHERE filmSizeID = :filmSizeID
+                AND format = 'Sheet'""")
+            format = connection.execute(qry, filmSizeID = form.filmSizeID.data).fetchone()
+            if format and filmTypeID:
+                decrement_film_stock(connection, filmTypeID, filmSizeID)
+
         if request.form['button'] == 'updateExposure':
             qry = text("""UPDATE Exposures
                 SET exposureNumber = :exposureNumberNew,
@@ -546,6 +564,7 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                 shutter = encode_shutter(form.shutter.data),
                 aperture = form.aperture.data,
                 filmTypeID = zero_to_none(form.filmTypeID.data),
+                filmSizeID = filmSizeID,
                 shotISO = zero_to_none(form.shotISO.data),
                 metering = zero_to_none(form.metering.data),
                 flash = form.flash.data,
