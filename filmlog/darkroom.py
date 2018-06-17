@@ -138,8 +138,7 @@ class ContactSheetForm(FlaskForm):
     file = FileField('File (JPG)',
         validators=[Optional(), FileAllowed(['jpg'], 'JPEGs Only')])
 
-    def __init__(self, connection):
-        super(ContactSheetForm, self).__init__()
+    def populate_select_fields(self, connection):
         self.connection = connection
         self.paperID.choices = optional_choices("None", get_papers(connection))
         self.paperFilterID.choices = optional_choices("None", get_paper_filters(connection))
@@ -234,7 +233,8 @@ def contactsheet(binderID, projectID, filmID):
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
-    form = ContactSheetForm(connection)
+    form = ContactSheetForm()
+    form.populate_select_fields(connection)
 
     # Upload a new contact sheet
     if request.method == 'POST':
@@ -280,6 +280,9 @@ def contactsheet(binderID, projectID, filmID):
     qry = text("""SELECT fileID, Papers.name AS paperName,
         PaperBrands.name AS paperBrand, PaperFilters.name AS paperFilterName,
         EnlargerLenses.name AS lens, aperture, headHeight, notes,
+        ContactSheets.paperID AS paperID,
+        ContactSheets.paperFilterID AS paperFilterID,
+        ContactSheets.enlargerLensID AS enlargerLensID,
         SECONDS_TO_DURATION(exposureTime) AS exposureTime
         FROM ContactSheets
         LEFT OUTER JOIN Papers ON Papers.paperID = ContactSheets.paperID
@@ -292,18 +295,15 @@ def contactsheet(binderID, projectID, filmID):
         userID = userID,
         binderID = binderID,
         filmID=filmID).fetchone()
-
-    filters = get_paper_filters(connection)
-    papers = get_papers(connection)
-    enlargerLenses = get_enlarger_lenses(connection)
+    if contactSheet:
+        app.logger.debug("Existing Contact Sheet")
+        form = ContactSheetForm(data=contactSheet)
+        form.populate_select_fields(connection)
 
     transaction.commit()
     return render_template('darkroom/contactsheet.html',
         binderID=binderID,
-        papers=papers,
-        filters=filters,
         film=film,
-        enlargerLenses=enlargerLenses,
-        contactSheet = contactSheet,
+        contactSheet=contactSheet,
         form=form,
         view='contactsheet')
