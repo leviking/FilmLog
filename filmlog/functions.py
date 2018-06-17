@@ -40,7 +40,9 @@ def get_film_details(connection, binderID, projectID, filmID):
         FilmTypes.name AS filmName, FilmTypes.iso AS filmISO,
         Films.iso AS shotISO, fileNo, fileDate, FilmSizes.size AS size,
         Films.filmSizeID AS filmSizeID,
-        FilmSizes.type AS filmSizeType, title,
+        FilmSizes.type AS filmSizeType,
+        FilmSizes.format AS filmSizeFormat,
+        title,
         FilmTypes.filmTypeID AS filmTypeID, loaded, unloaded, developed, development,
         Cameras.name AS camera,
         Cameras.cameraID AS cameraID, notes

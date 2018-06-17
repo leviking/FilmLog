@@ -555,14 +555,37 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                     exposureNumber = form.exposureNumber.data,
                     filterID = filterID)
 
+            # Decrement film stock for exposures if relevant
+
+            # First we get basic info about the film log
+            qry = text("""SELECT filmTypeID, filmSizeID FROM Films
+                WHERE projectID = :projectID
+                AND filmID = :filmID
+                AND userID = :userID""")
+            filmInfo = connection.execute(qry,
+                projectID = projectID,
+                filmID = filmID,
+                userID = userID).fetchone()
+            filmTypeID = filmInfo.filmTypeID
+            filmSizeID = filmInfo.filmSizeID
+
             # Decrement the logged film from the film stock if the film
             # type was provided and it is a sheet.
             qry = text("""SELECT 1 FROM FilmSizes
                 WHERE filmSizeID = :filmSizeID
                 AND format = 'Sheet'""")
-            format = connection.execute(qry, filmSizeID = form.filmSizeID.data).fetchone()
-            if format and filmTypeID:
-                auto_decrement_film_stock(connection, filmTypeID, filmSizeID)
+            format = connection.execute(qry,
+                filmSizeID = filmSizeID).fetchone()
+            print format
+            if format:
+                # First look at the film type from the sheet
+                if zero_to_none(form.filmTypeID.data):
+                    print "here0"
+                    auto_decrement_film_stock(connection, form.filmTypeID.data, filmSizeID)
+                # If that doesn't exist, we use the global film type
+                else:
+                    print "HERE1"
+                    auto_decrement_film_stock(connection, filmTypeID, filmSizeID)
 
         if request.form['button'] == 'updateExposure':
             qry = text("""UPDATE Exposures
