@@ -25,3 +25,15 @@ INSERT INTO PaperBrands VALUES (5, 'Fomapan');
 INSERT INTO Papers VALUES (1, 1, 'Resin Coated', 'Multi', 'Satin', 'Neutral', 'MULTIGRADE IV RC DELUXE Satin');
 INSERT INTO Papers VALUES (2, 1, 'Resin Coated', 'Multi', 'Glossy', 'Neutral', 'MULTIGRADE IV RC DELUXE Glossy');
 INSERT INTO Papers VALUES (3, 2, 'Resin Coated', 'Multi', 'Pearl', 'Neutral', 'RC Perle');
+
+INSERT INTO FilmSizes VALUES (1, '35mm 12', 'Small', 'Roll');
+INSERT INTO FilmSizes VALUES (2, '35mm 24', 'Small', 'Roll');
+INSERT INTO FilmSizes VALUES (3, '35mm 36', 'Small', 'Roll');
+INSERT INTO FilmSizes VALUES (4, '35mm Hand Roll', 'Small', 'Roll');
+INSERT INTO FilmSizes VALUES (5, '120', 'Medium', 'Roll');
+INSERT INTO FilmSizes VALUES (6, '220', 'Medium', 'Roll');
+INSERT INTO FilmSizes VALUES (7, '4x5', 'Large', 'Sheet');
+INSERT INTO FilmSizes VALUES (8, '5x7', 'Large', 'Sheet');
+INSERT INTO FilmSizes VALUES (9, '8x10', 'Large', 'Sheet');
+INSERT INTO FilmSizes VALUES (10,'11x14', 'Ultra-Large', 'Sheet');
+

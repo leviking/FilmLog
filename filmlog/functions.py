@@ -28,20 +28,30 @@ def get_film_types(connection):
         ORDER BY brand, name""")
     return connection.execute(qry).fetchall()
 
+def get_film_sizes(connection):
+    qry = text("""SELECT filmSizeID, size
+        FROM FilmSizes""")
+    return connection.execute(qry).fetchall()
+
 def get_film_details(connection, binderID, projectID, filmID):
     userID = current_user.get_id()
 
     qry = text("""SELECT filmID, Films.projectID, Projects.name AS project, brand,
         FilmTypes.name AS filmName, FilmTypes.iso AS filmISO,
-        Films.iso AS shotISO, fileNo, fileDate, filmSize, title,
+        Films.iso AS shotISO, fileNo, fileDate, FilmSizes.size AS size,
+        Films.filmSizeID AS filmSizeID,
+        FilmSizes.type AS filmSizeType,
+        FilmSizes.format AS filmSizeFormat,
+        title,
         FilmTypes.filmTypeID AS filmTypeID, loaded, unloaded, developed, development,
         Cameras.name AS camera,
         Cameras.cameraID AS cameraID, notes
         FROM Films
         JOIN Projects ON Projects.projectID = Films.projectID
         JOIN Binders ON Binders.binderID = Projects.binderID
-        JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
-        JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
+        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
         LEFT JOIN Cameras ON Cameras.cameraID = Films.cameraID
         WHERE Films.projectID = :projectID
         AND filmID = :filmID

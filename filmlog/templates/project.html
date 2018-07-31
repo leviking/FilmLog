@@ -9,8 +9,9 @@
       <tr>
           <th>Name</th>
           <th>File No.</th>
-          <th>Exposures</th>
+          <th>Logged Exposures</th>
           <th>Camera</th>
+          <th>Film Size</th>
           <th>Film</th>
           <th>File Date</th>
       </tr>
@@ -20,9 +21,13 @@
               <td>{{ film.fileNo }}</td>
               <td>{{ film.exposures }}</td>
               <td>{{ film.camera }}</td>
+              <td>{{ film.size }}</td>
               <td>
                 {% if film.brand %}
-                  {{ film.brand }} {{ film.filmName }} at {{ film.iso }}
+                  {{ film.brand }} {{ film.filmName }}
+                  {% if film.iso %}
+                   at {{ film.iso }}
+                  {% endif %}
                 {% endif %}
               </td>
               <td>{{ film.fileDate|to_date }}</td>

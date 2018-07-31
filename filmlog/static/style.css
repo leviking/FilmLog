@@ -1,13 +1,19 @@
-
 .filmNotes{
   margin-left: 4px;
   margin-right: 4px;
+  white-space: pre-wrap;
+}
+
+.filmStockZero{
+  color: #440000;
+  font-weight: bold;
 }
 
 .filmStockNegative{
   color: #bb0000;
   font-weight: bold;
 }
+
 
 .table-striped-by-two tr:nth-child(4n+1) {
   background-color: #f9f9f9;

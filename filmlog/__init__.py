@@ -12,21 +12,16 @@ import os, re
 
 app = Flask(__name__)
 
-
 config = ConfigParser.ConfigParser()
 config.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../config.ini'))
 
 app.secret_key = config.get('session','secret_key')
-
-#app.server_name = config.get('session', 'server_name')
-
 app.config['TESTING'] = config.getboolean('app','testing')
 
-#UPLOAD_FOLDER = config.get('files','upload_folder')
+
 user_files = os.path.join(os.path.abspath(os.path.dirname(__file__)),
     config.get('files', 'user_files'))
-# print "DEBUG: " + UPLOAD_FOLDER
-#UPLOAD_FOLDER = "/nfs/home/tim/git/filmlog/filmlog/files"
+
 app.config['ALLOWED_EXTENSIONS'] = set(['jpg', 'jpeg'])
 app.config['UPLOAD_FOLDER'] = user_files
 app.config['THUMBNAIL_SIZE'] = config.get('files', 'thumbnail_size')
@@ -41,19 +36,20 @@ csrf = CSRFProtect(app)
 from filmlog import views
 
 # Error Handling
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('errors/404.html'), 404
+if not app.debug:
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('errors/404.html'), 404
 
-@app.errorhandler(500)
-def internal_server_error(error):
-    app.logger.error('Server Error: %s', (error))
-    return render_template('errors/500.html'), 500
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        app.logger.error('Server Error: %s', (error))
+        return render_template('errors/500.html'), 500
 
-@app.errorhandler(Exception)
-def unhandled_exception(e):
-    app.logger.error('Unhandled Exception: %s', (e))
-    return render_template('errors/500.html'), 500
+    @app.errorhandler(Exception)
+    def unhandled_exception(e):
+        app.logger.error('Unhandled Exception: %s', (e))
+        return render_template('errors/500.html'), 500
 
 # Template Filters
 @app.template_filter('to_date')
