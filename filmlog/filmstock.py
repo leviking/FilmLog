@@ -70,7 +70,7 @@ def filmstock():
                     filmSize=request.form.get('filmSize'),
                     userID = userID).fetchone()
                 if result.qty == 1:
-                    qry = text(""" DELETE FROM FilmStock
+                    qry = text("""DELETE FROM FilmStock
                         WHERE filmTypeID = :filmTypeID
                         AND filmSize = :filmSize
                         AND userID = :userID""")
