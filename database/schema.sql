@@ -1,3 +1,7 @@
+CREATE TABLE Migrations (
+  name varchar(64) NOT NULL PRIMARY KEY
+) ENGINE='InnoDB';
+
 CREATE TABLE Users (
     userID INT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
     username varchar(64) NOT NULL,
