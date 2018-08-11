@@ -14,10 +14,10 @@ MariaDB 10.1 (or MySQL 5.6 may work) will need to be installed separately.
 For now, let's go the virtualenv route:
 
   * In Your MariaDB/MySQL Installation, create a DB and user for FilmLog
-    ```
-        CREATE DATABASE FilmLogDev;
-       GRANT ALL ON FilmLogDev.* TO 'FilmLog'@'localhost' IDENTIFIED BY 'password';
-    ```
+```
+CREATE DATABASE FilmLogDev;
+GRANT ALL ON FilmLogDev.* TO 'FilmLog'@'localhost' IDENTIFIED BY 'password';
+```
   * Populate the DB by sourcing the `schema.sql` and `base-data.sql` files
     These are under the database directory along with a helper script
     you can optionally use. The script will populate the base schema, some
@@ -26,14 +26,14 @@ For now, let's go the virtualenv route:
   * Install virtualenv for Python 2.6: 
     http://flask.pocoo.org/docs/0.12/installation/
   * Activate the virtualenv
-    ```
-    . venv/bin/activate
-    ```
+```
+. venv/bin/activate
+```
     (Assuming you called your virtual env, `venv`)
   * Make sure you are in the project root then run
-    ```
-    pip install -r requirements.txt
-    ```
+```
+pip install -r requirements.txt
+```
   * Copy config.ini.example to config.ini and fill in as appropriate
     If testing logins, you'll need to make sure Testing is true or you
     have Google Recaptcha keys generated. Otherwise toss in your DB
@@ -41,5 +41,4 @@ For now, let's go the virtualenv route:
   * If all goes well, assuming your virtualenv is named `venv` you can
     simply run the wsgi.sh script in the root. It should start the
     app on http://localhost:5000.
-
 
