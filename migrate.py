@@ -40,18 +40,21 @@ to_migrate = set(migration_files) - set(completed_migrations)
 
 # This should use a prepared statement, but since it's just a migration
 # it didn't seem worth the extra effort
-for migration in to_migrate:
+for migration in sorted(to_migrate):
     f = open(migration_directory + migration + '.sql')
     qry = f.read()
     try:
         result = connection.execute(qry)
     except Exception:
         print "Migration failed for %s" % migration
+        f.close()
         break
     try:
         qry = text("""INSERT INTO Migrations (name) VALUES (:name)""")
         connection.execute(qry, name = migration)
     except Exception:
         print "Migration passed but failed to update Migrations table"
+        f.close()
         break
     print "Migration %s passed" % migration
+    f.close()
