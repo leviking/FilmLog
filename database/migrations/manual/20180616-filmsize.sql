@@ -18,7 +18,7 @@ INSERT INTO FilmSizes VALUES (8, '5x7', 'Large', 'Sheet');
 INSERT INTO FilmSizes VALUES (9, '8x10', 'Large', 'Sheet');
 INSERT INTO FilmSizes VALUES (10,'11x14', 'Ultra-Large', 'Sheet');
 
--- ALTER TABLE FilmStock ADD COLUMN filmSizeID TINYINT UNSIGNED NOT NULL AFTER filmSize;
+ALTER TABLE FilmStock ADD COLUMN filmSizeID TINYINT UNSIGNED NOT NULL AFTER filmSize;
 
 UPDATE FilmStock SET filmSizeID = 2 WHERE filmSize = '35mm 24';
 UPDATE FilmStock SET filmSizeID = 3 WHERE filmSize = '35mm 36';

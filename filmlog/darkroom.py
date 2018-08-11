@@ -238,13 +238,14 @@ def contactsheet(binderID, projectID, filmID):
 
     # Upload a new contact sheet
     if request.method == 'POST':
+        # See if there is a contact sheet already
+        qry = text("""SELECT fileID FROM ContactSheets
+            WHERE filmID = :filmID AND userID = :userID""")
+        result = connection.execute(qry,
+            filmID = filmID,
+            userID = userID).fetchone()
+        fileID = result[0]
         if request.form['button'] == 'deleteCS':
-            qry = text("""SELECT fileID FROM ContactSheets
-                WHERE filmID = :filmID AND userID = :userID""")
-            result = connection.execute(qry,
-                filmID = filmID,
-                userID = userID).fetchone()
-            fileID = result[0]
             qry = text("""DELETE FROM ContactSheets
                 WHERE filmID = :filmID AND userID = :userID""")
             connection.execute(qry,
@@ -257,9 +258,10 @@ def contactsheet(binderID, projectID, filmID):
             if 'file' in request.files:
                 nextFileID = functions.next_id(connection, 'fileID', 'Files')
                 files.upload_file(request, connection, transaction, nextFileID)
+            # If we're updating an existing sheet and the user didn't upload
+            # a new file, use the old one.
             else:
-                nextFileID = None
-
+                nextFileID = fileID
             qry = text("""REPLACE INTO ContactSheets (filmID, userID, fileID, paperID, paperFilterID, enlargerLensID, aperture, headHeight, exposureTime, notes)
                 VALUES (:filmID, :userID, :fileID, :paperID, :paperFilterID, :enlargerLensID, :aperture, :headHeight, :exposureTime, :notes)""")
             connection.execute(qry,
@@ -299,7 +301,6 @@ def contactsheet(binderID, projectID, filmID):
         app.logger.debug("Existing Contact Sheet")
         form = ContactSheetForm(data=contactSheet)
         form.populate_select_fields(connection)
-
     transaction.commit()
     return render_template('darkroom/contactsheet.html',
         binderID=binderID,
