@@ -42,3 +42,12 @@ pip install -r requirements.txt
     simply run the wsgi.sh script in the root. It should start the
     app on http://localhost:5000.
 
+Schema Changes
+--------------
+
+To update an existing development installation, if there are any
+database changes (they'll show up as updates to database/migrations),
+you will need to run the migrate.py script under your virtual env. Or
+you can re-import the fill schema.sql from scratch but that would be
+rather extreme. The migrate.py should roll through any updates that have
+not yet been run since the last pull.
