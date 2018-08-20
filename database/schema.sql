@@ -79,6 +79,13 @@ CREATE TABLE FilmTypes (
     CONSTRAINT filmtypes_filmBrandID FOREIGN KEY (filmBrandID) REFERENCES FilmBrands (filmBrandID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
+CREATE TABLE FilmSizes (
+    filmSizeID TINYINT UNSIGNED NOT NULL PRIMARY KEY,
+    size VARCHAR(32),
+    type ENUM('Miniature', 'Small', 'Medium', 'Large', 'Ultra-Large') NOT NULL,
+    format ENUM('Roll', 'Sheet')
+) ENGINE='InnoDB';
+
 CREATE TABLE FilmStock(
     userID INT UNSIGNED NOT NULL,
     filmTypeID SMALLINT UNSIGNED NOT NULL,
@@ -88,7 +95,7 @@ CREATE TABLE FilmStock(
     KEY filmtypeID_fk (filmTypeID),
     CONSTRAINT FilmStock_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT FilmStock_filmTypeID_fk FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
-    ADD CONSTRAINT FilmStock_filmSizeID_fk FOREIGN KEY (filmSizeID) REFERENCES FilmSizes (filmSizeID) ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT FilmStock_filmSizeID_fk FOREIGN KEY (filmSizeID) REFERENCES FilmSizes (filmSizeID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
 CREATE TABLE Binders(
@@ -256,10 +263,10 @@ CREATE TABLE Prints (
     userID INT UNSIGNED NOT NULL,
     paperID TINYINT UNSIGNED DEFAULT NULL,
     paperFilterID TINYINT UNSIGNED DEFAULT NULL,
-    enlargerLensID TINYINT UNSIGNED DEFAULT NULL
+    enlargerLensID TINYINT UNSIGNED DEFAULT NULL,
     fileID INT UNSIGNED DEFAULT NULL,
     aperture decimal(3,1) DEFAULT NULL,
-    headHeight TINYINT UNSIGNED,
+    headHeight TINYINT UNSIGNED DEFAULT NULL,
     exposureTime TIME NOT NULL,
     printType ENUM('Enlargement', 'Contact') NOT NULL,
     size ENUM ('4x5', '4x6', '5x7', '8x10', '11x14', 'Other') NOT NULL,
@@ -273,12 +280,11 @@ CREATE TABLE Prints (
     CONSTRAINT prints_paperFilterID_fk FOREIGN KEY (paperFilterID) REFERENCES PaperFilters (paperFilterID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Prints_Exposures_fk FOREIGN KEY (userID, filmID, exposureNumber) REFERENCES Exposures (userID, filmID, exposureNumber),
     CONSTRAINT Prints_Files_fk FOREIGN KEY (userID, fileID) REFERENCES Files (userID, fileID) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT Prints_EnlargerLenses_fk FOREIGN KEY (userID, enlargerLensID) REFERENCES EnlargerLenses (userID, enlargerLensID) ON DELETE CASCADE ON UPDATE CASCADE;
-
+    CONSTRAINT Prints_EnlargerLenses_fk FOREIGN KEY (userID, enlargerLensID) REFERENCES EnlargerLenses (userID, enlargerLensID) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
 -- Functions
-DROP FUNCTION SECONDS_TO_DURATION;
+DROP FUNCTION IF EXISTS SECONDS_TO_DURATION;
 DELIMITER //
 CREATE FUNCTION SECONDS_TO_DURATION (inSeconds SMALLINT) RETURNS VARCHAR(8) DETERMINISTIC
 BEGIN
