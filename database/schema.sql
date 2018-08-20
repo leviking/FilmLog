@@ -128,6 +128,7 @@ CREATE TABLE Films (
     cameraID SMALLINT UNSIGNED DEFAULT NULL,
     lensID SMALLINT UNSIGNED DEFAULT NULL,
     filmTypeID SMALLINT UNSIGNED DEFAULT NULL,
+    filmSizeID TINYINT UNSIGNED NOT NULL,
     iso SMALLINT UNSIGNED DEFAULT NULL,
     fileDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     loaded TIMESTAMP NULL,
@@ -148,6 +149,7 @@ CREATE TABLE Films (
     CONSTRAINT Films_projectID_fk FOREIGN KEY (userID, projectID) REFERENCES Projects (userID, projectID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Films_Cameras_fk FOREIGN KEY (userID, cameraID) REFERENCES Cameras (userID, cameraID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Films_filmTypeID_fk FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT Films_filmSizeID_fk FOREIGN KEY (filmSizeID) REFERENCES FilmSizes (filmSizeID) ON UPDATE CASCADE,
     CONSTRAINT Films_Lenses_fk FOREIGN KEY (userID, lensID) REFERENCES Lenses (userID, lensID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
@@ -208,8 +210,6 @@ CREATE TABLE PaperBrands(
     UNIQUE name_iq (name)
 ) ENGINE='InnoDB';
 
-INSERT INTO PaperBrands (name) VALUES ('Ilford');
-
 CREATE TABLE Papers(
     paperID TINYINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
     paperBrandID TINYINT UNSIGNED NOT NULL,
@@ -221,9 +221,6 @@ CREATE TABLE Papers(
     KEY paperBrandID_fk (paperBrandID),
     CONSTRAINT papers_paperBrandID FOREIGN KEY (paperBrandID) REFERENCES PaperBrands (paperBrandID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
-
-INSERT INTO Papers (paperBrandID, type, grade, surface, tone, name)
-VALUES (1, 'Resin Coated', 'Multi', 'Satin', 'Neutral', 'MULTIGRADE IV RC DELUXE Satin');
 
 CREATE TABLE PaperFilters(
     paperFilterID TINYINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
