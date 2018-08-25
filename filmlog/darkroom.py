@@ -88,7 +88,7 @@ class PrintForm(FlaskForm):
         choices=[('Enlargement', 'Enlargement'), ('Contact', 'Contact')])
     size = SelectField('Size',
         validators=[DataRequired()],
-        choices=[('4x5', '4x5'), ('5x7', '5x7'), ('8x10', '8x10')])
+        choices=[('4x5', '4x5'), ('5x7', '5x7'), ('8x10', '8x10'), ('11x14', '11x14'])
     enlargerLensID = SelectField('Enlarger Lens',
         validators=[Optional()],
         coerce=int)
