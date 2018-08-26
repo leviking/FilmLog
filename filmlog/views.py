@@ -1,5 +1,6 @@
 from flask import request, render_template, redirect, url_for, Response, \
     session, abort, flash, send_from_directory
+
 from sqlalchemy.sql import select, text, func
 import os, re
 
@@ -20,7 +21,13 @@ from filmlog.functions import next_id, result_to_dict, get_film_details, \
 from filmlog.classes import MultiCheckboxField
 from filmlog import users, filmstock, darkroom, files, stats, gear, help
 
+from filmlog.api import api_blueprint
+
+
 engine = database.engine
+
+app.register_blueprint(api_blueprint, url_prefix='/api', engine=engine)
+
 
 ## Functions
 def encode_shutter(shutter):

@@ -9,7 +9,6 @@ from flask_wtf.csrf import CSRFProtect
 
 import os, re
 
-
 app = Flask(__name__)
 
 config = ConfigParser.ConfigParser()
