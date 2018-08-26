@@ -24,3 +24,4 @@ def binders():
         FROM Binders WHERE userID = :userID""")
     binders = connection.execute(qry, userID = userID).fetchall()
     transaction.commit()
+    return "Here's a binder"
