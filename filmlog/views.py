@@ -246,16 +246,6 @@ def projects(binderID):
     userID = current_user.get_id()
     form = BinderForm()
 
-    # Get current binder (and check to make sure a user isn't trying to
-    # access someone else's binder)
-    qry = text("""SELECT binderID, name FROM Binders
-        WHERE binderID = :binderID AND userID = :userID ORDER BY createdOn""")
-    binder = connection.execute(qry,
-        binderID=binderID,
-        userID=userID).fetchone()
-    if binder is None:
-        abort(404)
-
     if request.method == 'POST':
         if form.validate_on_submit():
             nextProjectID = next_id(connection, 'projectID', 'Projects')
