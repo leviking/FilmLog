@@ -31,6 +31,9 @@ app.config['RECAPTCHA_PRIVATE_KEY'] = config.get('recaptcha','private_key')
 # Global CSRF Protection
 csrf = CSRFProtect(app)
 
+from filmlog import database
+engine = database.engine
+
 # Views
 from filmlog import views
 

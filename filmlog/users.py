@@ -12,10 +12,8 @@ from werkzeug.security import generate_password_hash, \
      check_password_hash
 
 from filmlog import app
-from filmlog import database
+from filmlog import database, engine
 #from filmlog.functions import insert
-
-engine = database.engine
 
 ### Functions
 def generate_registration_code(size=64, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):

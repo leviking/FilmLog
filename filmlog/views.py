@@ -19,15 +19,11 @@ from filmlog.functions import next_id, result_to_dict, get_film_details, \
     optional_choices, zero_to_none, get_film_types, get_film_sizes, \
     insert, delete
 from filmlog.classes import MultiCheckboxField
-from filmlog import users, filmstock, darkroom, files, stats, gear, help
+from filmlog import users, filmstock, darkroom, files, stats, gear, help, engine
 
+## Blueprints
 from filmlog.api import api_blueprint
-
-
-engine = database.engine
-
-app.register_blueprint(api_blueprint, url_prefix='/api', engine=engine)
-
+app.register_blueprint(api_blueprint, url_prefix='/api/v1', engine=engine)
 
 ## Functions
 def encode_shutter(shutter):

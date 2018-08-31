@@ -12,7 +12,7 @@ from wtforms.validators import DataRequired, Optional, NumberRange, ValidationEr
 from flask_wtf.file import FileAllowed
 
 from filmlog import app
-from filmlog import database
+from filmlog import database, engine
 from filmlog import functions
 from filmlog import files
 

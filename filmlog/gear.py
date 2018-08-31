@@ -12,11 +12,9 @@ from wtforms.validators import DataRequired, Optional, Length, NumberRange
 from wtforms import widgets
 
 from filmlog import app
-from filmlog import database
+from filmlog import database, engine
 from filmlog.functions import next_id, insert, delete
 from filmlog.classes import MultiCheckboxField
-
-engine = database.engine
 
 def get_lenses(connection):
     userID = current_user.get_id()
