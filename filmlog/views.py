@@ -13,8 +13,7 @@ from wtforms import Form, StringField, DateField, SelectField, IntegerField, \
 from wtforms.validators import DataRequired, Optional, Length, NumberRange
 from wtforms import widgets
 
-from filmlog import app
-from filmlog import database
+from filmlog import app, csrf, database
 from filmlog.functions import next_id, result_to_dict, get_film_details, \
     optional_choices, zero_to_none, get_film_types, get_film_sizes, \
     insert, delete
@@ -24,6 +23,7 @@ from filmlog import users, filmstock, darkroom, files, stats, gear, help, engine
 ## Blueprints
 from filmlog.api import api_blueprint
 app.register_blueprint(api_blueprint, url_prefix='/api/v1', engine=engine)
+csrf.exempt(api_blueprint)
 
 ## Functions
 def encode_shutter(shutter):
