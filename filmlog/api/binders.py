@@ -1,5 +1,5 @@
 from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
-from flask import Blueprint, jsonify, request, make_response
+from flask import Blueprint, jsonify, request, make_response, url_for
 from sqlalchemy.sql import select, text, func
 from sqlalchemy.exc import IntegrityError
 from filmlog import database, functions
@@ -43,10 +43,14 @@ def post(connection, transaction):
             name = json['data']['attributes']['name'])
     except IntegrityError:
        return "FAILED", status.HTTP_409_CONFLICT
+    location_url = url_for('api.binder_details', binderID = nextBinderID)
     json['data']['id'] = str(nextBinderID)
     json['data']['attributes']['projectCount'] = str(0)
+    json['data']['links'] = {
+        "self" : location_url
+    }
     resp = make_response(jsonify(json))
-    resp.headers['Location'] = "/binders/" + str(nextBinderID)
+    resp.headers['Location'] = location_url
     return resp, status.HTTP_201_CREATED
 
 ## Binder (Singular)
@@ -57,18 +61,46 @@ def get(connection, transaction, binderID):
     binder_query = connection.execute(qry,
         userID = userID,
         binderID = binderID).fetchone()
+    qry = text("""SELECT projectID, name, filmCount, createdOn FROM Projects
+        WHERE binderID = :binderID
+        AND userID = :userID
+        ORDER BY createdOn""")
+    projects_query = connection.execute(qry,
+        userID = userID,
+        binderID = binderID).fetchall()
 
     binder = {
         "data" : {
             "type" : "binders",
-            "id" : str(binder_query['binderID']),
+            "id" : str(binderID),
             "attributes" : {
                 "name" : binder_query['name'],
                 "project_count" : binder_query['projectCount'],
                 "created_on" : binder_query['createdOn']
+            },
+            "relationships": {
+                "project": {
+                    "data" : [ ]
+                    }
+                }
             }
         }
-    }
+
+    for row in projects_query:
+        project = {
+            "type" : "project",
+            "id" : str(binderID) + ":" + str(row['projectID']),
+            "attributes" : {
+                "name" : row['name'],
+                "film_count" : row['filmCount'],
+                "created_on" : row['createdOn']
+            },
+            "links" : {
+                "self" : url_for('api.project_details', binderID = binderID, projectID = row['projectID'])
+            }
+        }
+        binder["data"]["relationships"]["project"]["data"].append(project)
+
     return jsonify(binder), status.HTTP_200_OK
 
 def patch(connection, transaction, binderID):

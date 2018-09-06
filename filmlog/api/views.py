@@ -28,7 +28,7 @@ def binders_all():
 
 @api_blueprint.route('/binders/<int:binderID>',  methods = ['GET', 'PATCH', 'DELETE'])
 @login_required
-def binder(binderID):
+def binder_details(binderID):
     connection = engine.connect()
     transaction = connection.begin()
     if request.method == 'GET':
@@ -51,6 +51,10 @@ def projects_all(binderID):
     transaction.commit()
     return status
 
+@api_blueprint.route('/binders/<int:binderID>/projects/<int:projectID>',  methods = ['GET'])
+@login_required
+def project_details(binderID, projectID):
+    return True
 
 @api_blueprint.route('/filmstock',  methods = ['GET'])
 @login_required
