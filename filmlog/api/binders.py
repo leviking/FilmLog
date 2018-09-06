@@ -20,7 +20,7 @@ def get_all(connection, transaction):
     for row in binders_query:
         binder = {
             "type" : "binders",
-            "id" : row['binderID'],
+            "id" : str(row['binderID']),
             "attributes" : {
                 "name" : row['name'],
                 "project_count" : row['projectCount'],
@@ -61,7 +61,7 @@ def get(connection, transaction, binderID):
     binder = {
         "data" : {
             "type" : "binders",
-            "id" : binder_query['binderID'],
+            "id" : str(binder_query['binderID']),
             "attributes" : {
                 "name" : binder_query['name'],
                 "project_count" : binder_query['projectCount'],

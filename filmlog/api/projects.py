@@ -22,8 +22,8 @@ def get_all(connection, transaction, binderID):
         project = {
             "type" : "projects",
             "id" : {
-                "binder_id" : binderID,
-                "project_id": row['projectID'],
+                "binder_id" : str(binderID),
+                "project_id": str(row['projectID']),
             },
             "attributes" : {
                 "name" : row['name'],

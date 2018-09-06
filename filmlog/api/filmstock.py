@@ -29,8 +29,8 @@ def get_all(connection, transaction):
         item = {
             "type" : "filmstock",
             "id" : {
-                "filmtype_id" : row['filmTypeID'],
-                "filmsize_id": row['filmSizeID'],
+                "filmtype_id" : str(row['filmTypeID']),
+                "filmsize_id": str(row['filmSizeID']),
             },
             "attributes" : {
                 "brand" : row['brand'],
@@ -38,7 +38,6 @@ def get_all(connection, transaction):
                 "iso" : row['iso'],
                 "size" : row['size'],
                 "qty" : row['qty'],
-
             }
         }
         filmstock["data"].append(item)
