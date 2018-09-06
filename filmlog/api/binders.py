@@ -25,6 +25,9 @@ def get_all(connection, transaction):
                 "name" : row['name'],
                 "project_count" : row['projectCount'],
                 "created_on" : row['createdOn']
+            },
+            "links" : {
+                "self" : url_for("api.binder_details", binderID = row['binderID'])
             }
         }
         binders["data"].append(binder)
@@ -77,6 +80,9 @@ def get(connection, transaction, binderID):
                 "name" : binder_query['name'],
                 "project_count" : binder_query['projectCount'],
                 "created_on" : binder_query['createdOn']
+            },
+            "links" : {
+                "self" : url_for("api.binder_details", binderID = binderID)
             },
             "relationships": {
                 "project": {

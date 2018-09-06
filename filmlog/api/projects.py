@@ -1,5 +1,5 @@
 from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
-from flask import Blueprint, jsonify, request, make_response
+from flask import Blueprint, jsonify, request, make_response, url_for
 from sqlalchemy.sql import select, text, func
 from sqlalchemy.exc import IntegrityError
 from filmlog import database, functions
@@ -30,6 +30,11 @@ def get_all(connection, transaction, binderID):
                     "binder_id" : str(binderID),
                     "project_id": str(row['projectID']),
                 }
+            },
+            "links" : {
+                "self" : url_for("api.project_details",
+                    binderID = binderID,
+                    projectID = row['projectID'])
             }
         }
         projects["data"].append(project)

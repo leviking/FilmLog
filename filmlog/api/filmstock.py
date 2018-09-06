@@ -1,5 +1,5 @@
 from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
-from flask import Blueprint, jsonify, request, make_response
+from flask import Blueprint, jsonify, request, make_response, url_for
 from sqlalchemy.sql import select, text, func
 from sqlalchemy.exc import IntegrityError
 from filmlog import database, functions
@@ -39,6 +39,11 @@ def get_all(connection, transaction):
                     "filmtype_id" : str(row['filmTypeID']),
                     "filmsize_id": str(row['filmSizeID'])
                 }
+            },
+            "links" : {
+                "self" : url_for("api.filmstock_details",
+                    filmTypeID = row['filmTypeID'],
+                    filmSizeID = row['filmSizeID'])
             }
         }
         filmstock["data"].append(item)
@@ -76,6 +81,11 @@ def get(connection, transaction, filmTypeID, filmSizeID):
                     "filmtype_id" : str(filmTypeID),
                     "filmsize_id": str(filmSizeID)
                 }
+            },
+            "links" : {
+                "self" : url_for("api.filmstock_details",
+                    filmTypeID = filmTypeID,
+                    filmSizeID = filmSizeID)
             }
         }
     }
