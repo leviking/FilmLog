@@ -12,10 +12,8 @@ from wtforms.validators import DataRequired, Optional, Length, NumberRange
 from wtforms import widgets
 
 from filmlog import app
-from filmlog import database
+from filmlog import database, engine
 from filmlog.functions import get_film_types, get_film_sizes
-
-engine = database.engine
 
 class FilmStockForm(FlaskForm):
     filmTypeID = SelectField('Film',

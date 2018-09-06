@@ -5,11 +5,9 @@ import os, re
 from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
 
 from filmlog import app
-from filmlog import database
+from filmlog import database, engine
 from filmlog import functions
 from filmlog import files
-
-engine = database.engine
 
 @app.route('/stats/', methods = ['GET'])
 @login_required

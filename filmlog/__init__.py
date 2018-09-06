@@ -9,7 +9,6 @@ from flask_wtf.csrf import CSRFProtect
 
 import os, re
 
-
 app = Flask(__name__)
 
 config = ConfigParser.ConfigParser()
@@ -31,6 +30,9 @@ app.config['RECAPTCHA_PRIVATE_KEY'] = config.get('recaptcha','private_key')
 
 # Global CSRF Protection
 csrf = CSRFProtect(app)
+
+from filmlog import database
+engine = database.engine
 
 # Views
 from filmlog import views
