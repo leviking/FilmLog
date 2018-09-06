@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from filmlog import database, functions
 from flask import Blueprint, jsonify, request, make_response
 from flask_api import status
-from filmlog.api import api_blueprint, binders, projects
+from filmlog.api import api_blueprint, binders, projects, filmstock
 from filmlog import engine
 
 # http://jsonapi.org/format/
@@ -52,11 +52,13 @@ def projects_all(binderID):
     return status
 
 
-#@api_blueprint.route('/filmstock/<int:filmTypeID>/<int:filmSizeID>',  methods = ['PATCH', 'GET'])
-#@login_required
-#def binders():
-    #connection = engine.connect()
-    #transaction = connection.begin()
-    #userID = current_user.get_id()
+@api_blueprint.route('/filmstock',  methods = ['GET'])
+@login_required
+def filmstock_all():
+    connection = engine.connect()
+    transaction = connection.begin()
 
-    #if request.method == 'PATCH':
+    if request.method == 'GET':
+        status = filmstock.get_all(connection, transaction)
+    transaction.commit()
+    return status
