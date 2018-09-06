@@ -4,9 +4,8 @@ from sqlalchemy.exc import IntegrityError
 from filmlog import database, functions
 from flask import Blueprint, jsonify, request, make_response
 from flask_api import status
-from filmlog.api import api_blueprint
+from filmlog.api import api_blueprint, binders
 from filmlog import engine
-from filmlog.functions import next_id
 
 # http://jsonapi.org/format/
 
@@ -14,111 +13,18 @@ from filmlog.functions import next_id
 def index():
     return "Hello"
 
-## Binders
-def binders_get(connection, transaction):
-    userID = current_user.get_id()
-    qry = text("""SELECT binderID, name, projectCount, createdOn
-        FROM Binders WHERE userID = :userID""")
-    binders_query = connection.execute(qry, userID = userID).fetchall()
-
-    binders = {
-        "data": []
-    }
-    for row in binders_query:
-        binder = {
-            "type" : "binders",
-            "id" : row['binderID'],
-            "attributes" : {
-                "name" : row['name'],
-                "project_count" : row['projectCount'],
-                "created_on" : row['createdOn']
-            }
-        }
-        binders["data"].append(binder)
-    return jsonify(binders)
-
-def binders_post(connection, transaction):
-    userID = current_user.get_id()
-    json = request.get_json()
-    nextBinderID = next_id(connection, 'binderID', 'Binders')
-    qry = text("""INSERT INTO Binders
-        (binderID, userID, name) VALUES (:binderID, :userID, :name)""")
-    try:
-        connection.execute(qry,
-            binderID = nextBinderID,
-            userID = userID,
-            name = json['data']['attributes']['name'])
-    except IntegrityError:
-       return "FAILED", status.HTTP_409_CONFLICT
-    json['data']['id'] = str(nextBinderID)
-    json['data']['attributes']['projectCount'] = str(0)
-    resp = make_response(jsonify(json))
-    resp.headers['Location'] = "/binders/" + str(nextBinderID)
-    return resp, status.HTTP_201_CREATED
-
 @api_blueprint.route('/binders',  methods = ['GET', 'POST'])
 @login_required
-def binders():
+def binders_all():
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
     if request.method == 'GET':
-        status = binders_get(connection, transaction)
+        status = binders.get_all(connection, transaction)
     if request.method == 'POST':
-        status = binders_post(connection, transaction)
+        status = binders.post(connection, transaction)
     transaction.commit()
     return status
-
-
-## Binder (Singular)
-def binder_get(connection, transaction, binderID):
-    userID = current_user.get_id()
-    qry = text("""SELECT binderID, name, projectCount, createdOn
-        FROM Binders WHERE userID = :userID AND binderID = :binderID""")
-    binder_query = connection.execute(qry,
-        userID = userID,
-        binderID = binderID).fetchone()
-
-    binder = {
-        "data" : {
-            "type" : "binders",
-            "id" : binder_query['binderID'],
-            "attributes" : {
-                "name" : binder_query['name'],
-                "project_count" : binder_query['projectCount'],
-                "created_on" : binder_query['createdOn']
-            }
-        }
-    }
-    return jsonify(binder)
-
-def binder_patch(connection, transaction, binderID):
-    userID = current_user.get_id()
-    json = request.get_json()
-    qry = text("""UPDATE Binders SET name = :name
-        WHERE userID = :userID AND binderID = :binderID""")
-    try:
-        connection.execute(qry,
-            name = json['data']['attributes']['name'],
-            userID = userID,
-            binderID = binderID)
-    except IntegrityError:
-       return "FAILED", status.HTTP_409_CONFLICT
-    resp = make_response(jsonify(json))
-    resp.headers['Location'] = "/binders/" + str(binderID)
-    return resp, status.HTTP_200_OK
-
-def binder_delete(connection, transaction, binderID):
-    userID = current_user.get_id()
-    qry = text("""DELETE FROM Binders WHERE userID = :userID AND binderID = :binderID""")
-    try:
-        connection.execute(qry,
-            binderID = binderID,
-            userID = userID)
-    except IntegrityError:
-        transaction.rollback()
-        return "FAILED", status.HTTP_403_FORBIDDEN
-    return "OK", status.HTTP_204_NO_CONTENT
 
 @api_blueprint.route('/binders/<int:binderID>',  methods = ['GET', 'PATCH', 'DELETE'])
 @login_required
@@ -126,11 +32,11 @@ def binder(binderID):
     connection = engine.connect()
     transaction = connection.begin()
     if request.method == 'GET':
-        status = binder_get(connection, transaction, binderID)
+        status = binders.get(connection, transaction, binderID)
     if request.method == 'PATCH':
-        status = binder_patch(connection, transaction, binderID)
+        status = binders.patch(connection, transaction, binderID)
     if request.method == 'DELETE':
-        status = binder_delete(connection, transaction, binderID)
+        status = binders.delete(connection, transaction, binderID)
     transaction.commit()
     return status
 
