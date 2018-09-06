@@ -14,7 +14,9 @@ def get_all(connection, transaction, binderID):
         WHERE binderID = :binderID
         AND userID = :userID
         ORDER BY createdOn""")
-    projects_query = connection.execute(qry, binderID=binderID, userID = userID).fetchall()
+    projects_query = connection.execute(qry,
+        binderID = binderID,
+        userID = userID).fetchall()
     projects = {
         "data": []
     }
@@ -37,7 +39,40 @@ def get_all(connection, transaction, binderID):
                     projectID = row['projectID'])
             }
         }
-        projects["data"].append(project)
+        projects['data'].append(project)
+    return jsonify(projects), status.HTTP_200_OK
+
+def get(connection, transaction, binderID, projectID):
+    userID = current_user.get_id()
+    qry = text("""SELECT projectID, name, filmCount, createdOn FROM Projects
+        WHERE binderID = :binderID
+        AND projectID = :projectID
+        AND userID = :userID
+        ORDER BY createdOn""")
+    projects_query = connection.execute(qry,
+        binderID = binderID,
+        projectID = projectID,
+        userID = userID).fetchone()
+    projects = {
+        "data": {
+            "type" : "projects",
+            "id" : str(binderID) + ":" + str(projectID),
+            "attributes" : {
+                "name" : projects_query['name'],
+                "film_count" : projects_query['filmCount'],
+                "created_on" : projects_query['createdOn'],
+                "composite_id" : {
+                    "binder_id" : str(binderID),
+                    "project_id": str(projectID),
+                }
+            },
+            "links" : {
+                "self" : url_for("api.project_details",
+                    binderID = binderID,
+                    projectID = projectID)
+            }
+        }
+    }
     return jsonify(projects), status.HTTP_200_OK
 
 def post(connection, transaction, binderID):
