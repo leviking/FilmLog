@@ -39,3 +39,30 @@ def get_all(connection, transaction, binderID):
         }
         projects["data"].append(project)
     return jsonify(projects), status.HTTP_200_OK
+
+def post(connection, transaction, binderID):
+    userID = current_user.get_id()
+    json = request.get_json()
+    nextProjectID = next_id(connection, 'projectID', 'Projects')
+    qry = text("""INSERT INTO Projects
+        (projectID, binderID, userID, name)
+        VALUES (:projectID, :binderID, :userID, :name)""")
+    try:
+        connection.execute(qry,
+            projectID = nextProjectID,
+            binderID = binderID,
+            userID = userID,
+            name = json['data']['attributes']['name'])
+    except IntegrityError:
+       return "FAILED", status.HTTP_409_CONFLICT
+    location_url = url_for('api.project_details',
+        binderID = binderID,
+        projectID = nextProjectID)
+    json['data']['id'] = str(binderID) + ":" + str(nextProjectID),
+    json['data']['attributes']['film_count'] = str(0)
+    json['data']['links'] = {
+        "self" : location_url
+    }
+    resp = make_response(jsonify(json))
+    resp.headers['Location'] = location_url
+    return resp, status.HTTP_201_CREATED

@@ -48,7 +48,7 @@ def post(connection, transaction):
        return "FAILED", status.HTTP_409_CONFLICT
     location_url = url_for('api.binder_details', binderID = nextBinderID)
     json['data']['id'] = str(nextBinderID)
-    json['data']['attributes']['projectCount'] = str(0)
+    json['data']['attributes']['project_count'] = str(0)
     json['data']['links'] = {
         "self" : location_url
     }

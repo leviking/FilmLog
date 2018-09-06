@@ -40,7 +40,7 @@ def binder_details(binderID):
     transaction.commit()
     return status
 
-@api_blueprint.route('/binders/<int:binderID>/projects',  methods = ['GET'])
+@api_blueprint.route('/binders/<int:binderID>/projects',  methods = ['GET', 'POST'])
 @login_required
 def projects_all(binderID):
     connection = engine.connect()
@@ -48,6 +48,8 @@ def projects_all(binderID):
 
     if request.method == 'GET':
         status = projects.get_all(connection, transaction, binderID)
+    if request.method == 'POST':
+        status = projects.post(connection, transaction, binderID)
     transaction.commit()
     return status
 
