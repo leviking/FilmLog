@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from filmlog import database, functions
 from flask import Blueprint, jsonify, request, make_response
 from flask_api import status
-from filmlog.api import api_blueprint, binders
+from filmlog.api import api_blueprint, binders, projects
 from filmlog import engine
 
 # http://jsonapi.org/format/
@@ -42,36 +42,14 @@ def binder(binderID):
 
 @api_blueprint.route('/binders/<int:binderID>/projects',  methods = ['GET'])
 @login_required
-def projects(binderID):
+def projects_all(binderID):
     connection = engine.connect()
     transaction = connection.begin()
-    userID = current_user.get_id()
 
-    qry = text("""SELECT projectID, name, filmCount, createdOn FROM Projects
-        WHERE binderID = :binderID
-        AND userID = :userID
-        ORDER BY createdOn""")
-    projects_query = connection.execute(qry, binderID=binderID, userID = userID).fetchall()
-
-    projects = {
-        "data": []
-    }
-    for row in projects_query:
-        project = {
-            "type" : "projects",
-            "id" : {
-                "binder_id" : binderID,
-                "project_id": row['projectID'],
-            },
-            "attributes" : {
-                "name" : row['name'],
-                "film_count" : row['filmCount'],
-                "created_on" : row['createdOn']
-            }
-        }
-        projects["data"].append(project)
+    if request.method == 'GET':
+        status = projects.get_all(connection, transaction, binderID)
     transaction.commit()
-    return jsonify(projects)
+    return status
 
 
 #@api_blueprint.route('/filmstock/<int:filmTypeID>/<int:filmSizeID>',  methods = ['PATCH', 'GET'])

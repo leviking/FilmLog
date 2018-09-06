@@ -7,7 +7,6 @@ from flask_api import status
 from filmlog import engine
 from filmlog.functions import next_id
 
-
 ## Binders
 def get_all(connection, transaction):
     userID = current_user.get_id()
@@ -29,7 +28,7 @@ def get_all(connection, transaction):
             }
         }
         binders["data"].append(binder)
-    return jsonify(binders)
+    return jsonify(binders), status.HTTP_200_OK
 
 def post(connection, transaction):
     userID = current_user.get_id()
@@ -70,7 +69,7 @@ def get(connection, transaction, binderID):
             }
         }
     }
-    return jsonify(binder)
+    return jsonify(binder), status.HTTP_200_OK
 
 def patch(connection, transaction, binderID):
     userID = current_user.get_id()
