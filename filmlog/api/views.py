@@ -62,3 +62,16 @@ def filmstock_all():
         status = filmstock.get_all(connection, transaction)
     transaction.commit()
     return status
+
+@api_blueprint.route('/filmstock/<int:filmTypeID>/<int:filmSizeID>',  methods = ['GET', 'PATCH'])
+@login_required
+def filmstock_details(filmTypeID, filmSizeID):
+    connection = engine.connect()
+    transaction = connection.begin()
+
+    if request.method == 'GET':
+        status = filmstock.get(connection, transaction, filmTypeID, filmSizeID)
+    if request.method == 'PATCH':
+        status = filmstock.patch(connection, transaction, filmTypeID, filmSizeID)
+    transaction.commit()
+    return status

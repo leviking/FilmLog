@@ -21,14 +21,15 @@ def get_all(connection, transaction, binderID):
     for row in projects_query:
         project = {
             "type" : "projects",
-            "id" : {
-                "binder_id" : str(binderID),
-                "project_id": str(row['projectID']),
-            },
+            "id" : str(binderID) + ":" + str(row['projectID']),
             "attributes" : {
                 "name" : row['name'],
                 "film_count" : row['filmCount'],
-                "created_on" : row['createdOn']
+                "created_on" : row['createdOn'],
+                "composite_id" : {
+                    "binder_id" : str(binderID),
+                    "project_id": str(row['projectID']),
+                }
             }
         }
         projects["data"].append(project)
