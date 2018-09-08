@@ -642,9 +642,13 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
             + '/projects/' + str(projectID)
             + '/films/' + str(filmID))
 
+    ## HERE, this is busted because filmsizes can be from a project OR
+    ## exposure (not sure why I did it that way thinking about it)
     qry = text("""SELECT exposureNumber, shutter, aperture,
-        lensID, flash, notes, metering, subject, development, filmTypeID, iso
+        lensID, flash, notes, metering, subject, development, filmTypeID, iso,
+        Exposures.filmSizeID, format
         FROM Exposures
+        LEFT OUTER JOIN FilmSizes ON FilmSizes.filmSizeID = Exposures.filmSizeID
         WHERE filmID = :filmID
         AND exposureNumber = :exposureNumber
         AND userID = :userID""")
@@ -654,6 +658,7 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
         userID = userID).fetchall()
     row = result_to_dict(exposure_result)
     exposure = row[0]
+
     exposure['shutter'] = format_shutter(exposure['shutter'])
 
     qry = text("""SELECT cameraID FROM Films
