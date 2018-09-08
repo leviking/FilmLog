@@ -244,7 +244,7 @@ def projects(binderID):
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
-    form = BinderForm()
+    form = ProjectForm()
 
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -257,6 +257,13 @@ def projects(binderID):
                 binderID = binderID,
                 userID = userID,
                 name = form.name.data)
+
+    qry = text("""SELECT binderID, name, projectCount, createdOn
+        FROM Binders WHERE userID = :userID
+        AND binderID = :binderID""")
+    binder = connection.execute(qry,
+        binderID = binderID,
+        userID = userID).fetchone()
 
     qry = text("""SELECT projectID, name, filmCount, createdOn FROM Projects
         WHERE binderID = :binderID
