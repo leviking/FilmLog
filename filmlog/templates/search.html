@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1 class="page-header">Search Results</h1>
+  <p>Searched For: {{ search }}</p>
+  <h2>Projects</h2>
+  <table class="table table-striped table-bordered" id="projects">
+    <tr>
+        <th>Binder</th>
+        <th>Name</th>
+        <th>Rolls / Sheets</th>
+        <th>Created On</th>
+    </tr>
+    {% for project in projects %}
+        <tr>
+          <td><a href="/binders/{{ project.binderID }}">{{ project.binder_name }}</a></td>
+          <td><a href="/binders/{{ project.binderID }}/projects/{{ project.projectID}}">{{ project.project_name }}</a></td>
+          <td>{{ project.filmCount }}</td>
+          <td>{{ project.createdOn }}</td>
+        </tr>
+    {% else %}
+      <tr><td colspan="5">No Projects Found</td></tr>
+    {% endfor %}
+  </table>
+
+  <h2>Films</h2>
+  <div class="card">
+    <table class="table table-striped table-bordered" id="films">
+      <tr>
+          <th>Name</th>
+          <th>File No.</th>
+          <th>Logged Exposures</th>
+          <th>Camera</th>
+          <th>Film Size</th>
+          <th>Film</th>
+          <th>File Date</th>
+      </tr>
+      {% for film in films %}
+          <tr>
+              <td><a href="/binders/{{ film.binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}">{{ film.title }}</a></td>
+              <td>{{ film.fileNo }}</td>
+              <td>{{ film.exposures }}</td>
+              <td>{{ film.camera }}</td>
+              <td>{{ film.size }}</td>
+              <td>
+                {% if film.brand %}
+                  {{ film.brand }} {{ film.filmName }}
+                  {% if film.iso %}
+                   at {{ film.iso }}
+                  {% endif %}
+                {% endif %}
+              </td>
+              <td>{{ film.fileDate|to_date }}</td>
+          </tr>
+      {% else %}
+        <tr><td colspan="6">No Films Found</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+{% endblock %}

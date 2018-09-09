@@ -18,7 +18,7 @@ from filmlog.functions import next_id, result_to_dict, get_film_details, \
     optional_choices, zero_to_none, get_film_types, get_film_sizes, \
     insert, delete
 from filmlog.classes import MultiCheckboxField
-from filmlog import users, filmstock, darkroom, files, stats, gear, help, engine
+from filmlog import users, filmstock, darkroom, files, stats, gear, help, engine, search
 
 ## Blueprints
 from filmlog.api import api_blueprint
@@ -348,8 +348,8 @@ def project(binderID, projectID):
         LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
         JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
         JOIN Cameras ON Cameras.cameraID = Films.cameraID
-        WHERE projectID = :projectID ORDER BY fileDate""")
-    films = connection.execute(qry, projectID=projectID).fetchall()
+        WHERE projectID = :projectID AND Films.userID = :userID ORDER BY fileDate""")
+    films = connection.execute(qry, projectID=projectID, userID=userID).fetchall()
     transaction.commit()
 
     return render_template('project.html',

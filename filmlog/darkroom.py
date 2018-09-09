@@ -331,10 +331,9 @@ def contactsheet(binderID, projectID, filmID):
         # See if there is a contact sheet already
         qry = text("""SELECT fileID FROM ContactSheets
             WHERE filmID = :filmID AND userID = :userID""")
-        result = connection.execute(qry,
+        fileID = connection.execute(qry,
             filmID = filmID,
             userID = userID).fetchone()
-        fileID = result[0]
         if request.form['button'] == 'deleteCS':
             qry = text("""DELETE FROM ContactSheets
                 WHERE filmID = :filmID AND userID = :userID""")
