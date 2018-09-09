@@ -576,15 +576,12 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                 AND format = 'Sheet'""")
             format = connection.execute(qry,
                 filmSizeID = filmSizeID).fetchone()
-            print format
             if format:
                 # First look at the film type from the sheet
                 if zero_to_none(form.filmTypeID.data):
-                    print "here0"
                     auto_decrement_film_stock(connection, form.filmTypeID.data, filmSizeID)
                 # If that doesn't exist, we use the global film type
                 else:
-                    print "HERE1"
                     auto_decrement_film_stock(connection, filmTypeID, filmSizeID)
 
         if request.form['button'] == 'updateExposure':
@@ -642,8 +639,6 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
             + '/projects/' + str(projectID)
             + '/films/' + str(filmID))
 
-    ## HERE, this is busted because filmsizes can be from a project OR
-    ## exposure (not sure why I did it that way thinking about it)
     qry = text("""SELECT exposureNumber, shutter, aperture,
         lensID, flash, notes, metering, subject, development, filmTypeID, iso
         FROM Exposures
@@ -656,7 +651,6 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
         userID = userID).fetchall()
     row = result_to_dict(exposure_result)
     exposure = row[0]
-
     exposure['shutter'] = format_shutter(exposure['shutter'])
 
     qry = text("""SELECT cameraID, format
@@ -669,7 +663,6 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
         filmID = filmID).fetchone()
     cameraID = extras_result[0]
     filmFormat = extras_result[1]
-    print "What the fuck: " + filmFormat
 
     qry = text("""SELECT Filters.filterID AS filterID FROM ExposureFilters
         JOIN Filters ON Filters.filterID = ExposureFilters.filterID

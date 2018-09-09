@@ -38,11 +38,16 @@
 
           <td class="text-right">
             <form role="form" class="form-horizontal"
-              action="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}/prints"
+              action="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}/prints/{{ print.printID }}"
+              method="GET">
+              {{ form.csrf_token }}
+              <button name="button" value="editPrint" action="submit" class="btn btn-xs btn-success">Edit</button>
+            </form>
+            <form role="form" class="form-horizontal"
+              action="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}/prints/{{ print.printID }}"
               method="POST">
               {{ form.csrf_token }}
               <button name="button" value="deletePrint" action="submit" class="btn btn-xs btn-danger">Delete</button>
-              <input type="hidden" name="printID" value="{{ print.printID }}" >
             </form>
           </td>
         </tr>
@@ -70,7 +75,19 @@
 
 <div class="card">
   <div class="card-header">Add Print</div>
-    {% include 'darkroom/print.html' %}
+    <div class="card-body">
+      {% include 'form_errors.html' %}
+      <form role="form" class="form-horizontal"
+        action="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}/prints"
+        method="POST"
+        enctype=multipart/form-data>
+        {{ form.csrf_token }}
+        {% include 'darkroom/print.html' %}
+        <div class="button-bar">
+          <button class="btn btn-success" name="button" value="addPrint" action="submit">Add</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 

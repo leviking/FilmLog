@@ -16,7 +16,7 @@ from filmlog import database, engine
 from filmlog import functions
 from filmlog import files
 
-from filmlog.functions import optional_choices, zero_to_none, insert
+from filmlog.functions import optional_choices, zero_to_none, insert, result_to_dict
 
 engine = database.engine
 
@@ -75,7 +75,7 @@ def seconds_to_time(seconds):
 # Forms
 class PrintForm(FlaskForm):
     exposureNumber = SelectField('Exposure #',
-        validators=[Optional()],
+        validators=[DataRequired()],
         coerce=int)
     paperID = SelectField('Paper',
         validators=[Optional()],
@@ -102,16 +102,17 @@ class PrintForm(FlaskForm):
     notes = TextAreaField('Notes',
         validators=[Optional()],
         filters = [lambda x: x or None])
+
     file = FileField('File (JPG)',
         validators=[Optional(), FileAllowed(['jpg'], 'JPEGs Only')])
 
-    def __init__(self, connection, filmID):
-        super(PrintForm, self).__init__()
+    def populate_select_fields(self, connection, filmID):
         self.connection = connection
         self.paperID.choices = optional_choices("None", get_papers(connection))
         self.paperFilterID.choices = optional_choices("None", get_paper_filters(connection))
         self.enlargerLensID.choices = optional_choices("None", get_enlarger_lenses(connection))
         self.exposureNumber.choices = get_exposures(connection, filmID)
+
 
 class ContactSheetForm(FlaskForm):
     paperID = SelectField('Paper',
@@ -150,26 +151,10 @@ def prints(binderID, projectID, filmID):
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
-    form = PrintForm(connection, filmID)
+    form = PrintForm()
+    form.populate_select_fields(connection, filmID)
 
     if request.method == 'POST':
-        if request.form['button'] == 'deletePrint':
-            printID = request.form['printID']
-            qry = text("""SELECT fileID FROM Prints
-                WHERE printID = :printID AND userID = :userID""")
-            result = connection.execute(qry,
-                printID = printID,
-                userID = userID).fetchone()
-            fileID = result[0]
-            qry = text("""DELETE FROM Prints
-                WHERE printID = :printID
-                AND userID = :userID""")
-            connection.execute(qry,
-                printID = printID,
-                userID = userID)
-            if fileID:
-                files.delete_file(request, connection, transaction, fileID)
-
         if request.form['button'] == 'addPrint':
             if form.validate_on_submit():
                 nextPrintID = functions.next_id(connection, 'printID', 'Prints')
@@ -228,44 +213,109 @@ def prints(binderID, projectID, filmID):
         prints = prints,
         view='prints')
 
-@app.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>/prints/<int:exposureNumber>',  methods = ['POST', 'GET'])
+@app.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>/prints/<int:printID>',  methods = ['POST', 'GET'])
 @login_required
-def print_exposure(binderID, projectID, filmID, exposureNumber):
+def print_exposure(binderID, projectID, filmID, printID):
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
-    form = PrintForm(connection, filmID)
+    form = PrintForm()
+    form.populate_select_fields(connection, filmID)
+
+    if request.method == 'POST':
+        if request.form['button'] == 'deletePrint':
+            qry = text("""SELECT fileID FROM Prints
+                WHERE printID = :printID AND userID = :userID""")
+            result = connection.execute(qry,
+                printID = printID,
+                userID = userID).fetchone()
+            fileID = result[0]
+            qry = text("""DELETE FROM Prints
+                WHERE printID = :printID
+                AND userID = :userID""")
+            connection.execute(qry,
+                printID = printID,
+                userID = userID)
+            if fileID:
+                files.delete_file(request, connection, transaction, fileID)
+            transaction.commit()
+            return redirect('/binders/' + str(binderID)
+                + '/projects/' + str(projectID)
+                + '/films/' + str(filmID)
+                + '/prints')
+
+        if request.form['button'] == 'updatePrint':
+            if form.validate_on_submit():
+                # See if there is a fileID (yes this is ghetto)
+                if request.form['fileID'] == 'None':
+                    fileID = None
+                else:
+                    fileID = request.form['fileID']
+                # If the user has a file already, delete it first.
+                # Otherwise treat it like a new file.
+                if form.file.data:
+                    if fileID:
+                        app.logger.info('Replace File')
+                        files.delete_file(request, connection, transaction, fileID)
+                        files.upload_file(request, connection, transaction, fileID)
+                    else:
+                        app.logger.info('Brand New File')
+                        fileID = functions.next_id(connection, 'fileID', 'Files')
+                        files.upload_file(request, connection, transaction, fileID)
+                qry = text("""REPLACE INTO Prints
+                    (printID, filmID, exposureNumber, userID, paperID, paperFilterID,
+                    enlargerLensID, fileID, aperture, headHeight, exposureTime, printType, size, notes)
+                    VALUES (:printID, :filmID, :exposureNumber, :userID, :paperID,
+                    :paperFilterID, :enlargerLensID, :fileID, :aperture, :headHeight, :exposureTime,
+                    :printType, :size, :notes)""")
+                insert(connection, qry, "Print",
+                    printID = printID,
+                    filmID = filmID,
+                    userID = userID,
+                    fileID = fileID,
+                    exposureNumber = form.exposureNumber.data,
+                    paperID = zero_to_none(form.paperID.data),
+                    paperFilterID = zero_to_none(form.paperFilterID.data),
+                    enlargerLensID = zero_to_none(form.enlargerLensID.data),
+                    aperture = form.aperture.data,
+                    headHeight = form.headHeight.data,
+                    exposureTime = time_to_seconds(form.exposureTime.data),
+                    printType = form.printType.data,
+                    size = form.size.data,
+                    notes = form.notes.data)
+                transaction.commit()
+                return redirect('/binders/' + str(binderID)
+                    + '/projects/' + str(projectID)
+                    + '/films/' + str(filmID)
+                    + '/prints')
 
     film = functions.get_film_details(connection, binderID, projectID, filmID)
-
     qry = text("""SELECT printID, exposureNumber, Papers.name AS paperName,
-        PaperBrands.name AS paperBrand, PaperFilters.name AS paperFilterName,
+        Papers.paperID, PaperFilters.paperFilterID, EnlargerLenses.enlargerLensID,
         printType, size, aperture, headHeight, notes, fileID,
-        EnlargerLenses.name AS lens,
         SECONDS_TO_DURATION(exposureTime) AS exposureTime
         FROM Prints
         LEFT OUTER JOIN Papers ON Papers.paperID = Prints.paperID
         LEFT OUTER JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID
         LEFT OUTER JOIN PaperFilters ON PaperFilters.paperFilterID = Prints.paperFilterID
         LEFT OUTER JOIN EnlargerLenses ON EnlargerLenses.enlargerLensID = Prints.enlargerLensID
-            AND EnlargerLenses.userID = Prints.userID
-        WHERE filmID = :filmID
-        AND Prints.userID = :userID
-        AND Prints.exposureNumber = :exposureNumber""")
-    prints = connection.execute(qry,
+        AND EnlargerLenses.userID = Prints.userID
+        WHERE Prints.userID = :userID
+        AND Prints.printID = :printID""")
+    print_details = connection.execute(qry,
         userID = userID,
-        filmID = filmID,
-        exposureNumber = exposureNumber)
-
+        printID = printID).fetchone()
     transaction.commit()
+    form = PrintForm(data=print_details)
+    form.populate_select_fields(connection, filmID)
     return render_template('darkroom/edit-print.html',
         form = form,
-        binderID=binderID,
-        projectID=projectID,
-        film=film,
-        prints = prints,
-        view='prints')
-
+        film = film,
+        binderID = binderID,
+        projectID = projectID,
+        printID = printID,
+        print_details = print_details,
+        view = 'prints')
 
 @app.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>/contactsheet',  methods = ['POST', 'GET'])
 @login_required
