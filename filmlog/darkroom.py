@@ -223,6 +223,7 @@ def prints(binderID, projectID, filmID):
     return render_template('darkroom/prints.html',
         form = form,
         binderID=binderID,
+        projectID=projectID,
         film=film,
         prints = prints,
         view='prints')
@@ -304,6 +305,7 @@ def contactsheet(binderID, projectID, filmID):
     transaction.commit()
     return render_template('darkroom/contactsheet.html',
         binderID=binderID,
+        projectID=projectID,
         film=film,
         contactSheet=contactSheet,
         form=form,
