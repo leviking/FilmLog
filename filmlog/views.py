@@ -645,10 +645,8 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
     ## HERE, this is busted because filmsizes can be from a project OR
     ## exposure (not sure why I did it that way thinking about it)
     qry = text("""SELECT exposureNumber, shutter, aperture,
-        lensID, flash, notes, metering, subject, development, filmTypeID, iso,
-        Exposures.filmSizeID, format
+        lensID, flash, notes, metering, subject, development, filmTypeID, iso
         FROM Exposures
-        LEFT OUTER JOIN FilmSizes ON FilmSizes.filmSizeID = Exposures.filmSizeID
         WHERE filmID = :filmID
         AND exposureNumber = :exposureNumber
         AND userID = :userID""")
@@ -661,13 +659,17 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
 
     exposure['shutter'] = format_shutter(exposure['shutter'])
 
-    qry = text("""SELECT cameraID FROM Films
+    qry = text("""SELECT cameraID, format
+        FROM Films
+        LEFT OUTER JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
         WHERE userID = :userID
         AND filmID = :filmID""")
-    cameraID_result = connection.execute(qry,
+    extras_result = connection.execute(qry,
         userID = userID,
         filmID = filmID).fetchone()
-    cameraID = cameraID_result[0]
+    cameraID = extras_result[0]
+    filmFormat = extras_result[1]
+    print "What the fuck: " + filmFormat
 
     qry = text("""SELECT Filters.filterID AS filterID FROM ExposureFilters
         JOIN Filters ON Filters.filterID = ExposureFilters.filterID
@@ -688,5 +690,8 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
         form=form,
         userID=userID,
         binderID=binderID,
-        projectID=projectID, filmID=filmID, exposureNumber=exposureNumber,
+        projectID=projectID,
+        filmID=filmID,
+        filmFormat=filmFormat,
+        exposureNumber=exposureNumber,
         film=film)
