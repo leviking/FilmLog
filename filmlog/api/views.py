@@ -64,7 +64,6 @@ def project_details(binderID, projectID):
     transaction.commit()
     return status
 
-
 @api_blueprint.route('/filmstock',  methods = ['GET'])
 @login_required
 def filmstock_all():

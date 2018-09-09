@@ -228,6 +228,45 @@ def prints(binderID, projectID, filmID):
         prints = prints,
         view='prints')
 
+@app.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>/prints/<int:exposureNumber>',  methods = ['POST', 'GET'])
+@login_required
+def print_exposure(binderID, projectID, filmID, exposureNumber):
+    connection = engine.connect()
+    transaction = connection.begin()
+    userID = current_user.get_id()
+    form = PrintForm(connection, filmID)
+
+    film = functions.get_film_details(connection, binderID, projectID, filmID)
+
+    qry = text("""SELECT printID, exposureNumber, Papers.name AS paperName,
+        PaperBrands.name AS paperBrand, PaperFilters.name AS paperFilterName,
+        printType, size, aperture, headHeight, notes, fileID,
+        EnlargerLenses.name AS lens,
+        SECONDS_TO_DURATION(exposureTime) AS exposureTime
+        FROM Prints
+        LEFT OUTER JOIN Papers ON Papers.paperID = Prints.paperID
+        LEFT OUTER JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID
+        LEFT OUTER JOIN PaperFilters ON PaperFilters.paperFilterID = Prints.paperFilterID
+        LEFT OUTER JOIN EnlargerLenses ON EnlargerLenses.enlargerLensID = Prints.enlargerLensID
+            AND EnlargerLenses.userID = Prints.userID
+        WHERE filmID = :filmID
+        AND Prints.userID = :userID
+        AND Prints.exposureNumber = :exposureNumber""")
+    prints = connection.execute(qry,
+        userID = userID,
+        filmID = filmID,
+        exposureNumber = exposureNumber)
+
+    transaction.commit()
+    return render_template('darkroom/edit-print.html',
+        form = form,
+        binderID=binderID,
+        projectID=projectID,
+        film=film,
+        prints = prints,
+        view='prints')
+
+
 @app.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>/contactsheet',  methods = ['POST', 'GET'])
 @login_required
 def contactsheet(binderID, projectID, filmID):
