@@ -44,9 +44,22 @@ def search():
         ORDER BY fileDate""")
     films = connection.execute(qry, userID=userID).fetchall()
 
+    qry = text("""SELECT Films.title AS film_title, Exposures.filmID,
+        Films.projectID, Projects.binderID,
+        exposureNumber, shutter, aperture,
+        Exposures.subject, Exposures.notes
+        FROM Exposures
+        JOIN Films ON Films.filmID = Exposures.filmID
+        JOIN Projects ON Projects.projectID = Films.projectID
+        WHERE Exposures.userID = :userID
+        AND (Exposures.subject LIKE ('%""" + search + """%')
+        OR Exposures.notes LIKE ('%""" + search + """%'))
+        ORDER BY Films.filmID, exposureNumber""")
+    exposures = connection.execute(qry, userID=userID).fetchall()
 
     transaction.commit()
     return render_template('search.html',
         search = search,
         projects = projects,
-        films = films)
+        films = films,
+        exposures = exposures)
