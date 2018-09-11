@@ -527,32 +527,41 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
         filmSizeID = zero_to_none(form.filmSizeID.data)
 
         if request.form['button'] == 'addExposure':
-            qry = text("""INSERT INTO Exposures
-                (userID, filmID, exposureNumber, lensID, shutter, aperture, filmTypeID, iso, metering, flash, subject, development, notes)
-                VALUES (:userID, :filmID, :exposureNumber, :lensID, :shutter, :aperture, :filmTypeID, :shotISO, :metering, :flash, :subject, :development, :notes)""")
-            insert(connection, qry, "Exposure",
-                userID = userID,
-                filmID = filmID,
-                exposureNumber = form.exposureNumber.data,
-                lensID = zero_to_none(form.lensID.data),
-                shutter = encode_shutter(form.shutter.data),
-                aperture = form.aperture.data,
-                filmTypeID = zero_to_none(form.filmTypeID.data),
-                shotISO = zero_to_none(form.shotISO.data),
-                metering = zero_to_none(form.metering.data),
-                flash = form.flash.data,
-                subject = form.subject.data,
-                development = form.development.data,
-                notes = form.notes.data)
-
-            qry = text("""INSERT INTO ExposureFilters
-                (userID, filmID, exposureNumber, filterID)
-                VALUES (:userID, :filmID, :exposureNumber, :filterID)""")
-            for filterID in form.filters.data:
-                insert(connection, qry, "Filter",
+            # If exposure number has a dash, it means
+            # we are adding a range of exposures
+            exposureNumber = form.exposureNumber.data
+            if re.search("-", exposureNumber):
+                ranges = exposureNumber.split("-", 2)
+                sequence = range(int(ranges[0]), int(ranges[1]))
+            else:
+                sequence = [int(exposureNumber)]
+            for exposure in sequence:
+                qry = text("""INSERT INTO Exposures
+                    (userID, filmID, exposureNumber, lensID, shutter, aperture, filmTypeID, iso, metering, flash, subject, development, notes)
+                    VALUES (:userID, :filmID, :exposureNumber, :lensID, :shutter, :aperture, :filmTypeID, :shotISO, :metering, :flash, :subject, :development, :notes)""")
+                insert(connection, qry, "Exposure",
                     userID = userID,
                     filmID = filmID,
-                    exposureNumber = form.exposureNumber.data,
+                    exposureNumber = exposure,
+                    lensID = zero_to_none(form.lensID.data),
+                    shutter = encode_shutter(form.shutter.data),
+                    aperture = form.aperture.data,
+                    filmTypeID = zero_to_none(form.filmTypeID.data),
+                    shotISO = zero_to_none(form.shotISO.data),
+                    metering = zero_to_none(form.metering.data),
+                    flash = form.flash.data,
+                    subject = form.subject.data,
+                    development = form.development.data,
+                    notes = form.notes.data)
+
+                qry = text("""INSERT INTO ExposureFilters
+                (userID, filmID, exposureNumber, filterID)
+                VALUES (:userID, :filmID, :exposureNumber, :filterID)""")
+                for filterID in form.filters.data:
+                    insert(connection, qry, "Filter",
+                    userID = userID,
+                    filmID = filmID,
+                    exposureNumber = exposure,
                     filterID = filterID)
 
             # Decrement film stock for exposures if relevant
