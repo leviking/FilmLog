@@ -124,7 +124,6 @@ class PrintForm(FlaskForm):
         self.enlargerID.choices = optional_choices("None", get_enlargers(connection))
         self.exposureNumber.choices = get_exposures(connection, filmID)
 
-
 class ContactSheetForm(FlaskForm):
     paperID = SelectField('Paper',
         validators=[Optional()],
@@ -159,6 +158,17 @@ class ContactSheetForm(FlaskForm):
         self.paperFilterID.choices = optional_choices("None", get_paper_filters(connection))
         self.enlargerLensID.choices = optional_choices("None", get_enlarger_lenses(connection))
         self.enlargerID.choices = optional_choices("None", get_enlargers(connection))
+
+def check_for_print_file(connection, printID):
+    userID = current_user.get_id()
+    qry = text("""SELECT fileID FROM Prints
+        WHERE printID = :printID AND userID = :userID""")
+    result = connection.execute(qry,
+        printID = printID,
+        userID = userID).fetchone()
+    if result:
+        return int(result[0])
+    return None
 
 @app.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>/prints',  methods = ['POST', 'GET'])
 @login_required
@@ -243,12 +253,7 @@ def print_exposure(binderID, projectID, filmID, printID):
 
     if request.method == 'POST':
         if request.form['button'] == 'deletePrint':
-            qry = text("""SELECT fileID FROM Prints
-                WHERE printID = :printID AND userID = :userID""")
-            result = connection.execute(qry,
-                printID = printID,
-                userID = userID).fetchone()
-            fileID = result[0]
+            fileID = check_for_print_file(connection, printID)
             qry = text("""DELETE FROM Prints
                 WHERE printID = :printID
                 AND userID = :userID""")
@@ -265,11 +270,8 @@ def print_exposure(binderID, projectID, filmID, printID):
 
         if request.form['button'] == 'updatePrint':
             if form.validate_on_submit():
-                # See if there is a fileID (yes this is ghetto)
-                if request.form['fileID'] == 'None':
-                    fileID = None
-                else:
-                    fileID = request.form['fileID']
+                # See if there is a fileID
+                fileID = check_for_print_file(connection, printID)
                 # If the user has a file already, delete it first.
                 # Otherwise treat it like a new file.
                 if form.file.data:
@@ -354,9 +356,13 @@ def contactsheet(binderID, projectID, filmID):
         # See if there is a contact sheet already
         qry = text("""SELECT fileID FROM ContactSheets
             WHERE filmID = :filmID AND userID = :userID""")
-        fileID = connection.execute(qry,
+        result = connection.execute(qry,
             filmID = filmID,
             userID = userID).fetchone()
+        if(result):
+            fileID = int(result[0])
+        else:
+            fileID = None
         if request.form['button'] == 'deleteCS':
             qry = text("""DELETE FROM ContactSheets
                 WHERE filmID = :filmID AND userID = :userID""")
@@ -364,6 +370,7 @@ def contactsheet(binderID, projectID, filmID):
                 filmID = filmID,
                 userID = userID)
             if fileID:
+                print fileID
                 files.delete_file(request, connection, transaction, fileID)
         elif request.form['button'] == 'updateCS' and form.validate_on_submit():
             # If user included a file, let's upload it. Otherwise skip it.
@@ -374,8 +381,8 @@ def contactsheet(binderID, projectID, filmID):
             # a new file, use the old one.
             else:
                 nextFileID = fileID
-            qry = text("""REPLACE INTO ContactSheets (filmID, userID, fileID, paperID, paperFilterID, enlargerLensID, aperture, headHeight, exposureTime, notes)
-                VALUES (:filmID, :userID, :fileID, :paperID, :paperFilterID, :enlargerLensID, :aperture, :headHeight, :exposureTime, :notes)""")
+            qry = text("""REPLACE INTO ContactSheets (filmID, userID, fileID, paperID, paperFilterID, enlargerLensID, enlargerID, aperture, headHeight, exposureTime, notes)
+                VALUES (:filmID, :userID, :fileID, :paperID, :paperFilterID, :enlargerLensID, :enlargerID, :aperture, :headHeight, :exposureTime, :notes)""")
             connection.execute(qry,
                 filmID = filmID,
                 userID = userID,
@@ -383,6 +390,7 @@ def contactsheet(binderID, projectID, filmID):
                 paperID = zero_to_none(form.paperID.data),
                 paperFilterID = zero_to_none(form.paperFilterID.data),
                 enlargerLensID = zero_to_none(form.enlargerLensID.data),
+                enlargerID = zero_to_none(form.enlargerID.data),
                 aperture = form.aperture.data,
                 headHeight = form.headHeight.data,
                 exposureTime = time_to_seconds(form.exposureTime.data),
@@ -393,7 +401,8 @@ def contactsheet(binderID, projectID, filmID):
     # Get contact sheet info
     qry = text("""SELECT fileID, Papers.name AS paperName,
         PaperBrands.name AS paperBrand, PaperFilters.name AS paperFilterName,
-        EnlargerLenses.name AS lens, aperture, headHeight, notes,
+        EnlargerLenses.name AS lens, Enlargers.name AS enlarger,
+        aperture, headHeight, ContactSheets.notes,
         ContactSheets.paperID AS paperID,
         ContactSheets.paperFilterID AS paperFilterID,
         ContactSheets.enlargerLensID AS enlargerLensID,
@@ -404,6 +413,8 @@ def contactsheet(binderID, projectID, filmID):
         LEFT OUTER JOIN PaperFilters ON PaperFilters.paperFilterID = ContactSheets.paperFilterID
         LEFT OUTER JOIN EnlargerLenses ON EnlargerLenses.enlargerLensID = ContactSheets.enlargerLensID
             AND EnlargerLenses.userID = ContactSheets.userID
+        LEFT OUTER JOIN Enlargers ON Enlargers.enlargerID = ContactSheets.enlargerID
+            AND Enlargers.userID = ContactSheets.userID
         WHERE filmID = :filmID AND ContactSheets.userID = :userID""")
     contactSheet =  connection.execute(qry,
         userID = userID,
