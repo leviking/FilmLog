@@ -66,6 +66,29 @@ class EnlargerLensForm(FlaskForm):
     name = StringField('Name',
         validators=[DataRequired(), Length(min=1, max=64)])
 
+class EnlargerForm(FlaskForm):
+    name = StringField('Name',
+        validators=[DataRequired(), Length(min=1, max=64)])
+    type = SelectField('Type',
+        validators=[DataRequired()],
+        choices=[
+            ('Condenser', 'Condenser'),
+            ('Diffuser', 'Diffuser')])
+    lightsource = SelectField('Type',
+        validators=[DataRequired()],
+        choices=[
+            ('LED', 'LED'),
+            ('Incandescent', 'Incandescent')])
+    wattage = IntegerField('Wattage',
+            validators=[NumberRange(min=0,max=65535),
+                        Optional()])
+    temperature = IntegerField('Temperature (K)',
+            validators=[NumberRange(min=0,max=65535),
+                        Optional()])
+    notes = TextAreaField('Notes',
+        validators=[Optional()],
+        filters = [lambda x: x or None])
+
 @app.route('/gear',  methods = ['GET', 'POST'])
 @login_required
 def gear():
@@ -75,6 +98,7 @@ def gear():
     camera_form = CameraForm()
     filter_form = FilterForm()
     enlarger_lens_form = EnlargerLensForm()
+    enlarger_form = EnlargerForm()
     camera_lens_form = CameraLensForm()
 
     if request.method == 'POST':
@@ -151,6 +175,29 @@ def gear():
                 userID = userID,
                 enlargerLensID = int(request.form['enlargerLensID']))
 
+        if request.form['button'] == 'addEnlarger':
+            nextEnlargerID = next_id(connection, 'enlargerID', 'Enlargers')
+            qry = text("""INSERT INTO Enlargers
+                (userID, enlargerID, name, type, lightsource, wattage, temperature, notes)
+                VALUES (:userID, :enlargerID, :name, :type, :lightsource, :wattage,
+                    :temperature, :notes)""")
+            connection.execute(qry,
+                userID = userID,
+                enlargerID = nextEnlargerID,
+                name = enlarger_form.name.data,
+                type = enlarger_form.type.data,
+                lightsource = enlarger_form.lightsource.data,
+                wattage = enlarger_form.wattage.data,
+                temperature = enlarger_form.temperature.data,
+                notes = enlarger_form.notes.data)
+        if request.form['button'] == 'deleteEnlarger':
+            qry = text("""DELETE FROM Enlargers
+                WHERE userID = :userID
+                AND enlargerID = :enlargerID""")
+            connection.execute(qry,
+                userID = userID,
+                enlargerID = int(request.form['enlargerID']))
+
     qry = text("""SELECT cameraID, name, filmSize
         FROM Cameras
         WHERE userID = :userID ORDER BY filmSize, name""")
@@ -171,16 +218,24 @@ def gear():
         WHERE userID = :userID ORDER BY name""")
     enlargerLenses = connection.execute(qry, userID = current_user.get_id()).fetchall()
 
+    qry = text("""SELECT enlargerID, name, type, lightsource, wattage,
+        temperature, notes
+        FROM Enlargers
+        WHERE userID = :userID ORDER BY name""")
+    enlargers = connection.execute(qry, userID = current_user.get_id()).fetchall()
+
     transaction.commit()
     return render_template('/gear/index.html',
         camera_form = camera_form,
         filter_form = filter_form,
         camera_lens_form = camera_lens_form,
         enlarger_lens_form = enlarger_lens_form,
+        enlarger_form = enlarger_form,
         cameras=cameras,
         filters=filters,
         cameraLenses = cameraLenses,
-        enlargerLenses=enlargerLenses)
+        enlargerLenses = enlargerLenses,
+        enlargers = enlargers)
 
 
 @app.route('/gear/camera/<int:cameraID>',  methods = ['GET', 'POST'])
