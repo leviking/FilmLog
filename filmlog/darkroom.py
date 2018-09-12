@@ -40,6 +40,13 @@ def get_enlarger_lenses(connection):
         WHERE userID = :userID""")
     return connection.execute(qry, userID = userID).fetchall()
 
+def get_enlargers(connection):
+    userID = current_user.get_id()
+    qry = text("""SELECT enlargerID, name
+        FROM Enlargers
+        WHERE userID = :userID""")
+    return connection.execute(qry, userID = userID).fetchall()
+
 def get_exposures(connection, filmID):
     userID = current_user.get_id()
     qry = text("""SELECT exposureNumber AS exposureNumber,
@@ -92,6 +99,9 @@ class PrintForm(FlaskForm):
     enlargerLensID = SelectField('Enlarger Lens',
         validators=[Optional()],
         coerce=int)
+    enlargerID = SelectField('Enlarger',
+        validators=[Optional()],
+        coerce=int)
     aperture = DecimalField('Aperture', places=1,
         validators=[Optional()])
     headHeight = IntegerField('Head Height',
@@ -111,6 +121,7 @@ class PrintForm(FlaskForm):
         self.paperID.choices = optional_choices("None", get_papers(connection))
         self.paperFilterID.choices = optional_choices("None", get_paper_filters(connection))
         self.enlargerLensID.choices = optional_choices("None", get_enlarger_lenses(connection))
+        self.enlargerID.choices = optional_choices("None", get_enlargers(connection))
         self.exposureNumber.choices = get_exposures(connection, filmID)
 
 
@@ -122,6 +133,9 @@ class ContactSheetForm(FlaskForm):
         validators=[Optional()],
         coerce=int)
     enlargerLensID = SelectField('Enlarger Lens',
+        validators=[Optional()],
+        coerce=int)
+    enlargerID = SelectField('Enlarger',
         validators=[Optional()],
         coerce=int)
     aperture = DecimalField('Aperture', places=1,
@@ -144,6 +158,7 @@ class ContactSheetForm(FlaskForm):
         self.paperID.choices = optional_choices("None", get_papers(connection))
         self.paperFilterID.choices = optional_choices("None", get_paper_filters(connection))
         self.enlargerLensID.choices = optional_choices("None", get_enlarger_lenses(connection))
+        self.enlargerID.choices = optional_choices("None", get_enlargers(connection))
 
 @app.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>/prints',  methods = ['POST', 'GET'])
 @login_required
@@ -167,9 +182,9 @@ def prints(binderID, projectID, filmID):
 
                 qry = text("""INSERT INTO Prints
                     (printID, filmID, exposureNumber, userID, paperID, paperFilterID,
-                    enlargerLensID, fileID, aperture, headHeight, exposureTime, printType, size, notes)
+                    enlargerLensID, enlargerID, fileID, aperture, headHeight, exposureTime, printType, size, notes)
                     VALUES (:printID, :filmID, :exposureNumber, :userID, :paperID,
-                    :paperFilterID, :enlargerLensID, :fileID, :aperture, :headHeight, :exposureTime,
+                    :paperFilterID, :enlargerLensID, :enlargerID, :fileID, :aperture, :headHeight, :exposureTime,
                     :printType, :size, :notes)""")
                 insert(connection, qry, "Print",
                     printID = nextPrintID,
@@ -180,6 +195,7 @@ def prints(binderID, projectID, filmID):
                     paperID = zero_to_none(form.paperID.data),
                     paperFilterID = zero_to_none(form.paperFilterID.data),
                     enlargerLensID = zero_to_none(form.enlargerLensID.data),
+                    enlargerID = zero_to_none(form.enlargerID.data),
                     aperture = form.aperture.data,
                     headHeight = form.headHeight.data,
                     exposureTime = time_to_seconds(form.exposureTime.data),
@@ -190,8 +206,9 @@ def prints(binderID, projectID, filmID):
 
     qry = text("""SELECT printID, exposureNumber, Papers.name AS paperName,
         PaperBrands.name AS paperBrand, PaperFilters.name AS paperFilterName,
-        printType, size, aperture, headHeight, notes, fileID,
+        printType, size, aperture, headHeight, Prints.notes, fileID,
         EnlargerLenses.name AS lens,
+        Enlargers.name AS enlarger,
         SECONDS_TO_DURATION(exposureTime) AS exposureTime
         FROM Prints
         LEFT OUTER JOIN Papers ON Papers.paperID = Prints.paperID
@@ -199,6 +216,8 @@ def prints(binderID, projectID, filmID):
         LEFT OUTER JOIN PaperFilters ON PaperFilters.paperFilterID = Prints.paperFilterID
         LEFT OUTER JOIN EnlargerLenses ON EnlargerLenses.enlargerLensID = Prints.enlargerLensID
             AND EnlargerLenses.userID = Prints.userID
+        LEFT OUTER JOIN Enlargers ON Enlargers.enlargerID = Prints.enlargerID
+            AND Enlargers.userID = Prints.userID
         WHERE filmID = :filmID AND Prints.userID = :userID""")
     prints = connection.execute(qry,
         userID = userID,
@@ -264,9 +283,9 @@ def print_exposure(binderID, projectID, filmID, printID):
                         files.upload_file(request, connection, transaction, fileID)
                 qry = text("""REPLACE INTO Prints
                     (printID, filmID, exposureNumber, userID, paperID, paperFilterID,
-                    enlargerLensID, fileID, aperture, headHeight, exposureTime, printType, size, notes)
+                    enlargerLensID, enlargerID, fileID, aperture, headHeight, exposureTime, printType, size, notes)
                     VALUES (:printID, :filmID, :exposureNumber, :userID, :paperID,
-                    :paperFilterID, :enlargerLensID, :fileID, :aperture, :headHeight, :exposureTime,
+                    :paperFilterID, :enlargerLensID, :enlargerID, :fileID, :aperture, :headHeight, :exposureTime,
                     :printType, :size, :notes)""")
                 insert(connection, qry, "Print",
                     printID = printID,
@@ -277,6 +296,7 @@ def print_exposure(binderID, projectID, filmID, printID):
                     paperID = zero_to_none(form.paperID.data),
                     paperFilterID = zero_to_none(form.paperFilterID.data),
                     enlargerLensID = zero_to_none(form.enlargerLensID.data),
+                    enlargerID = zero_to_none(form.enlargerID.data),
                     aperture = form.aperture.data,
                     headHeight = form.headHeight.data,
                     exposureTime = time_to_seconds(form.exposureTime.data),
@@ -292,14 +312,17 @@ def print_exposure(binderID, projectID, filmID, printID):
     film = functions.get_film_details(connection, binderID, projectID, filmID)
     qry = text("""SELECT printID, exposureNumber, Papers.name AS paperName,
         Papers.paperID, PaperFilters.paperFilterID, EnlargerLenses.enlargerLensID,
-        printType, size, aperture, headHeight, notes, fileID,
+        Enlargers.enlargerID,
+        printType, size, aperture, headHeight, Prints.notes, fileID,
         SECONDS_TO_DURATION(exposureTime) AS exposureTime
         FROM Prints
         LEFT OUTER JOIN Papers ON Papers.paperID = Prints.paperID
         LEFT OUTER JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID
         LEFT OUTER JOIN PaperFilters ON PaperFilters.paperFilterID = Prints.paperFilterID
         LEFT OUTER JOIN EnlargerLenses ON EnlargerLenses.enlargerLensID = Prints.enlargerLensID
-        AND EnlargerLenses.userID = Prints.userID
+            AND EnlargerLenses.userID = Prints.userID
+        LEFT OUTER JOIN Enlargers ON Enlargers.enlargerID = Prints.enlargerID
+            AND Enlargers.userID = Prints.userID
         WHERE Prints.userID = :userID
         AND Prints.printID = :printID""")
     print_details = connection.execute(qry,
