@@ -437,6 +437,18 @@ def film(binderID, projectID, filmID):
     if film is None:
         abort(404)
 
+
+    qry = text("""SELECT cameraID, format
+        FROM Films
+        LEFT OUTER JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
+        WHERE userID = :userID
+        AND filmID = :filmID""")
+    extras_result = connection.execute(qry,
+        userID = userID,
+        filmID = filmID).fetchone()
+    cameraID = extras_result[0]
+    filmFormat = extras_result[1]
+
     qry = text("""SELECT exposureNumber, shutter, aperture,
         Lenses.name AS lens, flash, metering, subject, notes, development,
         Exposures.iso AS shotISO,
@@ -511,6 +523,7 @@ def film(binderID, projectID, filmID):
         form=form,
         binderID=binderID, projectID=projectID, filmID=filmID,
         film=film, exposures=exposures, exposureNumber=exposureNumber,
+        filmFormat = filmFormat,
         print_view=print_view,
         view='exposures')
 
