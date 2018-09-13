@@ -545,7 +545,7 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
             exposureNumber = form.exposureNumber.data
             if re.search("-", exposureNumber):
                 ranges = exposureNumber.split("-", 2)
-                sequence = range(int(ranges[0]), int(ranges[1]))
+                sequence = range(int(ranges[0]), int(ranges[1]) + 1)
             else:
                 sequence = [int(exposureNumber)]
             for exposure in sequence:
