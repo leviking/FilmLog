@@ -167,7 +167,8 @@ def check_for_print_file(connection, printID):
         printID = printID,
         userID = userID).fetchone()
     if result:
-        return int(result[0])
+        if result[0]:
+            return int(result[0])
     return None
 
 @app.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>/prints',  methods = ['POST', 'GET'])
