@@ -19,66 +19,67 @@
 
 {% block body %}
 <body>
-  {% block navbar %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="collapse navbar-collapse">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-            {% if current_user.is_authenticated %}
-              <li class="nav-item"><a class="nav-link"href="/binders">Binders</a></li>
-              {% if binderID %}
-                <li class="nav-item"><a class="nav-link"href="/binders/{{ binderID }}/projects">Projects</a></li>
-                {% if projectID %}
-                  <li class="nav-item"><a class="nav-link"href="/binders/{{ binderID }}/projects/{{ projectID }}">Films</a></li>
-                {% endif %}
+{% block navbar %}
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          {% if current_user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link"href="/binders">Binders</a></li>
+            {% if binderID %}
+              <li class="nav-item"><a class="nav-link"href="/binders/{{ binderID }}/projects">Projects</a></li>
+              {% if projectID %}
+                <li class="nav-item"><a class="nav-link"href="/binders/{{ binderID }}/projects/{{ projectID }}">Films</a></li>
               {% endif %}
-              <li class="nav-item"><a class="nav-link"href="/gear">Gear</a></li>
-              <li class="nav-item"><a class="nav-link"href="/filmtypes">Available Films</a></li>
-              <li class="nav-item"><a class="nav-link"href="/filmstock">Film Stock</a></li>
-              <li class="nav-item"><a class="nav-link"href="/stats">Stats</a></li>
-              <li class="nav-item"><a class="nav-link"href="/logout">Logout</a></li>
-            {% else %}
-              <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
             {% endif %}
-            <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
-          </ul>
-          <form class="form-inline my-2 my-lg-0"
-            action="/search"
-            method="GET">
-            <input name="search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-          </form>
-        </div>
+            <li class="nav-item"><a class="nav-link"href="/gear">Gear</a></li>
+            <li class="nav-item"><a class="nav-link"href="/filmstock">Film Stock</a></li>
+            <li class="nav-item"><a class="nav-link"href="/filmtypes">Available Films</a></li>
+            <li class="nav-item"><a class="nav-link"href="/stats">Stats</a></li>
+            <li class="nav-item"><a class="nav-link"href="/logout">Logout</a></li>
+          {% else %}
+            <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+          {% endif %}
+          <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0"
+          action="/search"
+          method="GET">
+          <input name="search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        </form>
       </div>
-    </nav>
-  {% endblock %}
+    </div>
+  </nav>
+{% endblock %}
 
+<div class="container-fluid">
   {% block container %}
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-md-12 main">
-        <div id="content">
-          {% with messages = get_flashed_messages() %}
-            {% if messages %}
-              <br />
-              <div class="alert alert-warning" role="alert">
+    <div class="col-md-10 main">
+      <div id="content">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <br />
+            <div class="alert alert-warning" role="alert">
               <ul class=flashes>
                 {% for message in messages %}
                 <li>{{ message }}</li>
                 {% endfor %}
               </ul>
-              </div>
-            {% endif %}
-          {% endwith %}
-          <br />
-          {% block content %}
-          {% endblock %}
-        </div>
+            </div>
+          {% endif %}
+        {% endwith %}
+        <br />
+        {% block content %}
+        {% endblock %}
       </div>
     </div>
   </div>
+  </main>
   {% endblock %}
-  <script src="/static/jquery-3.3.1.min.js"></script>
-  <script src="/static/popper.min.js"></script>
-  <script src="/static/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</div>
+
+<script src="/static/jquery-3.3.1.min.js"></script>
+<script src="/static/popper.min.js"></script>
+<script src="/static/bootstrap/4.1.0/js/bootstrap.min.js"></script>
 </body>
 {% endblock %}

@@ -13,7 +13,7 @@ from wtforms import widgets
 
 from filmlog import app
 from filmlog import database, engine
-from filmlog.functions import next_id, insert, delete
+from filmlog.functions import next_id, insert, delete, optional_choices, get_film_types
 from filmlog.classes import MultiCheckboxField
 
 def get_lenses(connection):
@@ -89,74 +89,55 @@ class EnlargerForm(FlaskForm):
         validators=[Optional()],
         filters = [lambda x: x or None])
 
+class HolderForm(FlaskForm):
+    name = StringField('Name',
+        validators=[DataRequired(), Length(min=1, max=64)])
+    size = SelectField('Size',
+        validators=[DataRequired()],
+        choices=[
+            ('4x5', '4x5'),
+            ('5x7', '5x7'),
+            ('8x10', '8x10'),
+            ('11x14', '11x14')])
+    filmTypeID = SelectField('Film',
+        validators=[Optional()],
+        coerce=int)
+    temperature = IntegerField('ISO',
+            validators=[NumberRange(min=0,max=65535),
+                        Optional()])
+    compensation = IntegerField('Compensation',
+            validators=[NumberRange(min=-64,max=64),
+                        Optional()])
+    notes = TextAreaField('Notes',
+        validators=[Optional()],
+        filters = [lambda x: x or None])
+
+    def populate_select_fields(self, connection):
+        self.connection = connection
+        self.filmTypeID.choices = optional_choices("None", get_film_types(connection))
+
 @app.route('/gear',  methods = ['GET', 'POST'])
 @login_required
 def gear():
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
-    camera_form = CameraForm()
-    filter_form = FilterForm()
+
+    transaction.commit()
+    return render_template('/gear/index.html')
+
+@app.route('/gear/enlargers',  methods = ['GET', 'POST'])
+@login_required
+def enlargers():
+    connection = engine.connect()
+    transaction = connection.begin()
+    userID = current_user.get_id()
+
     enlarger_lens_form = EnlargerLensForm()
     enlarger_form = EnlargerForm()
-    camera_lens_form = CameraLensForm()
 
     if request.method == 'POST':
         app.logger.debug('POST')
-
-        # Camera
-        if request.form['button'] == 'addCamera':
-            app.logger.debug('Add Camera')
-            nextCameraID = next_id(connection, 'cameraID', 'Cameras')
-            qry = text("""INSERT INTO Cameras
-                (cameraID, userID, name, filmSize) VALUES (:cameraID, :userID, :name, :filmSize)""")
-            insert(connection, qry, "Camera",
-                cameraID = nextCameraID,
-                userID = int(current_user.get_id()),
-                name = camera_form.name.data,
-                filmSize = camera_form.filmSize.data
-                )
-
-        # Filters
-        if request.form['button'] == 'addFilter':
-            nextFilterID = next_id(connection, 'filterID', 'Filters')
-            qry = text("""INSERT INTO Filters
-                (userID, filterID, name, code, factor, ev)
-                VALUES (:userID, :filterID, :name, :code, :factor, :ev)""")
-            insert(connection, qry, "Filters",
-                userID = userID,
-                filterID = nextFilterID,
-                name = filter_form.name.data,
-                code = filter_form.code.data,
-                factor = filter_form.factor.data,
-                ev = filter_form.ev.data)
-
-        if request.form['button'] == 'deleteFilter':
-            qry = text("""DELETE FROM Filters
-                WHERE userID = :userID
-                AND filterID = :filterID""")
-            delete(connection, qry, "Filter",
-                userID = userID,
-                filterID = int(request.form['filterID']))
-
-        # Camera Lenses
-        if request.form['button'] == 'addCameraLens':
-            nextLensID = next_id(connection, 'lensID', 'Lenses')
-            qry = text("""INSERT INTO Lenses
-                (lensID, userID, name)
-                VALUES (:lensID, :userID, :name)""")
-            insert(connection, qry, "Lens",
-                lensID = nextLensID,
-                userID = userID,
-                name = camera_lens_form.name.data)
-        if request.form['button'] == 'deleteCameraLens':
-            qry = text("""DELETE FROM Lenses
-                WHERE userID = :userID
-                AND lensID = :lensID""")
-            delete(connection, qry, "Lens",
-                userID = userID,
-                lensID = int(request.form['lensID']))
-
         # Enlarger Lenses
         if request.form['button'] == 'addEnlargerLens':
             nextEnlargerLensID = next_id(connection, 'enlargerLensID', 'EnlargerLenses')
@@ -198,21 +179,6 @@ def gear():
                 userID = userID,
                 enlargerID = int(request.form['enlargerID']))
 
-    qry = text("""SELECT cameraID, name, filmSize
-        FROM Cameras
-        WHERE userID = :userID ORDER BY filmSize, name""")
-    cameras = connection.execute(qry, userID = userID).fetchall()
-
-    qry = text("""SELECT lensID, name
-        FROM Lenses
-        WHERE userID = :userID ORDER BY name""")
-    cameraLenses = connection.execute(qry, userID = userID).fetchall()
-
-    qry = text("""SELECT filterID, name, code, factor, ev
-        FROM Filters
-        WHERE userID = :userID ORDER BY name""")
-    filters = connection.execute(qry, userID = current_user.get_id()).fetchall()
-
     qry = text("""SELECT enlargerLensID, name
         FROM EnlargerLenses
         WHERE userID = :userID ORDER BY name""")
@@ -225,18 +191,111 @@ def gear():
     enlargers = connection.execute(qry, userID = current_user.get_id()).fetchall()
 
     transaction.commit()
-    return render_template('/gear/index.html',
-        camera_form = camera_form,
-        filter_form = filter_form,
-        camera_lens_form = camera_lens_form,
+    return render_template('/gear/enlargers.html',
         enlarger_lens_form = enlarger_lens_form,
         enlarger_form = enlarger_form,
-        cameras=cameras,
-        filters=filters,
-        cameraLenses = cameraLenses,
         enlargerLenses = enlargerLenses,
         enlargers = enlargers)
 
+@app.route('/gear/filters',  methods = ['GET', 'POST'])
+@login_required
+def filters():
+    connection = engine.connect()
+    transaction = connection.begin()
+    userID = current_user.get_id()
+    filter_form = FilterForm()
+
+    if request.method == 'POST':
+        app.logger.debug('POST')
+        # Filters
+        if request.form['button'] == 'addFilter':
+            nextFilterID = next_id(connection, 'filterID', 'Filters')
+            qry = text("""INSERT INTO Filters
+                (userID, filterID, name, code, factor, ev)
+                VALUES (:userID, :filterID, :name, :code, :factor, :ev)""")
+            insert(connection, qry, "Filters",
+                userID = userID,
+                filterID = nextFilterID,
+                name = filter_form.name.data,
+                code = filter_form.code.data,
+                factor = filter_form.factor.data,
+                ev = filter_form.ev.data)
+
+        if request.form['button'] == 'deleteFilter':
+            qry = text("""DELETE FROM Filters
+                WHERE userID = :userID
+                AND filterID = :filterID""")
+            delete(connection, qry, "Filter",
+                userID = userID,
+                filterID = int(request.form['filterID']))
+
+    qry = text("""SELECT filterID, name, code, factor, ev
+        FROM Filters
+        WHERE userID = :userID ORDER BY name""")
+    filters = connection.execute(qry, userID = current_user.get_id()).fetchall()
+
+    transaction.commit()
+    return render_template('/gear/filters.html',
+        filter_form = filter_form,
+        filters=filters)
+
+@app.route('/gear/cameras',  methods = ['GET', 'POST'])
+@login_required
+def cameras():
+    connection = engine.connect()
+    transaction = connection.begin()
+    userID = current_user.get_id()
+    camera_form = CameraForm()
+    camera_lens_form = CameraLensForm()
+
+    if request.method == 'POST':
+        # Camera
+        if request.form['button'] == 'addCamera':
+            app.logger.debug('Add Camera')
+            nextCameraID = next_id(connection, 'cameraID', 'Cameras')
+            qry = text("""INSERT INTO Cameras
+                (cameraID, userID, name, filmSize) VALUES (:cameraID, :userID, :name, :filmSize)""")
+            insert(connection, qry, "Camera",
+                cameraID = nextCameraID,
+                userID = int(current_user.get_id()),
+                name = camera_form.name.data,
+                filmSize = camera_form.filmSize.data)
+
+        # Camera Lenses
+        if request.form['button'] == 'addCameraLens':
+            nextLensID = next_id(connection, 'lensID', 'Lenses')
+            qry = text("""INSERT INTO Lenses
+                (lensID, userID, name)
+                VALUES (:lensID, :userID, :name)""")
+            insert(connection, qry, "Lens",
+                lensID = nextLensID,
+                userID = userID,
+                name = camera_lens_form.name.data)
+
+        if request.form['button'] == 'deleteCameraLens':
+            qry = text("""DELETE FROM Lenses
+                WHERE userID = :userID
+                AND lensID = :lensID""")
+            delete(connection, qry, "Lens",
+                userID = userID,
+                lensID = int(request.form['lensID']))
+
+    qry = text("""SELECT cameraID, name, filmSize
+        FROM Cameras
+        WHERE userID = :userID ORDER BY filmSize, name""")
+    cameras = connection.execute(qry, userID = userID).fetchall()
+
+    qry = text("""SELECT lensID, name
+        FROM Lenses
+        WHERE userID = :userID ORDER BY name""")
+    cameraLenses = connection.execute(qry, userID = userID).fetchall()
+
+    transaction.commit()
+    return render_template('/gear/cameras.html',
+        camera_form = camera_form,
+        camera_lens_form = camera_lens_form,
+        cameras=cameras,
+        cameraLenses = cameraLenses)
 
 @app.route('/gear/camera/<int:cameraID>',  methods = ['GET', 'POST'])
 @login_required
@@ -251,7 +310,7 @@ def camera(cameraID):
             qry = text("""UPDATE Cameras
                 SET name = :name,
                     filmSize = :filmSize
-                WHERE userID = :userID
+                WHERE uintserID = :userID
                 AND cameraID = :cameraID""")
             connection.execute(qry,
                 name = camera_form.name.data,
@@ -305,3 +364,98 @@ def camera(cameraID):
         camera = camera,
         camera_lenses = camera_lenses,
         lenses = lenses)
+
+@app.route('/gear/holders',  methods = ['GET', 'POST'])
+@login_required
+def holders():
+    connection = engine.connect()
+    transaction = connection.begin()
+    userID = current_user.get_id()
+    form = HolderForm()
+
+    if request.method == 'POST':
+        if request.form['button'] == 'Unload':
+            qry = text("""UPDATE Holders
+                SET loaded = NULL, exposed = NULL, unloaded = NOW()
+                WHERE userID = :userID AND holderID = :holderID""")
+            connection.execute(qry,
+                userID = userID,
+                holderID = int(request.form['holderID']))
+
+        if request.form['button'] == 'Load':
+            return redirect("/gear/holders/" + request.form['holderID'])
+
+        if request.form['button'] == 'Reload':
+            qry = text("""UPDATE Holders
+                SET loaded = NOW(), exposed = NULL, unloaded = NULL
+                WHERE userID = :userID AND holderID = :holderID""")
+            connection.execute(qry,
+                userID = userID,
+                holderID = int(request.form['holderID']))
+
+        if request.form['button'] == 'Expose':
+            qry = text("""UPDATE Holders
+                SET exposed = NOW()
+                WHERE userID = :userID AND holderID = :holderID""")
+            connection.execute(qry,
+                userID = userID,
+                holderID = int(request.form['holderID']))
+
+        if request.form['button'] == 'addHolder':
+            nextHolderID = next_id(connection, 'holderID', 'Holders')
+            qry = text("""INSERT INTO Holders
+                (userID, holderID, name, size, notes)
+                VALUES (:userID, :holderID, :name, :size, :notes)""")
+            connection.execute(qry,
+                userID = userID,
+                holderID = nextHolderID,
+                name = form.name.data,
+                size = form.size.data,
+                notes = form.notes.data)
+
+    form.populate_select_fields(connection)
+
+    qry = text("""SELECT holderID, Holders.name, size,
+        IF(exposed, "Exposed",
+            IF(loaded, "Loaded", "Unloaded")) AS state,
+        Holders.filmTypeID, Holders.iso, brand AS filmBrand, FilmTypes.name AS filmName,
+        FilmTypes.iso AS filmISO, compensation, notes
+        FROM Holders
+        LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Holders.filmTypeID
+        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        WHERE userID = :userID""")
+    holders = connection.execute(qry,
+        userID = userID)
+    transaction.commit()
+
+    return render_template('/gear/holders.html',
+        form = form,
+        holders = holders)
+
+@app.route('/gear/holders/<int:holderID>',  methods = ['GET', 'POST'])
+@login_required
+def holder(holderID):
+    connection = engine.connect()
+    transaction = connection.begin()
+    userID = current_user.get_id()
+
+
+    qry = text("""SELECT holderID, Holders.name, size,
+        IF(exposed, "Exposed",
+            IF(loaded, "Loaded", "Unloaded")) AS state,
+        loaded, unloaded, exposed,
+        Holders.filmTypeID, Holders.iso, brand AS filmBrand, FilmTypes.name AS filmName,
+        FilmTypes.iso AS filmISO, compensation, notes
+        FROM Holders
+        LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Holders.filmTypeID
+        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        WHERE userID = :userID""")
+
+    holder = connection.execute(qry,
+        userID = userID).fetchone()
+    form = HolderForm(data=holder)
+
+    transaction.commit()
+
+    return render_template('/gear/holder.html',
+        form = form, holder = holder)

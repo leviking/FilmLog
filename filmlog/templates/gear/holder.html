@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+  {% include "gear/sidebar.html" %}
+  <div class="col-10">
+    <h1 class="page-header">Film Holder</h1>
+    <table class="table">
+      <tr>
+        <th>Name</th>
+        <td>{{ holder.name }}</td>
+        <th>Size</th>
+        <td>{{ holder.size }}</td>
+      </tr>
+      <tr>
+        <th>State</th>
+        <td>{{ holder.state }}</td>
+        <th>Film</th>
+        <td>
+          {% if holder.filmType %}
+          {{ holder.filmBrand }} {{ holder.filmType }} {{ holder.filmISO }}
+          {% endif %}
+        </td>
+      </tr>
+    </table>
+
+    <table class="table">
+      <tr>
+        <th>Loaded</th>
+        <td>{{ holder.loaded }}</td>
+        <th>Unloaded</th>
+        <td>{{ holder.unloaded }}</td>
+        <th>Exposed</th>
+        <td>{{ holder.exposed }}</td>
+      </tr>
+    </table>
+
+    <div class="card my-4">
+      <div class="card-header"><strong>Notes</strong></div>
+      <div class="card-body"><pre class="holderNotes">{{ holder.notes }}</pre></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Update Film Holder</div>
+      <div class="card-body">
+        {{ form_errors(form) }}
+        <form role="form" class="form-horizontal"
+          action="/gear/holders"
+          method="POST">
+          {{ form.csrf_token }}
+          <div class="form-group">
+            <div class="col-sm-6">
+              {{ form.name.label }}
+              {{ form.name(class="form-control") }}
+            </div>
+            <div class="col-sm-6">
+              {{ form.size.label }}
+              {{ form.size(class="form-control") }}
+            </div>
+            <div class="col-sm-12">
+              {{ form.notes.label }}
+              {{ form.notes(class="form-control") }}
+            </div>
+          </div>
+          <div class="button-bar">
+            <button class="btn btn-success" name="button" value="addHolder" action="submit">Add</button>
+          </div>
+        </form>
+      </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+  {% include "gear/sidebar.html" %}
+  <div class="col-10">
+    <h1 class="page-header">Film Holders</h1>
+    <table class="table table-striped table-bordered" id="holders">
+      <tr>
+          <th>Name</th>
+          <th>Size</th>
+          <th>Film</th>
+          <th>State</th>
+          <th>Command</th>
+      </tr>
+      {% for holder in holders %}
+        <tr>
+          <td><a href="/gear/holders/{{ holder.holderID }}">{{ holder.name }}</a></td>
+          <td>{{ holder.size }}</td>
+          <td>
+            {% if holder.filmType %}
+            {{ holder.filmBrand }} {{ holder.filmType }} {{ holder.filmISO }}
+            {% endif %}
+          </td>
+          <td>{{ holder.state }}</td>
+          <td>
+            <form role="form" class="form-horizontal"
+              action="/gear/holders"
+              method="POST">
+              {{ form.csrf_token }}
+              {% if holder.state == 'Unloaded' %}
+                <button class="btn btn-danger" name="button" action="submit" value="Load">Load</button>
+                <button class="btn btn-warning" name="button" action="submit" value="Reload">Reload</button>
+              {% endif %}
+              {% if holder.state == 'Loaded' %}
+                <button class="btn btn-dark" name="button" action="submit" value="Expose">Expose</button>
+              {% endif %}
+              {% if holder.state == 'Loaded' or holder.state == 'Exposed' %}
+                <button class="btn btn-secondary" name="button" action="submit" value="Unload">Unload</button>
+              {% endif %}
+              <input type="hidden" name="holderID" value="{{ holder.holderID }}" >
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="4">No Holders Found</td></tr>
+      {% endfor %}
+    </table>
+
+    <div class="card">
+      <div class="card-header">Add Film Holder</div>
+      <div class="card-body">
+        {{ form_errors(form) }}
+        <form role="form" class="form-horizontal"
+          action="/gear/holders"
+          method="POST">
+          {{ form.csrf_token }}
+          <div class="form-group">
+            <div class="col-sm-6">
+              {{ form.name.label }}
+              {{ form.name(class="form-control") }}
+            </div>
+            <div class="col-sm-6">
+              {{ form.size.label }}
+              {{ form.size(class="form-control") }}
+            </div>
+            <div class="col-sm-12">
+              {{ form.notes.label }}
+              {{ form.notes(class="form-control") }}
+            </div>
+          </div>
+          <div class="button-bar">
+            <button class="btn btn-success" name="button" value="addHolder" action="submit">Add</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
