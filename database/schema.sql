@@ -237,6 +237,20 @@ CREATE TABLE EnlargerLenses(
     CONSTRAINT EnlargerLenses_Users_fk FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
+CREATE TABLE Enlargers(
+    userID INT UNSIGNED NOT NULL,
+    enlargerID TINYINT UNSIGNED NOT NULL,
+    name VARCHAR(64) NOT NULL,
+    type ENUM('Condenser', 'Diffuser'),
+    lightsource ENUM('LED', 'Incandescent'),
+    wattage SMALLINT UNSIGNED,
+    temperature SMALLINT UNSIGNED,
+    notes TEXT,
+    PRIMARY KEY (userID, enlargerID),
+    UNIQUE KEY user_name_uq (userID, name),
+    CONSTRAINT Enlargers_Users_fk FOREIGN KEY (userID) REFERENCES Users (userID) ON UPDATE CASCADE
+);
+
 CREATE TABLE ContactSheets(
     filmID INT UNSIGNED NOT NULL,
     userID INT UNSIGNED NOT NULL,
@@ -244,13 +258,15 @@ CREATE TABLE ContactSheets(
     paperID TINYINT UNSIGNED DEFAULT NULL,
     paperFilterID TINYINT UNSIGNED DEFAULT NULL,
     enlargerLensID TINYINT UNSIGNED DEFAULT NULL,
+    COLUMN enlargerID TINYINT UNSIGNED DEFAULT NULL,
     aperture decimal(3,1) DEFAULT NULL,
     headHeight TINYINT UNSIGNED,
     exposureTime SMALLINT UNSIGNED NOT NULL,
     notes TEXT DEFAULT NULL,
     PRIMARY KEY (filmID, userID),
     CONSTRAINT ContactSheets_Files_fk FOREIGN KEY (userID, fileID) REFERENCES Files (userID, fileID),
-    CONSTRAINT ContactSheets_EnlargerLenses_fk FOREIGN KEY (userID, enlargerLensID) REFERENCES EnlargerLenses (userID, enlargerLensID) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT ContactSheets_EnlargerLenses_fk FOREIGN KEY (userID, enlargerLensID) REFERENCES EnlargerLenses (userID, enlargerLensID) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT ContactSheets_Enlargers_fk FOREIGN KEY (userID, enlargerID) REFERENCES Enlargers (userID, enlargerID)
 ) ENGINE='InnoDB';
 
 CREATE TABLE Prints (
@@ -261,6 +277,7 @@ CREATE TABLE Prints (
     paperID TINYINT UNSIGNED DEFAULT NULL,
     paperFilterID TINYINT UNSIGNED DEFAULT NULL,
     enlargerLensID TINYINT UNSIGNED DEFAULT NULL,
+    enlargerID TINYINT UNSIGNED DEFAULT NULL,
     fileID INT UNSIGNED DEFAULT NULL,
     aperture decimal(3,1) DEFAULT NULL,
     headHeight TINYINT UNSIGNED DEFAULT NULL,
@@ -277,15 +294,54 @@ CREATE TABLE Prints (
     CONSTRAINT prints_paperFilterID_fk FOREIGN KEY (paperFilterID) REFERENCES PaperFilters (paperFilterID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Prints_Exposures_fk FOREIGN KEY (userID, filmID, exposureNumber) REFERENCES Exposures (userID, filmID, exposureNumber),
     CONSTRAINT Prints_Files_fk FOREIGN KEY (userID, fileID) REFERENCES Files (userID, fileID) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT Prints_EnlargerLenses_fk FOREIGN KEY (userID, enlargerLensID) REFERENCES EnlargerLenses (userID, enlargerLensID) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT Prints_EnlargerLenses_fk FOREIGN KEY (userID, enlargerLensID) REFERENCES EnlargerLenses (userID, enlargerLensID) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT Prints_Enlargers_fk FOREIGN KEY (userID, enlargerID) REFERENCES Enlargers (userID, enlargerID)
 ) ENGINE='InnoDB';
+
+CREATE TABLE Developers(
+    developerID TINYINT UNSIGNED NOT NULL,
+    name VARCHAR(64),
+    PRIMARY KEY (developerID),
+    UNIQUE KEY name (name)
+) ENGINE='InnoDB';
+
+CREATE TABLE Recipes(
+    userID INT UNSIGNED NOT NULL,
+    recipeID SMALLINT UNSIGNED NOT NULL,
+    developerID TINYINT UNSIGNED NOT NULL,
+    duration SMALLINT UNSIGNED,
+    method ENUM('Inversion', 'Rotary', 'Stand', 'Semi-Stand'),
+    temperature TINYINT UNSIGNED,
+    notes TEXT DEFAULT NULL,
+    PRIMARY KEY (userID, recipeID),
+    CONSTRAINT Recipes_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON UPDATE CASCADE,
+    CONSTRAINT Recipes_developerID FOREIGN KEY (developerID) REFERENCES Developers (developerID) ON UPDATE CASCADE
+) ENGINE='InnoDB';
+
+CREATE TABLE Holders (
+    userID INT UNSIGNED NOT NULL,
+    holderID SMALLINT UNSIGNED NOT NULL,
+    name VARCHAR(64) NOT NULL,
+    size ENUM('4x5', '5x7', '8x10', '11x14') DEFAULT '4x5' NOT NULL,
+    loaded DATE DEFAULT NULL,
+    exposed DATE DEFAULT NULL,
+    unloaded DATE DEFAULT NULL,
+    filmTypeID SMALLINT UNSIGNED DEFAULT NULL,
+    iso SMALLINT UNSIGNED DEFAULT NULL,
+    compensation TINYINT DEFAULT NULL,
+    notes TEXT DEFAULT NULL,
+    PRIMARY KEY (userID, holderID),
+    UNIQUE user_name_eq (userID, name),
+    CONSTRAINT Holders_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT Holders_filmTypeID FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID) ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
 -- Functions
 DROP FUNCTION IF EXISTS SECONDS_TO_DURATION;
 DELIMITER //
 CREATE FUNCTION SECONDS_TO_DURATION (inSeconds SMALLINT) RETURNS VARCHAR(8) DETERMINISTIC
 BEGIN
-    DECLARE minutes TINYINT UNSIGNED;             
+    DECLARE minutes TINYINT UNSIGNED;
     DECLARE seconds TINYINT UNSIGNED;
     SELECT ROUND(FLOOR(inSeconds / 60)) INTO minutes;
     SELECT inSeconds % 60 INTO seconds;
@@ -373,4 +429,3 @@ CREATE TRIGGER CreateDefaultUserPreferences
 //
 
 DELIMITER ;
-
