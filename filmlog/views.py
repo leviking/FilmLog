@@ -540,6 +540,25 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
         filmSizeID = zero_to_none(form.filmSizeID.data)
 
         if request.form['button'] == 'addExposure':
+            # First we get basic info about the film log
+            qry = text("""SELECT filmTypeID, filmSizeID FROM Films
+                WHERE projectID = :projectID
+                AND filmID = :filmID
+                AND userID = :userID""")
+            filmInfo = connection.execute(qry,
+                projectID = projectID,
+                filmID = filmID,
+                userID = userID).fetchone()
+            filmTypeID = filmInfo.filmTypeID
+            filmSizeID = filmInfo.filmSizeID
+
+            # Determine if the format is sheet film
+            qry = text("""SELECT 1 FROM FilmSizes
+                WHERE filmSizeID = :filmSizeID
+                AND format = 'Sheet'""")
+            sheet_film = connection.execute(qry,
+                filmSizeID = filmSizeID).fetchone()
+
             # If exposure number has a dash, it means
             # we are adding a range of exposures
             exposureNumber = form.exposureNumber.data
@@ -550,8 +569,11 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                 sequence = [int(exposureNumber)]
             for exposure in sequence:
                 qry = text("""INSERT INTO Exposures
-                    (userID, filmID, exposureNumber, lensID, shutter, aperture, filmTypeID, iso, metering, flash, subject, development, notes)
-                    VALUES (:userID, :filmID, :exposureNumber, :lensID, :shutter, :aperture, :filmTypeID, :shotISO, :metering, :flash, :subject, :development, :notes)""")
+                    (userID, filmID, exposureNumber, lensID, shutter, aperture,
+                    filmTypeID, iso, metering, flash, subject, development, notes)
+                    VALUES (:userID, :filmID, :exposureNumber, :lensID,
+                    :shutter, :aperture, :filmTypeID, :shotISO, :metering,
+                    :flash, :subject, :development, :notes)""")
                 insert(connection, qry, "Exposure",
                     userID = userID,
                     filmID = filmID,
@@ -577,34 +599,9 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                     exposureNumber = exposure,
                     filterID = filterID)
 
-            # Decrement film stock for exposures if relevant
-
-            # First we get basic info about the film log
-            qry = text("""SELECT filmTypeID, filmSizeID FROM Films
-                WHERE projectID = :projectID
-                AND filmID = :filmID
-                AND userID = :userID""")
-            filmInfo = connection.execute(qry,
-                projectID = projectID,
-                filmID = filmID,
-                userID = userID).fetchone()
-            filmTypeID = filmInfo.filmTypeID
-            filmSizeID = filmInfo.filmSizeID
-
-            # Decrement the logged film from the film stock if the film
-            # type was provided and it is a sheet.
-            qry = text("""SELECT 1 FROM FilmSizes
-                WHERE filmSizeID = :filmSizeID
-                AND format = 'Sheet'""")
-            format = connection.execute(qry,
-                filmSizeID = filmSizeID).fetchone()
-            if format:
-                # First look at the film type from the sheet
-                if zero_to_none(form.filmTypeID.data):
-                    auto_decrement_film_stock(connection, form.filmTypeID.data, filmSizeID)
-                # If that doesn't exist, we use the global film type
-                else:
-                    auto_decrement_film_stock(connection, filmTypeID, filmSizeID)
+                if sheet_film:
+                    auto_decrement_film_stock(connection,
+                        filmTypeID, filmSizeID)
 
         if request.form['button'] == 'updateExposure':
             qry = text("""UPDATE Exposures
