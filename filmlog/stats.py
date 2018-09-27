@@ -42,7 +42,7 @@ def stats():
         JOIN Films on Films.filmID = Exposures.filmID
         JOIN FilmTypes ON FilmTypes.filmTypeID = Exposures.filmTypeID
         JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
-        AND userID = :userID
+        AND Exposures.userID = :userID
         GROUP BY Exposures.filmTypeID
         ORDER BY COUNT(Exposures.filmTypeID) DESC""")
     favoriteSheets =  connection.execute(qry, userID = userID)

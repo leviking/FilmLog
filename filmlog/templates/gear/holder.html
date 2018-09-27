@@ -17,8 +17,8 @@
         <td>{{ holder.state }}</td>
         <th>Film</th>
         <td>
-          {% if holder.filmType %}
-          {{ holder.filmBrand }} {{ holder.filmType }} {{ holder.filmISO }}
+          {% if holder.filmTypeID %}
+          {{ holder.filmBrand }} {{ holder.filmName }} {{ holder.filmISO }}
           {% endif %}
         </td>
       </tr>
@@ -45,25 +45,41 @@
       <div class="card-body">
         {{ form_errors(form) }}
         <form role="form" class="form-horizontal"
-          action="/gear/holders"
+          action="/gear/holders/{{ holder.holderID }}"
           method="POST">
           {{ form.csrf_token }}
-          <div class="form-group">
+          <div class="form-group row">
             <div class="col-sm-6">
               {{ form.name.label }}
               {{ form.name(class="form-control") }}
             </div>
-            <div class="col-sm-6">
+          </div>
+          <div class="form-group row">
+            <div class="col-sm-3">
               {{ form.size.label }}
               {{ form.size(class="form-control") }}
             </div>
+            <div class="col-sm-3">
+              {{ form.filmTypeID.label }}
+              {{ form.filmTypeID(class="form-control") }}
+            </div>
+            <div class="col-sm-3">
+              {{ form.compensation.label }}
+              {{ form.compensation(class="form-control", placeholder="1, -1") }}
+            </div>
+            <div class="col-sm-3">
+              {{ form.iso.label }}
+              {{ form.iso(class="form-control") }}
+            </div>
+          </div>
+          <div class="form-group row">
             <div class="col-sm-12">
               {{ form.notes.label }}
               {{ form.notes(class="form-control") }}
             </div>
           </div>
           <div class="button-bar">
-            <button class="btn btn-success" name="button" value="addHolder" action="submit">Add</button>
+            <button class="btn btn-success" name="button" value="updateHolder" action="submit">Update</button>
           </div>
         </form>
       </div>

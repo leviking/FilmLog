@@ -102,7 +102,7 @@ class HolderForm(FlaskForm):
     filmTypeID = SelectField('Film',
         validators=[Optional()],
         coerce=int)
-    temperature = IntegerField('ISO',
+    iso = IntegerField('Shot ISO',
             validators=[NumberRange(min=0,max=65535),
                         Optional()])
     compensation = IntegerField('Compensation',
@@ -439,6 +439,23 @@ def holder(holderID):
     transaction = connection.begin()
     userID = current_user.get_id()
 
+    if request.method == 'POST':
+        form = HolderForm()
+        if request.form['button'] == 'updateHolder':
+            qry = text("""UPDATE Holders
+                SET name = :name, size = :size, filmTypeID = :filmTypeID,
+                iso = :iso, compensation = :compensation, notes = :notes
+                WHERE userID = :userID
+                AND holderID = :holderID""")
+            connection.execute(qry,
+                name = form.name.data,
+                size = form.size.data,
+                filmTypeID = form.filmTypeID.data,
+                iso = form.iso.data,
+                compensation = form.compensation.data,
+                notes = form.notes.data,
+                userID = userID,
+                holderID = holderID)
 
     qry = text("""SELECT holderID, Holders.name, size,
         IF(exposed, "Exposed",
@@ -449,12 +466,13 @@ def holder(holderID):
         FROM Holders
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Holders.filmTypeID
         LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
-        WHERE userID = :userID""")
+        WHERE userID = :userID
+        AND holderID = :holderID""")
 
     holder = connection.execute(qry,
-        userID = userID).fetchone()
+        userID = userID, holderID = holderID).fetchone()
     form = HolderForm(data=holder)
-
+    form.populate_select_fields(connection)
     transaction.commit()
 
     return render_template('/gear/holder.html',
