@@ -5,3 +5,7 @@ from filmlog import app
 @app.route('/help', methods=['GET', 'POST'])
 def help():
     return render_template('help/index.html')
+
+@app.route('/help/terms', methods = ['GET'])
+def terms():
+    return render_template('help/terms.html')

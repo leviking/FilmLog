@@ -42,7 +42,7 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[validators.input_required(), Length(min=1,max=64)])
-    #email = StringField('Email', validators=[validators.input_required(), Length(min=1,max=256)])
+    email = StringField('Email', validators=[Length(min=1,max=256)])
     password = PasswordField('Password', validators=[validators.input_required(),
         validators.EqualTo('password2', message='Passwords must match')])
     password2 = PasswordField('Re-Enter Password', validators=[validators.input_required()])

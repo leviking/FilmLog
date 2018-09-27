@@ -16,6 +16,10 @@
           {{ form.username(size=24) }}
         </div>
         <div class="col-sm-3">
+          {{ form.email.label }}
+          {{ form.email(size=32, placeholder="optional") }}
+        </div>
+        <div class="col-sm-3">
           {{ form.password.label }}
           {{ form.password(size=32) }}
         </div>
@@ -32,6 +36,9 @@
         <button class="btn btn-success" action="submit">Register</button>
       </div>
     </form>
+    <br />
+    <a href="/help/terms">Terms of Service</a>
   </div>
 </div>
+
 {% endblock %}
