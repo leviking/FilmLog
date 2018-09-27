@@ -55,19 +55,15 @@
             </div>
           </div>
           <div class="form-group row">
-            <div class="col-sm-3">
+            <div class="col-sm-4">
               {{ form.size.label }}
               {{ form.size(class="form-control") }}
             </div>
-            <div class="col-sm-3">
-              {{ form.filmTypeID.label }}
-              {{ form.filmTypeID(class="form-control") }}
-            </div>
-            <div class="col-sm-3">
+            <div class="col-sm-4">
               {{ form.compensation.label }}
               {{ form.compensation(class="form-control", placeholder="1, -1") }}
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-4">
               {{ form.iso.label }}
               {{ form.iso(class="form-control") }}
             </div>
@@ -78,8 +74,15 @@
               {{ form.notes(class="form-control") }}
             </div>
           </div>
+          <div class="form-group row">
+            <div class="col-sm-3">
+              {{ form.filmTypeID.label }}
+              {{ form.filmTypeID(class="form-control") }}
+            </div>
+          </div>
           <div class="button-bar">
             <button class="btn btn-success" name="button" value="updateHolder" action="submit">Update</button>
+            <button class="btn btn-danger" name="button" value="loadHolder" action="submit">Update &amp; Load</button>
           </div>
         </form>
       </div>

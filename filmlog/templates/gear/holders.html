@@ -22,13 +22,21 @@
             {{ holder.filmBrand }} {{ holder.filmType }} {{ holder.filmISO }}
             {% endif %}
           </td>
-          <td>{{ holder.state }}</td>
+          {% if holder.state == 'Empty' %}
+            <td class="holderState holderUnloaded">
+          {% elif holder.state ==  'Loaded' %}
+            <td class="holderState holderLoaded">
+          {% elif holder.state == 'Exposed' %}
+            <td class="holderState holderExposed">
+          {% endif %}
+            {{ holder.state }}
+          </td>
           <td>
             <form role="form" class="form-horizontal"
               action="/gear/holders"
               method="POST">
               {{ form.csrf_token }}
-              {% if holder.state == 'Unloaded' %}
+              {% if holder.state == 'Empty' %}
                 <button class="btn btn-danger" name="button" action="submit" value="Load">Load</button>
                 <button class="btn btn-warning" name="button" action="submit" value="Reload">Reload</button>
               {% endif %}

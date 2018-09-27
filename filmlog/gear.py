@@ -417,7 +417,7 @@ def holders():
 
     qry = text("""SELECT holderID, Holders.name, size,
         IF(exposed, "Exposed",
-            IF(loaded, "Loaded", "Unloaded")) AS state,
+            IF(loaded, "Loaded", "Empty")) AS state,
         Holders.filmTypeID, Holders.iso, brand AS filmBrand, FilmTypes.name AS filmType,
         FilmTypes.iso AS filmISO, compensation, notes
         FROM Holders
@@ -456,6 +456,24 @@ def holder(holderID):
                 notes = form.notes.data,
                 userID = userID,
                 holderID = holderID)
+        if request.form['button'] == 'loadHolder':
+            qry = text("""UPDATE Holders
+                SET name = :name, size = :size, filmTypeID = :filmTypeID,
+                iso = :iso, compensation = :compensation, notes = :notes,
+                loaded = NOW()
+                WHERE userID = :userID
+                AND holderID = :holderID""")
+            connection.execute(qry,
+                name = form.name.data,
+                size = form.size.data,
+                filmTypeID = form.filmTypeID.data,
+                iso = form.iso.data,
+                compensation = form.compensation.data,
+                notes = form.notes.data,
+                userID = userID,
+                holderID = holderID)
+        transaction.commit()
+        return redirect("/gear/holders")
 
     qry = text("""SELECT holderID, Holders.name, size,
         IF(exposed, "Exposed",
