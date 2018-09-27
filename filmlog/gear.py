@@ -418,7 +418,7 @@ def holders():
     qry = text("""SELECT holderID, Holders.name, size,
         IF(exposed, "Exposed",
             IF(loaded, "Loaded", "Unloaded")) AS state,
-        Holders.filmTypeID, Holders.iso, brand AS filmBrand, FilmTypes.name AS filmName,
+        Holders.filmTypeID, Holders.iso, brand AS filmBrand, FilmTypes.name AS filmType,
         FilmTypes.iso AS filmISO, compensation, notes
         FROM Holders
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Holders.filmTypeID
