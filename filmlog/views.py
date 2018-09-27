@@ -659,7 +659,8 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
             + '/films/' + str(filmID))
 
     qry = text("""SELECT exposureNumber, shutter, aperture,
-        lensID, flash, notes, metering, subject, development, filmTypeID, iso
+        lensID, flash, notes, metering, subject, development, filmTypeID,
+        iso AS shotISO
         FROM Exposures
         WHERE filmID = :filmID
         AND exposureNumber = :exposureNumber
