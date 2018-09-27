@@ -349,6 +349,7 @@ def camera(cameraID):
 
     qry = text("""SELECT CameraLenses.lensID AS lensID, name FROM CameraLenses
         JOIN Lenses ON Lenses.lensID = CameraLenses.lensID
+            AND Lenses.userID = CameraLenses.userID
         WHERE CameraLenses.userID = :userID
         AND cameraID = :cameraID""")
     camera_lenses = connection.execute(qry,

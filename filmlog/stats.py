@@ -40,6 +40,7 @@ def stats():
         COUNT(Exposures.filmTypeID) AS count
         FROM Exposures
         JOIN Films on Films.filmID = Exposures.filmID
+            AND Films.userID = Exposuers.userID
         JOIN FilmTypes ON FilmTypes.filmTypeID = Exposures.filmTypeID
         JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
         AND Exposures.userID = :userID

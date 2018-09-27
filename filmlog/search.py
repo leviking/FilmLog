@@ -20,6 +20,7 @@ def search():
         filmCount, Projects.createdOn
         FROM Projects
         JOIN Binders ON Binders.binderID = Projects.binderID
+            AND Binders.userID = Projects.userID
         WHERE Projects.userID = :userID
         AND Projects.name LIKE ('%""" + search + """%')
         ORDER BY createdOn""")
@@ -34,10 +35,12 @@ def search():
         Cameras.name AS camera
         FROM Films
         JOIN Projects ON Projects.projectID = Films.projectID
+            AND Projects.userID = Films.userID
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
         LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
         JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
         JOIN Cameras ON Cameras.cameraID = Films.cameraID
+            AND Cameras.userID = Films.userID
         WHERE Films.userID = :userID
         AND (Films.title LIKE ('%""" + search + """%')
         OR Films.notes LIKE ('%""" + search + """%'))
@@ -51,6 +54,7 @@ def search():
         FROM Exposures
         JOIN Films ON Films.filmID = Exposures.filmID
         JOIN Projects ON Projects.projectID = Films.projectID
+            AND Projects.userID = Films.userID
         WHERE Exposures.userID = :userID
         AND (Exposures.subject LIKE ('%""" + search + """%')
         OR Exposures.notes LIKE ('%""" + search + """%'))

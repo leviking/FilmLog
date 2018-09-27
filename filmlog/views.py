@@ -348,6 +348,7 @@ def project(binderID, projectID):
         LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
         JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
         JOIN Cameras ON Cameras.cameraID = Films.cameraID
+            AND Cameras.userID = Films.userID
         WHERE projectID = :projectID AND Films.userID = :userID ORDER BY fileDate""")
     films = connection.execute(qry, projectID=projectID, userID=userID).fetchall()
     transaction.commit()
@@ -426,7 +427,6 @@ def film(binderID, projectID, filmID):
                     + '/films/' + str(filmID))
             else:
                 film = get_film_details(connection, binderID, projectID, filmID)
-                print "HERE"
                 app.logger.debug("FilmTypeID: %s", film.filmTypeID)
                 return render_template('film/edit-film.html',
                     form=form,
@@ -456,6 +456,7 @@ def film(binderID, projectID, filmID):
         FilmBrands.brand AS filmBrand
         FROM Exposures
         LEFT JOIN Lenses ON Lenses.lensID = Exposures.lensID
+            AND Lenses.userID = Exposures.userID
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Exposures.filmTypeID
         LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
         WHERE filmID = :filmID
