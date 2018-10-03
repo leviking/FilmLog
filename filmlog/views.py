@@ -206,9 +206,15 @@ class ExposureForm(FlaskForm):
 
 @app.route('/',  methods = ['GET'])
 def index():
+    connection = engine.connect()
+    transaction = connection.begin()
     userID = current_user.get_id()
     if userID:
-        return render_template('overview.html')
+        qry = text("""SELECT COUNT(*) AS cnt FROM Binders
+            WHERE userID = :userID""")
+        binder_count = connection.execute(qry, userID = userID).fetchone()
+        return render_template('overview.html',
+            binder_count = binder_count.cnt)
     else:
         return render_template('public/index.html')
 

@@ -1,7 +1,48 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1 class="page-header">Film Log</h1>
-  <p>Log dem films</p>
+  <h1 class="page-header">Overview</h1>
+  {% if binder_count == 0 %}
+    <h2>First Steps</h2>
+    <h3>TLDR?</h3>
+    <ul>
+      <li><a href="/gear/cameras">Add a Camera (and optionally lenses, and filters)</a></li>
+      <li><a href="/binders">Create a New Binder</a></li>
+      <li>Create a new project under the new binder</li>
+      <li>Create films under the new project</li>
+    </ul>
 
+    <h3>Intro To Film Loggering</h3>
+    <p>It looks like you have not yet created a binder. new to Film Log? No Problem!
+      First things first, you'll want to <a href="/gear/cameras">add a camera</a>
+      and probably a lens. While there you may also want to add any filters you
+      might be using, such as a Yellow-8 or Red-25 filter. All these are used
+      when adding films and exposures.</p>
+
+    <p>Once you've done that, <a href="/binders">create a new binder</a>.
+      Binders are the first level of organizing your films and should
+      correspond to the physical binder you are using to store your film.
+      You can organize them however you like - by year seems to be a good
+      option, but it is up to you.</p>
+
+    <p>Once you have a binder, underneath you would create projects. To do that
+      go to your <a href="/binders">binders</a> list and click on one you
+      would like to add a project to. A project is a grouping of films and,
+      again, it is up to you how you might like to use it. Organizing projects
+      by paper dividers in yor physical binder is a good option. For instance,
+      you can organize by a trip, by film type, a portrait session, etc.
+      If you do not need to organize to this level, you can just create one
+      project for your films. Each binder will need at least one project.</p>
+
+    <p>Once you have a project, now you can get to the good stuff - adding
+      your films. Each film is where you will mark down both information about
+      the film (such as what film you used, speed, size; what camera; etc.) as
+      well as exposures. The exposures then correspond to darkroom prints.
+      You do not have to log exposures if you prefer not to.</p>
+
+    <p>The goal is to print out each film sheet so you can file it with the
+      actual film in your binder. You can also use The Film Log to search
+      and otherwise organize your films. The File No is meant to correspond
+      to the File No used in a PrintFile sheet.</p>
+  {% endif %}
 {% endblock %}
