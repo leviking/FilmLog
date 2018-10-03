@@ -42,7 +42,7 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[validators.input_required(), Length(min=1,max=64)])
-    email = StringField('Email', validators=[Length(min=1,max=256)])
+    email = StringField('Email', validators=[validators.Optional(), Length(min=1,max=256)])
     password = PasswordField('Password', validators=[validators.input_required(),
         validators.EqualTo('password2', message='Passwords must match')])
     password2 = PasswordField('Re-Enter Password', validators=[validators.input_required()])
@@ -63,6 +63,8 @@ def unauthorized():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    connection = engine.connect()
+    transaction = connection.begin()
     form = LoginForm()
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -70,11 +72,16 @@ def login():
             password = form.password.data
             qry = text("""SELECT userID, password FROM Users
                     WHERE username = :username""")
-            user = engine.execute(qry, username=username).fetchone()
+            user = connection.execute(qry, username=username).fetchone()
             if user:
                 if check_password_hash(user.password, password):
                     login_user(User(user.userID), remember=True)
+                    qry = text("""UPDATE Users SET lastLogin = NOW()
+                        WHERE userID = :userID""")
+                    connection.execute(qry, userID=user.userID)
+                    transaction.commit()
                     return redirect("/")
+            transaction.rollback()
     return render_template('users/login.html', form=form)
 
 @app.route('/logout', methods=['GET'])
@@ -118,8 +125,8 @@ def register():
                 #    password=generate_password_hash(form.password.data),
                 #    registrationCode=generate_registration_code())
                 qry = text("""INSERT INTO Users
-                    (username, password)
-                    VALUES (:username, :password)""")
+                    (username, password, createdOn)
+                    VALUES (:username, :password, NOW())""")
                 engine.execute(qry,
                     username=form.username.data,
                     password=generate_password_hash(form.password.data))
