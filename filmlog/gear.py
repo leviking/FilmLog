@@ -310,7 +310,7 @@ def camera(cameraID):
             qry = text("""UPDATE Cameras
                 SET name = :name,
                     filmSize = :filmSize
-                WHERE uintserID = :userID
+                WHERE userID = :userID
                 AND cameraID = :cameraID""")
             connection.execute(qry,
                 name = camera_form.name.data,
