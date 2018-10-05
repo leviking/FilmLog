@@ -58,7 +58,7 @@ def get_lenses(connection, cameraID):
     qry = text("""SELECT CameraLenses.lensID AS lensID, name
         FROM CameraLenses
         JOIN Lenses ON Lenses.lensID = CameraLenses.lensID
-            AND Lenses.userID = cameraLenses.userID
+            AND Lenses.userID = CameraLenses.userID
         WHERE CameraLenses.cameraID = :cameraID
         AND CameraLenses.userID = :userID""")
     return connection.execute(qry,
