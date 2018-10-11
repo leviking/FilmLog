@@ -474,6 +474,7 @@ def film(binderID, projectID, filmID):
     for exposure in exposures:
         qry = text("""SELECT code FROM ExposureFilters
             JOIN Filters ON Filters.filterID = ExposureFilters.filterID
+                AND Filters.userID = ExposureFilters.userID
             WHERE filmID = :filmID
             AND exposureNumber = :exposureNumber
             AND ExposureFilters.userID = :userID""")
