@@ -424,7 +424,7 @@ def holders():
         FROM Holders
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Holders.filmTypeID
         LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
-        WHERE userID = :userID""")
+        WHERE userID = :userID ORDER BY Holders.name""")
     holders = connection.execute(qry,
         userID = userID)
     transaction.commit()
