@@ -18,7 +18,8 @@ from filmlog.functions import next_id, result_to_dict, get_film_details, \
     optional_choices, zero_to_none, get_film_types, get_film_sizes, \
     insert, delete
 from filmlog.classes import MultiCheckboxField
-from filmlog import users, filmstock, darkroom, files, stats, gear, help, engine, search
+from filmlog import users, filmstock, darkroom, files, stats, gear, help, \
+    engine, search, developing
 
 ## Blueprints
 from filmlog.api import api_blueprint
