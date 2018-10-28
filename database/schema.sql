@@ -7,6 +7,8 @@ CREATE TABLE Users (
     username varchar(64) NOT NULL,
     email varchar(255) DEFAULT NULL,
     password varbinary(128) NOT NULL,
+    createdOn TIMESTAMP DEFAULT 0,
+    lastLogin TIMESTAMP DEFAULT 0,
     UNIQUE email_uq (email),
     UNIQUE username_uq (username)
 ) ENGINE='InnoDB';
