@@ -15,7 +15,6 @@ def search():
     userID = current_user.get_id()
     search = re.escape(request.args.get('search'))
 
-
     qry = text("""SELECT Projects.binderID, Projects.projectID,
         Projects.name AS project_name, Binders.name AS binder_name,
         filmCount, Projects.createdOn

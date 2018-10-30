@@ -8,7 +8,7 @@ from flask_login import LoginManager, login_required, current_user, login_user, 
 from flask_wtf import FlaskForm
 from wtforms import Form, StringField, IntegerField, SelectField, RadioField, \
     DecimalField, TextAreaField, FileField, validators
-from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError
+from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError, Length
 from flask_wtf.file import FileAllowed
 
 from filmlog import app
@@ -16,7 +16,7 @@ from filmlog import database, engine
 from filmlog import functions
 from filmlog import files
 
-from filmlog.functions import optional_choices, zero_to_none, insert, result_to_dict
+from filmlog.functions import optional_choices, zero_to_none, insert, result_to_dict, next_id
 
 engine = database.engine
 
@@ -80,6 +80,33 @@ def seconds_to_time(seconds):
 
 ## Classes
 # Forms
+class EnlargerLensForm(FlaskForm):
+    name = StringField('Name',
+        validators=[DataRequired(), Length(min=1, max=64)])
+
+class EnlargerForm(FlaskForm):
+    name = StringField('Name',
+        validators=[DataRequired(), Length(min=1, max=64)])
+    type = SelectField('Type',
+        validators=[DataRequired()],
+        choices=[
+            ('Condenser', 'Condenser'),
+            ('Diffuser', 'Diffuser')])
+    lightsource = SelectField('Type',
+        validators=[DataRequired()],
+        choices=[
+            ('LED', 'LED'),
+            ('Incandescent', 'Incandescent')])
+    wattage = IntegerField('Wattage',
+            validators=[NumberRange(min=0,max=65535),
+                        Optional()])
+    temperature = IntegerField('Temperature (K)',
+            validators=[NumberRange(min=0,max=65535),
+                        Optional()])
+    notes = TextAreaField('Notes',
+        validators=[Optional()],
+        filters = [lambda x: x or None])
+
 class PrintForm(FlaskForm):
     exposureNumber = SelectField('Exposure #',
         validators=[DataRequired()],
@@ -170,6 +197,79 @@ def check_for_print_file(connection, printID):
         if result[0]:
             return int(result[0])
     return None
+
+@app.route('/darkroom',  methods = ['GET', 'POST'])
+@login_required
+def enlargers():
+    connection = engine.connect()
+    transaction = connection.begin()
+    userID = current_user.get_id()
+
+    enlarger_lens_form = EnlargerLensForm()
+    enlarger_form = EnlargerForm()
+
+    if request.method == 'POST':
+        app.logger.debug('POST')
+        # Enlarger Lenses
+        if request.form['button'] == 'addEnlargerLens':
+            nextEnlargerLensID = next_id(connection, 'enlargerLensID', 'EnlargerLenses')
+            qry = text("""INSERT INTO EnlargerLenses
+                (enlargerLensID, userID, name)
+                VALUES (:enlargerLensID, :userID, :name)""")
+            insert(connection, qry, "Enlarger Lens",
+                enlargerLensID = nextEnlargerLensID,
+                userID = userID,
+                name = enlarger_lens_form.name.data)
+        if request.form['button'] == 'deleteEnlargerLens':
+            qry = text("""DELETE FROM EnlargerLenses
+                WHERE userID = :userID
+                AND enlargerLensID = :enlargerLensID""")
+            connection.execute(qry,
+                userID = userID,
+                enlargerLensID = int(request.form['enlargerLensID']))
+
+        if request.form['button'] == 'addEnlarger':
+            nextEnlargerID = next_id(connection, 'enlargerID', 'Enlargers')
+            qry = text("""INSERT INTO Enlargers
+                (userID, enlargerID, name, type, lightsource, wattage, temperature, notes)
+                VALUES (:userID, :enlargerID, :name, :type, :lightsource, :wattage,
+                    :temperature, :notes)""")
+            connection.execute(qry,
+                userID = userID,
+                enlargerID = nextEnlargerID,
+                name = enlarger_form.name.data,
+                type = enlarger_form.type.data,
+                lightsource = enlarger_form.lightsource.data,
+                wattage = enlarger_form.wattage.data,
+                temperature = enlarger_form.temperature.data,
+                notes = enlarger_form.notes.data)
+        if request.form['button'] == 'deleteEnlarger':
+            qry = text("""DELETE FROM Enlargers
+                WHERE userID = :userID
+                AND enlargerID = :enlargerID""")
+            connection.execute(qry,
+                userID = userID,
+                enlargerID = int(request.form['enlargerID']))
+
+    qry = text("""SELECT enlargerLensID, name
+        FROM EnlargerLenses
+        WHERE userID = :userID ORDER BY name""")
+    enlargerLenses = connection.execute(qry, userID = current_user.get_id()).fetchall()
+
+    qry = text("""SELECT enlargerID, name, type, lightsource, wattage,
+        temperature, notes
+        FROM Enlargers
+        WHERE userID = :userID ORDER BY name""")
+    enlargers = connection.execute(qry, userID = current_user.get_id()).fetchall()
+
+    transaction.commit()
+    return render_template('/darkroom/index.html',
+        enlarger_lens_form = enlarger_lens_form,
+        enlarger_form = enlarger_form,
+        enlargerLenses = enlargerLenses,
+        enlargers = enlargers)
+
+### Darkroom Film Tabs
 
 @app.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>/prints',  methods = ['POST', 'GET'])
 @login_required
