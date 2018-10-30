@@ -13,7 +13,8 @@ def search():
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
-    search = request.args.get('search')
+    search = re.escape(request.args.get('search'))
+
 
     qry = text("""SELECT Projects.binderID, Projects.projectID,
         Projects.name AS project_name, Binders.name AS binder_name,
