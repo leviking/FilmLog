@@ -392,9 +392,23 @@ def holder(holderID):
 
     holder = connection.execute(qry,
         userID = userID, holderID = holderID).fetchone()
+
+    qry = text("""SELECT Exposures.filmID, title, exposureNumber,
+        fileDate, Projects.projectID, binderID
+        FROM Exposures
+        JOIN Films ON Films.filmID = Exposures.filmID
+            AND Films.userID = Exposures.userID
+        JOIN Projects ON Projects.projectID = Films.projectID
+            AND Projects.userID = Films.userID
+        WHERE Exposures.userID = :userID
+        AND holderID = :holderID""")
+
+    exposures = connection.execute(qry,
+        userID = userID, holderID = holderID).fetchall()
+
     form = HolderForm(data=holder)
     form.populate_select_fields(connection)
     transaction.commit()
 
     return render_template('/gear/holder.html',
-        form = form, holder = holder)
+        form = form, holder = holder, exposures = exposures)

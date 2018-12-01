@@ -87,6 +87,28 @@
         </form>
       </div>
     </div>
+
+    <div class="card my-4">
+      <div class="card-header"><strong>Exposures</strong></div>
+      <div class="card-body">
+        <table class="table table-striped table-bordered" id="holderExposures">
+          <tr>
+            <th>Film Title</th>
+            <th>Exposure #</th>
+            <th>Date Filed</td>
+          </tr>
+          {% for exposure in exposures %}
+            <tr>
+              <td><a href="/binders/{{ exposure.binderID }}/projects/{{ exposure.projectID }}/films/{{ exposure.filmID }}">{{ exposure.title }}</a></td>
+              <td>{{ exposure.exposureNumber }}</td>
+              <td>{{ exposure.fileDate }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="2">No Exposures Logged</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
 </div>
 
 {% endblock %}

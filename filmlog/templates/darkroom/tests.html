@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+{% include "darkroom/sidebar.html" %}
+<div class="col-10">
+  <h1>Printing Tests</h1>
+
+  <h2>Maximum Black Tests</h2>
+  <table class="table table-striped table-bordered" id="mbt">
+    <thead class="thead-light">
+      <tr>
+        <th>Paper</th>
+        <th>Film</th>
+        <th>Enlarger</th>
+        <th>Enlarger Height</th>
+        <th>Enlarger Lens</th>
+        <th>Aperture</th>
+        <th>Size</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for test in tests %}
+      <tr>
+        <td>{{ test.paper }}</td>
+        <td>{{ test.film }}</td>
+        <td>{{ test.enlarger }}</td>
+        <td>{{ test.headHeight }}</td>
+        <td>{{ test.lens }}</td>
+        <td>{{ test.aperture }}</td>
+        <td>{{ test.size }}</td>
+        <td>{{ test.exposureTime }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8">No Tests Found</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+</div>
+{% endblock %}

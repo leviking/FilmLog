@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+{% include "darkroom/sidebar.html" %}
+<div class="col-10">
+
+<a name="Enlargers"><h2>Enlargers</h2></a>
+<table class="table table-striped table-bordered" id="enlargers">
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Lightsource</th>
+      <th>Wattage</th>
+      <th>Temperature (K)</th>
+      <th>Notes</th>
+      <th></th>
+  </tr>
+  {% for enlarger in enlargers %}
+    <tr>
+      <td>{{ enlarger.name }}</td>
+      <td>{{ enlarger.type }}</td>
+      <td>{{ enlarger.lightsource }}</td>
+      <td>{{ enlarger.wattage }}</td>
+      <td>{{ enlarger.temperature }}</td>
+      <td>{{ enlarger.notes }}</td>
+      <td>
+        <form role="form" class="form-horizontal"
+          action="/darkroom"
+          method="POST">
+          {{ enlarger_lens_form.csrf_token }}
+          <button name="button" value="deleteEnlarger" action="submit" class="btn btn-sm btn-danger">Delete</button>
+          <input type="hidden" name="enlargerID" value="{{ enlarger.enlargerID }}" >
+        </form>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6">None Found</td></tr>
+  {% endfor %}
+</table>
+
+<div class="card my-4">
+  <div class="card-header">Add Enlarger</div>
+  <div class="card-body">
+    {{ form_errors(enlarger_form) }}
+    <form role="form" class="form-horizontal"
+      action="/darkroom"
+      method="POST">
+      {{ enlarger_form.csrf_token }}
+      <div class="form-group row">
+        <div class="col-sm-4">
+          {{ enlarger_form.name.label }}
+          {{ enlarger_form.name(class="form-control", placeholder="Omega D2") }}
+        </div>
+        <div class="col-sm-2">
+          {{ enlarger_form.type.label }}
+          {{ enlarger_form.type(class="form-control") }}
+        </div>
+        <div class="col-sm-2">
+          {{ enlarger_form.lightsource.label }}
+          {{ enlarger_form.lightsource(class="form-control") }}
+        </div>
+        <div class="col-sm-2">
+          {{ enlarger_form.wattage.label }}
+          {{ enlarger_form.wattage(class="form-control", placeholder="70") }}
+        </div>
+        <div class="col-sm-2">
+          {{ enlarger_form.temperature.label }}
+          {{ enlarger_form.temperature(class="form-control", placeholder="5000") }}
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-sm-12">
+          {{ enlarger_form.notes.label }}
+          {{ enlarger_form.notes(class="form-control", placeholder="Notes") }}
+        </div>
+      </div>
+      <div class="button-bar">
+        <button class="btn btn-success" name="button" action="submit" value="addEnlarger">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<a name="EnlargerLenses"><h2>Enlarger Lenses</h2></a>
+<table class="table table-striped table-bordered" id="projects">
+  <tr>
+      <th>Name</th>
+      <th></th>
+  </tr>
+  {% for lens in enlargerLenses %}
+    <tr>
+      <td>{{ lens.name }}</td>
+      <td>
+        <form role="form" class="form-horizontal"
+          action="/darkroom"
+          method="POST">
+          {{ enlarger_lens_form.csrf_token }}
+          <button name="button" value="deleteEnlargerLens" action="submit" class="btn btn-sm btn-danger">Delete</button>
+          <input type="hidden" name="enlargerLensID" value="{{ lens.enlargerLensID }}" >
+        </form>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="2">None Found</td></tr>
+  {% endfor %}
+</table>
+
+<div class="card my-4">
+  <div class="card-header">Add Enlarger Lens</div>
+  <div class="card-body">
+    {{ form_errors(enlarger_lens_form) }}
+    <form role="form" class="form-horizontal"
+      action="/darkroom"
+      method="POST">
+      {{ enlarger_lens_form.csrf_token }}
+      <div class="form-group row">
+        <div class="col-sm-6">
+          {{ enlarger_lens_form.name.label }}
+          {{ enlarger_lens_form.name(class="form-control", placeholder="Schneider COMPONAR-S 2.8/50") }}
+        </div>
+      </div>
+      <div class="button-bar">
+        <button class="btn btn-success" name="button" action="submit" value="addEnlargerLens">Save</button>
+      </div>
+    </form>
+  </div>
+  </div>
+</div>
+
+{% endblock %}
