@@ -61,5 +61,18 @@ def _jinja2_filter_date(date, fmt=None):
     format='%Y-%m-%d'
     return date.strftime(format)
 
+@app.context_processor
+def section_mapping():
+    section_map = (
+        ('/gear', 'Gear'),
+        ('/darkroom', 'Darkroom'),
+        ('/developing', 'Developing'),
+        ('/filmstock', 'Film Stock'),
+        ('/filmtypes', 'Available Films'),
+        ('/stats', 'Stats')
+    )
+    return dict(section_map=section_map)
+
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0')

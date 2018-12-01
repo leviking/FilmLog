@@ -74,6 +74,14 @@ def get_filters(connection):
     return connection.execute(qry,
         userID = userID).fetchall()
 
+def get_holders(connection):
+    userID = current_user.get_id()
+    qry = text("""SELECT holderID, name
+        FROM Holders
+        WHERE userID = :userID""")
+    return connection.execute(qry,
+        userID = userID).fetchall()
+
 # Blindly Decrement Film Stock. If the film does not exist, the UPDATE
 # won't do anything. This is currently by design since if a user isn't
 # tracking a particular film, no sense in cluttering up the Film Stock.
@@ -184,6 +192,9 @@ class ExposureForm(FlaskForm):
     filmSizeID = SelectField('Film Size',
         validators=[Optional()],
         coerce=int)
+    holderID = SelectField('Film Holder',
+        validators=[Optional()],
+        coerce=int)
     shotISO = IntegerField('Shot ISO',
         validators=[NumberRange(min=0,max=65535),
                     Optional()])
@@ -193,6 +204,7 @@ class ExposureForm(FlaskForm):
         self.filmTypeID.choices = optional_choices("None", get_film_types(connection))
         self.filmSizeID.choices = optional_choices("None", get_film_sizes(connection))
         self.lensID.choices = optional_choices("None", get_lenses(connection, cameraID))
+        self.holderID.choices = optional_choices("None", get_holders(connection))
         self.filters.choices = get_filters(connection)
 
     def set_exposure_number(self, number):
@@ -445,7 +457,6 @@ def film(binderID, projectID, filmID):
     if film is None:
         abort(404)
 
-
     qry = text("""SELECT cameraID, format
         FROM Films
         LEFT OUTER JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
@@ -458,13 +469,17 @@ def film(binderID, projectID, filmID):
     filmFormat = extras_result[1]
 
     qry = text("""SELECT exposureNumber, shutter, aperture,
-        Lenses.name AS lens, flash, metering, subject, notes, development,
+        Lenses.name AS lens, flash, metering, subject, Exposures.notes, development,
         Exposures.iso AS shotISO,
         FilmTypes.name AS filmType, FilmTypes.iso AS filmISO,
-        FilmBrands.brand AS filmBrand
+        FilmBrands.brand AS filmBrand,
+        Holders.name AS holderName,
+        Holders.holderID AS holderID
         FROM Exposures
         LEFT JOIN Lenses ON Lenses.lensID = Exposures.lensID
             AND Lenses.userID = Exposures.userID
+        LEFT JOIN Holders ON Holders.holderID = Exposures.holderID
+            AND Holders.userID = Exposures.userID
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Exposures.filmTypeID
         LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
         WHERE filmID = :filmID
@@ -579,9 +594,9 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                 sequence = [int(exposureNumber)]
             for exposure in sequence:
                 qry = text("""INSERT INTO Exposures
-                    (userID, filmID, exposureNumber, lensID, shutter, aperture,
+                    (userID, filmID, exposureNumber, lensID, holderID, shutter, aperture,
                     filmTypeID, iso, metering, flash, subject, development, notes)
-                    VALUES (:userID, :filmID, :exposureNumber, :lensID,
+                    VALUES (:userID, :filmID, :exposureNumber, :lensID, :holderID,
                     :shutter, :aperture, :filmTypeID, :shotISO, :metering,
                     :flash, :subject, :development, :notes)""")
                 insert(connection, qry, "Exposure",
@@ -589,6 +604,7 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                     filmID = filmID,
                     exposureNumber = exposure,
                     lensID = zero_to_none(form.lensID.data),
+                    holderID = zero_to_none(form.holderID.data),
                     shutter = encode_shutter(form.shutter.data),
                     aperture = form.aperture.data,
                     filmTypeID = zero_to_none(form.filmTypeID.data),
@@ -619,6 +635,7 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                     shutter = :shutter,
                     aperture = :aperture,
                     lensID = :lensID,
+                    holderID = :holderID,
                     flash = :flash,
                     metering = :metering,
                     notes = :notes,
@@ -635,6 +652,7 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                 exposureNumberNew = form.exposureNumber.data,
                 exposureNumberOld = exposureNumber,
                 lensID = zero_to_none(form.lensID.data),
+                holderID = zero_to_none(form.holderID.data),
                 shutter = encode_shutter(form.shutter.data),
                 aperture = form.aperture.data,
                 filmTypeID = zero_to_none(form.filmTypeID.data),

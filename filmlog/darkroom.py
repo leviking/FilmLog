@@ -80,6 +80,30 @@ def seconds_to_time(seconds):
 
 ## Classes
 # Forms
+class TestForm(FlaskForm):
+    paperID = SelectField('Paper',
+        validators=[Optional()],
+        coerce=int)
+    size = SelectField('Size',
+        validators=[DataRequired()],
+        choices=[('4x5', '4x5'), ('4x6', '4x6'), ('5x7', '5x7'), ('8x10', '8x10'), ('11x14', '11x14'), ('Other', 'Other')])
+    enlargerLensID = SelectField('Enlarger Lens',
+        validators=[Optional()],
+        coerce=int)
+    enlargerID = SelectField('Enlarger',
+        validators=[Optional()],
+        coerce=int)
+    aperture = DecimalField('Aperture', places=1,
+        validators=[Optional()])
+    headHeight = IntegerField('Head Height',
+        validators=[NumberRange(min=0,max=255),
+                    Optional()])
+    exposureTime = StringField('Exposure Time',
+        validators=[DataRequired(), validate_exposure_time])
+    notes = TextAreaField('Notes',
+        validators=[Optional()],
+        filters = [lambda x: x or None])
+
 class EnlargerLensForm(FlaskForm):
     name = StringField('Name',
         validators=[DataRequired(), Length(min=1, max=64)])
@@ -198,7 +222,13 @@ def check_for_print_file(connection, printID):
             return int(result[0])
     return None
 
-@app.route('/darkroom',  methods = ['GET', 'POST'])
+### Darkroom Section
+@app.route('/darkroom',  methods = ['GET'])
+@login_required
+def darkroom_index():
+    return render_template('darkroom/index.html')
+
+@app.route('/darkroom/enlargers',  methods = ['GET', 'POST'])
 @login_required
 def enlargers():
     connection = engine.connect()
@@ -263,14 +293,38 @@ def enlargers():
     enlargers = connection.execute(qry, userID = current_user.get_id()).fetchall()
 
     transaction.commit()
-    return render_template('/darkroom/index.html',
+    return render_template('/darkroom/enlargers.html',
         enlarger_lens_form = enlarger_lens_form,
         enlarger_form = enlarger_form,
         enlargerLenses = enlargerLenses,
         enlargers = enlargers)
 
-### Darkroom Film Tabs
+@app.route('/darkroom/tests',  methods = ['GET'])
+@login_required
+def tests():
+    connection = engine.connect()
+    transaction = connection.begin()
+    userID = current_user.get_id()
 
+    qry = text("""SELECT CONCAT(PaperBrands.name, ' ', Papers.name) AS paper,
+        CONCAT(FilmBrands.brand, ' ', FilmTypes.name, ' ', FilmTypes.iso) AS film,
+        Enlargers.name AS enlarger,
+        EnlargerLenses.name AS lens,
+        aperture, size, SEC_TO_TIME(exposureTime) AS exposureTime
+        FROM MaxBlackTests
+        JOIN Papers ON Papers.paperID = MaxBlackTests.paperID
+        JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID
+        JOIN FilmTypes ON FilmTypes.filmTypeID = MaxBlackTests.filmTypeID
+        JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        LEFT OUTER JOIN Enlargers ON Enlargers.userID = MaxBlackTests.userID
+            AND Enlargers.enlargerID = MaxBlackTests.enlargerID
+        LEFT OUTER JOIN EnlargerLenses ON EnlargerLenses.userID = MaxBlackTests.userID
+            AND EnlargerLenses.enlargerLensID = MaxBlackTests.enlargerLensID
+        WHERE MaxBlackTests.userID = :userID""")
+    tests = connection.execute(qry, userID = userID)
+    return render_template('darkroom/tests.html', tests=tests)
+
+### Darkroom Film Tabs
 @app.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>/prints',  methods = ['POST', 'GET'])
 @login_required
 def prints(binderID, projectID, filmID):

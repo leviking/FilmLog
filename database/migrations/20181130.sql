@@ -1,0 +1,4 @@
+ALTER TABLE Exposures
+  ADD COLUMN holderID SMALLINT UNSIGNED DEFAULT NULL AFTER lensID,
+  ADD CONSTRAINT Exposure_Holders_fk FOREIGN KEY (userID, holderID)
+    REFERENCES Holders (userID, holderID) ON UPDATE CASCADE;

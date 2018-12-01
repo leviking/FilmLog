@@ -23,27 +23,54 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="collapse navbar-collapse">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link
+            {% if '/' == request.path %}
+              active
+            {% endif %}"
+            href="/">Home</a></li>
           {% if current_user.is_authenticated %}
-            <li class="nav-item"><a class="nav-link"href="/binders">Binders</a></li>
+
+            <li class="nav-item"><a class="nav-link
+                {% if '/binders' in request.path
+                and '/projects' not in request.path %}
+                  active
+                {% endif %}"
+                href="/binders">Binders</a></li>
             {% if binderID %}
-              <li class="nav-item"><a class="nav-link"href="/binders/{{ binderID }}/projects">Projects</a></li>
+              <li class="nav-item"><a class="nav-link
+                {% if '/projects' in request.path
+                  and '/films' not in request.path %}
+                  active
+                {% endif %}"
+                href="/binders/{{ binderID }}/projects">Projects</a></li>
               {% if projectID %}
-                <li class="nav-item"><a class="nav-link"href="/binders/{{ binderID }}/projects/{{ projectID }}">Films</a></li>
+                <li class="nav-item"><a class="nav-link
+                  {% if '/films' in request.path %}
+                    active
+                  {% endif %}"
+                  href="/binders/{{ binderID }}/projects/{{ projectID }}">Films</a></li>
               {% endif %}
             {% endif %}
-            <li class="nav-item"><a class="nav-link"href="/gear">Gear</a></li>
-            <li class="nav-item"><a class="nav-link"href="/darkroom">Darkroom</a></li>
-            <li class="nav-item"><a class="nav-link"href="/developing">Developing</a></li>
-            <li class="nav-item"><a class="nav-link"href="/filmstock">Film Stock</a></li>
-            <li class="nav-item"><a class="nav-link"href="/filmtypes">Available Films</a></li>
-            <li class="nav-item"><a class="nav-link"href="/stats">Stats</a></li>
-            <li class="nav-item"><a class="nav-link"href="/logout">Logout</a></li>
+
+            {% for url,name in section_map %}
+              <li class="nav-item">
+                {% if url in request.path %}
+                  <a class="nav-link active" href="{{ url }}">{{ name }}</a>
+                {% else %}
+                  <a class="nav-link" href="{{ url }}">{{ name }}</a>
+                {% endif %}
+              </li>
+            {% endfor %}
+            <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
           {% else %}
             <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
             <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
           {% endif %}
-          <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
+          <li class="nav-item"><a class="nav-link
+            {% if '/help' in request.path %}
+              active
+            {% endif %}"
+            href="/help">Help</a></li>
           <li class="nav-item"><a class="nav-link" href="https://gitlab.com/m00dawg/FilmLog/issues">Log a Bug</a></li>
         </ul>
         <form class="form-inline my-2 my-lg-0"
