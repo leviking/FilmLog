@@ -45,3 +45,5 @@ CREATE TABLE DeveloperLogFilms(
   CONSTRAINT DeveloperLogFilms_DeveloperLogs_fk FOREIGN KEY (userID, developerLogID)
       REFERENCES DeveloperLogs (userID, developerLogID) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE='InnoDB';
+
+ 
