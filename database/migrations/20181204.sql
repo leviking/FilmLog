@@ -1,10 +1,3 @@
--- Dropping Recipes as a half-baked feature made it into master, oops
-DROP TABLE IF EXISTS Recipes;
-
-DROP TABLE IF EXISTS DeveloperLogFilms;
-DROP TABLE IF EXISTS DeveloperLogs;
-DROP TABLE IF EXISTS Developers;
-
 CREATE TABLE Developers (
   userID INT UNSIGNED NOT NULL,
   developerID TINYINT UNSIGNED NOT NULL,
@@ -45,5 +38,3 @@ CREATE TABLE DeveloperLogFilms(
   CONSTRAINT DeveloperLogFilms_DeveloperLogs_fk FOREIGN KEY (userID, developerLogID)
       REFERENCES DeveloperLogs (userID, developerLogID) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE='InnoDB';
-
- 
