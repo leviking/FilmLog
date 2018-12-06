@@ -26,6 +26,8 @@ def developing():
 def developer(developerID):
     connection = engine.connect()
     userID = current_user.get_id()
+
+    # Grab the main info for the developer
     qry = text("""SELECT developerID, name, mixedOn, replenishment,
         state, notes
         FROM Developers
@@ -36,15 +38,7 @@ def developer(developerID):
         developerID = developerID).fetchone()
     developer = dict(developer_results)
 
-    # For each developer log entry, grab the films
-    # Will have to convert the developer logs to a dictionary of some sort?
-    # (This is probably easy in an API where we can build a JSON structure)
-    # E.g.:
-    # d_dict = dict(developer)
-    # d_dict['test'] = "bob"
-    # So we'd assign, in the above ['test'] another dictionary or result set
-    # so when we go to display it we can use a nested for (not efficient
-    # but probably ok here)
+    # Grab the logs
     qry = text("""SELECT developerLogID, loggedOn, mlReplaced,
         temperature, SECONDS_TO_DURATION(devTime) AS devTime, notes
         FROM DeveloperLogs
@@ -56,6 +50,9 @@ def developer(developerID):
         developerID = developerID).fetchall()
     developer_logs = [{key: value for (key, value) in row.items()} for row in developer_log_results]
 
+    # For each log entry we grab the films used and stuff them into the
+    # data dictionary for teh logs. I feel like there is a cleaner way
+    # but this works.
     qry = text("""SELECT developerLogFilmID, filmSize,
         DeveloperLogFilms.filmTypeID, FilmTypes.name AS filmName, iso,
         brand AS filmBrand, qty, compensation
@@ -66,13 +63,28 @@ def developer(developerID):
         AND developerLogID = :developerLogID""")
 
     for index, log in enumerate(developer_logs):
-        print index
         films = connection.execute(qry,
             userID = userID,
             developerLogID = log['developerLogID']).fetchall()
         developer_logs[index]['films'] = films
-    print developer_logs
+
+    # Grab film statistics
+    qry = text("""SELECT FilmTypes.name AS filmName, iso, brand AS filmBrand,
+        filmSize, SUM(qty) AS qty
+        FROM DeveloperLogs
+        JOIN DeveloperLogFilms ON DeveloperLogFilms.userID = DeveloperLogs.userID
+            AND DeveloperLogFilms.developerLogID = DeveloperLogs.developerLogID
+        JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
+        JOIN FilmBrands On FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        WHERE DeveloperLogs.userID = :userID
+        AND DeveloperLogs.developerID = :developerID
+        GROUP BY DeveloperLogFilms.filmTypeID
+        ORDER BY brand, filmName""")
+    film_stats = connection.execute(qry,
+        userID = userID,
+        developerID = developerID).fetchall()
 
     return render_template('/developing/developer.html',
         developer = developer,
-        developer_logs = developer_logs)
+        developer_logs = developer_logs,
+        film_stats = film_stats)
