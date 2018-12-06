@@ -57,9 +57,17 @@
           {% for film in log.films %}
             {{ film.qty }}x {{ film.filmSize }} {{ film.filmBrand }} {{ film.filmName }} {{ film.iso }}
             {% if film.compensation > 0 %}
-              Pushed +{{ film.compensation }} Stop
+              Pushed +{{ film.compensation }}
+              {% if film.compensation > 1 %}
+                Stops
+              {% else %}
+                Stop
             {% elif film.compensation < 0 %}
-              Pulled {{ film.compensation }} Stop
+              Pulled {{ film.compensation }}
+              {% if film.compensation < 1 %}
+                Stops
+              {% else %}
+                Stop
             {% endif %}
             <br />
           {% endfor %}
