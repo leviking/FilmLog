@@ -104,3 +104,7 @@ def delete(connection, qry, item, **args):
     except IntegrityError:
         flash("Cannot delete " + item +
             ". Could be you may have stuff that depends on it.")
+
+# Unused (see SECONDS_TO_DURATION MySQL function instead)
+#def seconds_to_time(seconds):
+#    return str(int(seconds / 60)) + ":" + str(int(seconds % 60))

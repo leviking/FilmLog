@@ -2,7 +2,11 @@
 
 {% block content %}
   <h1 class="page-header">Developing</h1>
-  <h2>Kits</h2>
-
+  <h2>Current Mixed Developers</h2>
+  <ul>
+    {% for developer in developers %}
+      <li><a href="/developing/developer/{{ developer.developerID }}">{{ developer.name }}</a></li>
+    {% endfor %}
+  </ul>
 
 {% endblock %}

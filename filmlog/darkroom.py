@@ -75,9 +75,6 @@ def validate_exposure_time(form, field):
     except Exception:
         raise ValidationError('Time in wrong format, it should be in MM:SS or in seconds.')
 
-def seconds_to_time(seconds):
-    return str(int(seconds / 60)) + ":" + str(int(seconds % 60))
-
 ## Classes
 # Forms
 class TestForm(FlaskForm):

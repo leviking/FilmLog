@@ -321,26 +321,6 @@ CREATE TABLE Prints (
     CONSTRAINT Prints_Enlargers_fk FOREIGN KEY (userID, enlargerID) REFERENCES Enlargers (userID, enlargerID)
 ) ENGINE='InnoDB';
 
-CREATE TABLE Developers(
-    developerID TINYINT UNSIGNED NOT NULL,
-    name VARCHAR(64),
-    PRIMARY KEY (developerID),
-    UNIQUE KEY name (name)
-) ENGINE='InnoDB';
-
-CREATE TABLE Recipes(
-    userID INT UNSIGNED NOT NULL,
-    recipeID SMALLINT UNSIGNED NOT NULL,
-    developerID TINYINT UNSIGNED NOT NULL,
-    duration SMALLINT UNSIGNED,
-    method ENUM('Inversion', 'Rotary', 'Stand', 'Semi-Stand'),
-    temperature TINYINT UNSIGNED,
-    notes TEXT DEFAULT NULL,
-    PRIMARY KEY (userID, recipeID),
-    CONSTRAINT Recipes_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON UPDATE CASCADE,
-    CONSTRAINT Recipes_developerID FOREIGN KEY (developerID) REFERENCES Developers (developerID) ON UPDATE CASCADE
-) ENGINE='InnoDB';
-
 CREATE TABLE MaxBlackTests(
   userID INT UNSIGNED NOT NULL,
   paperID TINYINT UNSIGNED,
