@@ -62,12 +62,14 @@
                 Stops
               {% else %}
                 Stop
+              {% endif %}
             {% elif film.compensation < 0 %}
               Pulled {{ film.compensation }}
               {% if film.compensation < 1 %}
                 Stops
               {% else %}
                 Stop
+              {% endif %}
             {% endif %}
             <br />
           {% endfor %}
