@@ -33,6 +33,11 @@
   color: #ffffff;
 }
 
+.developerRetired{
+  color: #ff4444;
+  font-weight: bold;
+}
+
 .table-striped-by-two tr:nth-child(4n+1) {
   background-color: #f9f9f9;
 }

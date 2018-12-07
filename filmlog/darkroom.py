@@ -57,24 +57,6 @@ def get_exposures(connection, filmID):
     return connection.execute(qry,
         userID = userID, filmID = filmID).fetchall()
 
-def time_to_seconds(time):
-    # If time is in MM:SS format, calculate the raw seconds
-    # Otherwise just return the time as-is
-    if time:
-        if ':' not in time:
-            if int(time) > 0:
-                return int(time)
-        else:
-            m, s = time.split(':')
-            return int(m) * 60 + int(s)
-    raise ValidationError('Time in wrong format, it should be MM:SS.')
-
-def validate_exposure_time(form, field):
-    try:
-        time_to_seconds(field.data)
-    except Exception:
-        raise ValidationError('Time in wrong format, it should be in MM:SS or in seconds.')
-
 ## Classes
 # Forms
 class TestForm(FlaskForm):
@@ -96,7 +78,7 @@ class TestForm(FlaskForm):
         validators=[NumberRange(min=0,max=255),
                     Optional()])
     exposureTime = StringField('Exposure Time',
-        validators=[DataRequired(), validate_exposure_time])
+        validators=[DataRequired(), functions.validate_exposure_time])
     notes = TextAreaField('Notes',
         validators=[Optional()],
         filters = [lambda x: x or None])
@@ -156,7 +138,7 @@ class PrintForm(FlaskForm):
         validators=[NumberRange(min=0,max=255),
                     Optional()])
     exposureTime = StringField('Exposure Time',
-        validators=[DataRequired(), validate_exposure_time])
+        validators=[DataRequired(), functions.validate_exposure_time])
     notes = TextAreaField('Notes',
         validators=[Optional()],
         filters = [lambda x: x or None])
@@ -193,7 +175,7 @@ class ContactSheetForm(FlaskForm):
                     Optional()],
         filters = [lambda x: x or None])
     exposureTime = StringField('Exposure Time',
-        validators=[DataRequired(), validate_exposure_time])
+        validators=[DataRequired(), functions.validate_exposure_time])
     notes = TextAreaField('Notes',
         validators=[Optional()],
         filters = [lambda x: x or None])
@@ -360,7 +342,7 @@ def prints(binderID, projectID, filmID):
                     enlargerID = zero_to_none(form.enlargerID.data),
                     aperture = form.aperture.data,
                     headHeight = form.headHeight.data,
-                    exposureTime = time_to_seconds(form.exposureTime.data),
+                    exposureTime = functions.time_to_seconds(form.exposureTime.data),
                     printType = form.printType.data,
                     size = form.size.data,
                     notes = form.notes.data)
@@ -453,7 +435,7 @@ def print_exposure(binderID, projectID, filmID, printID):
                     enlargerID = zero_to_none(form.enlargerID.data),
                     aperture = form.aperture.data,
                     headHeight = form.headHeight.data,
-                    exposureTime = time_to_seconds(form.exposureTime.data),
+                    exposureTime = functions.time_to_seconds(form.exposureTime.data),
                     printType = form.printType.data,
                     size = form.size.data,
                     notes = form.notes.data)
@@ -545,7 +527,7 @@ def contactsheet(binderID, projectID, filmID):
                 enlargerID = zero_to_none(form.enlargerID.data),
                 aperture = form.aperture.data,
                 headHeight = form.headHeight.data,
-                exposureTime = time_to_seconds(form.exposureTime.data),
+                exposureTime = functions.time_to_seconds(form.exposureTime.data),
                 notes = form.notes.data)
 
     film = functions.get_film_details(connection, binderID, projectID, filmID)

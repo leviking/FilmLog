@@ -2,10 +2,22 @@
 
 {% block content %}
   <h1 class="page-header">Developing</h1>
-  <h2>Current Mixed Developers</h2>
-  {% if developers %}
+  <h2>Current Developers</h2>
+  {% if active_developers %}
     <ul>
-      {% for developer in developers %}
+      {% for developer in active_developers %}
+        <li><a href="/developing/developer/{{ developer.developerID }}">
+          {{ developer.name }}</a> - {{ developer.type }} {{ developer.kind }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    None Found
+  {% endif %}
+
+  <h2>Retired Developers</h2>
+  {% if retired_developers %}
+    <ul>
+      {% for developer in retired_developers %}
         <li><a href="/developing/developer/{{ developer.developerID }}">
           {{ developer.name }}</a> - {{ developer.type }} {{ developer.kind }}</li>
       {% endfor %}
@@ -31,6 +43,11 @@
             {{ developer_form.mixedOn.label }}
             {{ developer_form.mixedOn(class="form-control", placeholder="YYYY-MM-DD HH:MM:SS") }}
             <small id="mixedOnHel" class="form-text text-muted">Leave blank to use current time</small>
+          </div>
+          <div class="col-sm-2">
+            {{ developer_form.capacity.label }}
+            {{ developer_form.capacity(class="form-control", placeholder="1000") }}
+            <small id="mixedML" class="form-text text-muted">In milliliters</small>
           </div>
           <div class="col-sm-2">
             {{ developer_form.type.label }}

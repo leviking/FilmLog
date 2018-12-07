@@ -4,6 +4,8 @@ from sqlalchemy.sql import text
 from flask_login import current_user
 from sqlalchemy.exc import IntegrityError
 
+from wtforms import validators
+from wtforms.validators import ValidationError
 
 # Functions
 def result_to_dict(result_set):
@@ -104,6 +106,24 @@ def delete(connection, qry, item, **args):
     except IntegrityError:
         flash("Cannot delete " + item +
             ". Could be you may have stuff that depends on it.")
+
+def time_to_seconds(time):
+    # If time is in MM:SS format, calculate the raw seconds
+    # Otherwise just return the time as-is
+    if time:
+        if ':' not in time:
+            if int(time) > 0:
+                return int(time)
+        else:
+            m, s = time.split(':')
+            return int(m) * 60 + int(s)
+    raise ValidationError('Time in wrong format, it should be MM:SS.')
+
+def validate_exposure_time(form, field):
+    try:
+        time_to_seconds(field.data)
+    except Exception:
+        raise ValidationError('Time in wrong format, it should be in MM:SS or in seconds.')
 
 # Unused (see SECONDS_TO_DURATION MySQL function instead)
 #def seconds_to_time(seconds):

@@ -1,7 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1 class="page-header">{{ developer.name }}</h1>
+  <form role="form" class="form-horizontal"
+      action="/developing/developer/{{ developer.developerID }}"
+    method="POST">
+    {{ developer_form.csrf_token }}
+  <h1 class="page-header">{{ developer.name }}
+    {% if developer.state == 'Active' %}
+      <button class="btn btn-warning btn-sm" name="button" value="retireDeveloper" action="submit">Retire</button>
+    {% else %}
+      <button class="btn btn-success btn-sm" name="button" value="unretireDeveloper" action="submit">Unretire</button>
+    {% endif %}
+  </h1>
   <ul>
     <li>
       <strong>Mixed On:</strong> {{ developer.mixedOn }}
@@ -9,6 +19,13 @@
         ({{ developer.age }} days old)
       {% endif %}
     </li>
+    <li><strong>Capacity:</strong>
+      {% if developer.capacity >= 1000 %}
+       {{ developer.capacity / 1000 }} L
+      {% else %}
+        {{ developer.capacity }} ml
+      {% endif %}
+     </li>
     <li><strong>Type:</strong> {{ developer.type }}</li>
     <li><strong>Kind:</strong> {{ developer.kind }}
     {% if developer.kind == 'Replenishment' %}
@@ -17,7 +34,13 @@
       </ul>
     {% endif %}
     </li>
-    <li><strong>State:</strong> {{ developer.state }}</li>
+    <li><strong>State:</strong>
+      {% if developer.state == 'Retired'%}
+        <span class="developerRetired">{{ developer.state }}</span>
+      {% else %}
+        {{ developer.state }}
+      {% endif %}
+    </li>
   </ul>
 
   {% if developer.notes %}
