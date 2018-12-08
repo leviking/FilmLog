@@ -44,8 +44,11 @@
 </ul>
 
 {% if developer.notes %}
+<div class="border">
   <h5>Notes</h5>
   <p>{{ developer.notes }}</p><br />
+</div>
+<br />
 {% endif %}
 
 {% if form_errors(developer_form)
