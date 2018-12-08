@@ -1,5 +1,5 @@
 ALTER TABLE FilmTypes
-  MODIFY COLUMN kind enum('Color Negative','Black & White Negative','Color Slide','Black & White Slide', 'Motion Picture Color Negative') DEFAULT NULL,
+  MODIFY COLUMN kind enum('Color Negative','Black & White Negative','Color Slide','Black & White Slide', 'Motion Picture Color Negative') DEFAULT NULL;
 
 INSERT INTO FilmTypes (filmBrandID, name, iso, kind)
   VALUES (1, 'Vision3 500T/5219', 500, 'Motion Picture Color Negative');
