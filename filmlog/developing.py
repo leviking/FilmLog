@@ -21,7 +21,7 @@ class DeveloperForm(FlaskForm):
     mixedOn = DateField('Mixed On',
         validators=[Optional()])
     capacity = IntegerField('Capacity',
-        validators=[NumberRange(min=0,max=65535),
+        validators=[NumberRange(min=1,max=65535),
                     DataRequired()])
     type = SelectField('Type',
         validators=[DataRequired()],
@@ -40,13 +40,14 @@ class DeveloperLogForm(FlaskForm):
     loggedOn = DateTimeField('Logged On',
         validators=[Optional()])
     mlReplaced = IntegerField('Replaced (ml)',
-        validators=[NumberRange(min=0,max=65535),
+        validators=[NumberRange(min=1,max=65535),
                     Optional()])
     mlUsed = IntegerField('Used (ml)',
-        validators=[NumberRange(min=0,max=65535),
+        validators=[NumberRange(min=1,max=65535),
                     Optional()])
     temperature = DecimalField('Temperature (C)', places=1,
-        validators=[Optional()],
+        validators=[NumberRange(min=-100,max=200),
+                    Optional()],
         filters = [lambda x: x or None])
     devTime = StringField('Development Time',
         validators=[Optional(), functions.validate_exposure_time])
