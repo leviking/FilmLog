@@ -293,6 +293,10 @@ def developer_log(developerID, developerLogID):
 
     if request.method == 'POST':
         if request.form['button'] == 'updateLog':
+            try:
+                devTime = functions.time_to_seconds(developer_log_form.devTime.data)
+            except:
+                devTime = None
             qry = text("""UPDATE DeveloperLogs
                 SET loggedOn = :loggedOn, mlReplaced = :mlReplaced,
                     mlUsed = :mlUsed, temperature = :temperature,
@@ -306,7 +310,7 @@ def developer_log(developerID, developerLogID):
                 mlReplaced = developer_log_form.mlReplaced.data,
                 mlUsed = developer_log_form.mlUsed.data,
                 temperature = developer_log_form.temperature.data,
-                devTime = functions.time_to_seconds(developer_log_form.devTime.data),
+                devTime = devTime,
                 notes = developer_log_form.notes.data)
         if request.form['button'] == 'deleteLog':
             qry = text("""DELETE FROM DeveloperLogs

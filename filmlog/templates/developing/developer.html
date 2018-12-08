@@ -47,7 +47,7 @@
 {% if developer.notes %}
 <div class="border">
   <h5>Notes</h5>
-  <p>{{ developer.notes }}</p><br />
+  <div class="notes">{{ developer_log.notes }}</div>
 </div>
 <br />
 {% endif %}
@@ -129,7 +129,7 @@
       </td>
       <td>{{ log.devTime if log.devTime }}</td>
       <td>{{ log.temperature if log.temperature }}</td>
-      <td>{{ log.notes if log.notes }}</td>
+      <td><div class="notes">{{ log.notes if log.notes }}</div></td>
     </tr>
   {% else %}
     <tr><td colspan="6">Nothing Logged</td></tr>

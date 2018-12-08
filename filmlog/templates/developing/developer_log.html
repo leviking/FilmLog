@@ -17,6 +17,15 @@
       <li><strong>Dev Time:</strong> {{ developer_log.devTime  }}</li>
     {% endif %}
   </ul>
+
+{% if developer_log.notes %}
+<div class="border">
+  <h5>Notes</h5>
+  <div class="notes">{{ developer_log.notes }}</div>
+</div>
+<br />
+{% endif %}
+
   <h2>Films</h2>
   <table class="table table-striped table-bordered">
     <tr>
