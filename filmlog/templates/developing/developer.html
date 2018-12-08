@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form role="form" class="form-horizontal"
+<form role="form" class="form-horizontal" id="developerStateForm"
     action="/developing/developer/{{ developer.developerID }}"
   method="POST">
   {{ developer_form.csrf_token }}
@@ -12,6 +12,7 @@
     <button class="btn btn-success btn-sm" name="button" value="unretireDeveloper" action="submit">Unretire</button>
   {% endif %}
 </h1>
+</form>
 <ul>
   <li>
     <strong>Mixed On:</strong> {{ developer.mixedOn }}
