@@ -123,6 +123,7 @@ def developer(developerID):
     userID = current_user.get_id()
     developer_form = DeveloperForm()
     developer_log_form = DeveloperLogForm()
+    error = False
 
     if request.method == 'POST':
         if request.form['button'] == 'retireDeveloper':
@@ -141,6 +142,29 @@ def developer(developerID):
             connection.execute(qry,
                 userID = userID,
                 developerID = developerID)
+        if request.form['button'] == 'updateDeveloper':
+            if developer_form.validate_on_submit():
+                qry = text("""UPDATE Developers
+                    SET name = :name,
+                        mixedOn = :mixedOn,
+                        type = :type,
+                        kind = :kind,
+                        capacity = :capacity,
+                        state = :state,
+                        notes = :notes
+                    WHERE userID = :userID
+                    AND developerID = :developerID""")
+                connection.execute(qry,
+                    name = developer_form.name.data,
+                    mixedOn = developer_form.mixedOn.data,
+                    type = developer_form.type.data,
+                    kind = developer_form.kind.data,
+                    capacity = developer_form.capacity.data,
+                    state = developer_form.state.data,
+                    notes = developer_form.notes.data,
+                    userID = userID,
+                    developerID = developerID)
+
         if request.form['button'] == 'addLog':
             if developer_log_form.validate_on_submit():
                 try:
@@ -246,6 +270,10 @@ def developer(developerID):
         userID = userID,
         developerID = developerID).fetchall()
     transaction.commit()
+
+    if not developer_form.errors:
+        developer_form = DeveloperForm(data=developer)
+
     return render_template('/developing/developer.html',
         developer = developer,
         developer_logs = developer_logs,

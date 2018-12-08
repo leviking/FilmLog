@@ -34,40 +34,7 @@
         action="/developing"
         method="POST">
         {{ developer_form.csrf_token }}
-        <div class="form-group row">
-          <div class="col-sm-4">
-            {{ developer_form.name.label }}
-            {{ developer_form.name(class="form-control", placeholder="Tetenol C-41 Kit") }}
-          </div>
-          <div class="col-sm-2">
-            {{ developer_form.mixedOn.label }}
-            {{ developer_form.mixedOn(class="form-control", placeholder="YYYY-MM-DD") }}
-            <small id="mixedOnHel" class="form-text text-muted">Leave blank to use current time</small>
-          </div>
-          <div class="col-sm-2">
-            {{ developer_form.capacity.label }}
-            {{ developer_form.capacity(class="form-control", placeholder="1000") }}
-            <small id="mixedML" class="form-text text-muted">In milliliters</small>
-          </div>
-          <div class="col-sm-2">
-            {{ developer_form.type.label }}
-            {{ developer_form.type(class="form-control") }}
-          </div>
-          <div class="col-sm-2">
-            {{ developer_form.kind.label }}
-            {{ developer_form.kind(class="form-control") }}
-          </div>
-          <div class="col-sm-2">
-            {{ developer_form.state.label }}
-            {{ developer_form.state(class="form-control", placeholder="70") }}
-          </div>
-        </div>
-        <div class="form-group row">
-          <div class="col-sm-12">
-            {{ developer_form.notes.label }}
-            {{ developer_form.notes(class="form-control", placeholder="Notes") }}
-          </div>
-        </div>
+        {% include '/developing/developer_form.html' %}
         <div class="button-bar">
           <button class="btn btn-success" name="button" action="submit" value="addEnlarger">Save</button>
         </div>
