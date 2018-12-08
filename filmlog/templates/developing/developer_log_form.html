@@ -1,0 +1,29 @@
+<div class="form-group row">
+  <div class="col-sm-2">
+    {{ developer_log_form.loggedOn.label }}
+    {{ developer_log_form.loggedOn(class="form-control", placeholder="YYYY-MM-DD HH:MM:SS") }}
+    <small id="mixedOnHel" class="form-text text-muted">Leave blank to use current time</small>
+  </div>
+  <div class="col-sm-2">
+    {{ developer_log_form.mlReplaced.label }}
+    {{ developer_log_form.mlReplaced(class="form-control") }}
+  </div>
+  <div class="col-sm-2">
+    {{ developer_log_form.mlUsed.label }}
+    {{ developer_log_form.mlUsed(class="form-control") }}
+  </div>
+  <div class="col-sm-2">
+    {{ developer_log_form.devTime.label }}
+    {{ developer_log_form.devTime(class="form-control", placeholder="MM:SS") }}
+  </div>
+  <div class="col-sm-2">
+    {{ developer_log_form.temperature.label }}
+    {{ developer_log_form.temperature(class="form-control") }}
+  </div>
+</div>
+<div class="form-group row">
+  <div class="col-sm-12">
+    {{ developer_log_form.notes.label }}
+    {{ developer_log_form.notes(class="form-control") }}
+  </div>
+</div>

@@ -5,7 +5,7 @@ import os, re
 from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
 
 from flask_wtf import FlaskForm
-from wtforms import Form, StringField, DateField, SelectField, IntegerField, \
+from wtforms import Form, StringField, DateField, DateTimeField, SelectField, IntegerField, \
     TextAreaField, DecimalField, SelectMultipleField, BooleanField
 from wtforms.validators import DataRequired, Optional, Length, NumberRange
 from wtforms import widgets
@@ -37,7 +37,7 @@ class DeveloperForm(FlaskForm):
         filters = [lambda x: x or None])
 
 class DeveloperLogForm(FlaskForm):
-    loggedOn = DateField('Logged On',
+    loggedOn = DateTimeField('Logged On',
         validators=[Optional()])
     mlReplaced = IntegerField('Replaced (ml)',
         validators=[NumberRange(min=0,max=65535),
@@ -50,6 +50,27 @@ class DeveloperLogForm(FlaskForm):
         filters = [lambda x: x or None])
     devTime = StringField('Development Time',
         validators=[Optional(), functions.validate_exposure_time])
+    notes = TextAreaField('Notes',
+        validators=[Optional()],
+        filters = [lambda x: x or None])
+
+class DeveloperLogFilmForm(FlaskForm):
+    filmSizeID = SelectField('Film Size',
+        validators=[DataRequired()],
+        coerce=int)
+    filmTypeID = SelectField('Film',
+        validators=[Optional()],
+        coerce=int)
+    qty = IntegerField('Qty',
+        validators=[NumberRange(min=1,max=255),
+                    DataRequired()])
+    compensation = IntegerField('Compensation',
+        validators=[NumberRange(min=-100,max=100),
+                Optional()])
+    def populate_select_fields(self, connection):
+        self.connection = connection
+        self.filmSizeID.choices = functions.get_film_sizes(connection)
+        self.filmTypeID.choices = functions.optional_choices("None", functions.get_film_types(connection))
 
 @app.route('/developing', methods = ['GET', 'POST'])
 @login_required
@@ -61,7 +82,6 @@ def developing():
 
     if request.method == 'POST':
         if developer_form.validate_on_submit():
-            nextDeveloperID = functions.next_id(connection, 'developerID', 'Developers')
             qry = text("""INSERT INTO Developers
                 (userID, developerID, name, mixedOn, capacity, type, kind,
                 state, notes)
@@ -69,7 +89,7 @@ def developing():
                 :capacity, :type, :kind, :state, :notes)""")
             functions.insert(connection, qry, "Developers",
                 userID = userID,
-                developerID = nextDeveloperID,
+                developerID = functions.next_id(connection, 'developerID', 'Developers'),
                 name = developer_form.name.data,
                 mixedOn = developer_form.mixedOn.data,
                 capacity = developer_form.capacity.data,
@@ -101,6 +121,7 @@ def developer(developerID):
     transaction = connection.begin()
     userID = current_user.get_id()
     developer_form = DeveloperForm()
+    developer_log_form = DeveloperLogForm()
 
     if request.method == 'POST':
         if request.form['button'] == 'retireDeveloper':
@@ -119,6 +140,28 @@ def developer(developerID):
             connection.execute(qry,
                 userID = userID,
                 developerID = developerID)
+        if request.form['button'] == 'addLog':
+            if developer_log_form.validate_on_submit():
+                try:
+                    devTime = functions.time_to_seconds(developer_log_form.devTime.data)
+                except:
+                    devTime = None
+                qry = text("""INSERT INTO DeveloperLogs
+                    (userID, developerID, developerLogID, loggedOn, mlReplaced, mlUsed,
+                        temperature, devTime, notes)
+                    VALUES (:userID, :developerID, :developerLogID, :loggedOn, :mlReplaced,
+                        :mlUsed, :temperature, :devTime, :notes)""")
+                connection.execute(qry,
+                    userID = userID,
+                    developerID = developerID,
+                    developerLogID =
+                        functions.next_id(connection, 'developerLogID', 'DeveloperLogs'),
+                    loggedOn = developer_log_form.loggedOn.data,
+                    mlReplaced = developer_log_form.mlReplaced.data,
+                    mlUsed = developer_log_form.mlUsed.data,
+                    temperature = developer_log_form.temperature.data,
+                    devTime = devTime,
+                    notes = developer_log_form.notes.data)
 
     # Grab the main info for the developer
     qry = text("""SELECT developerID, name, mixedOn, capacity, type, kind,
@@ -155,7 +198,7 @@ def developer(developerID):
         developer['last_replenished'] = last_replenished_dict['last_replenished']
 
     # Grab the logs
-    qry = text("""SELECT developerLogID, loggedOn, mlReplaced,
+    qry = text("""SELECT developerLogID, loggedOn, mlReplaced, mlUsed,
         temperature, SECONDS_TO_DURATION(devTime) AS devTime, notes
         FROM DeveloperLogs
         WHERE userID = :userID
@@ -169,12 +212,13 @@ def developer(developerID):
     # For each log entry we grab the films used and stuff them into the
     # data dictionary for teh logs. I feel like there is a cleaner way
     # but this works.
-    qry = text("""SELECT developerLogFilmID, filmSize,
+    qry = text("""SELECT developerLogFilmID, size AS filmSize,
         DeveloperLogFilms.filmTypeID, FilmTypes.name AS filmName, iso,
         brand AS filmBrand, qty, compensation
         FROM DeveloperLogFilms
-        JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
-        JOIN FilmBrands On FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        LEFT OUTER JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
+        LEFT OUTER JOIN FilmBrands On FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        JOIN FilmSizes ON FilmSizes.filmSizeID = DeveloperLogFilms.filmSizeID
         WHERE userID = :userID
         AND developerLogID = :developerLogID""")
 
@@ -186,12 +230,13 @@ def developer(developerID):
 
     # Grab film statistics
     qry = text("""SELECT FilmTypes.name AS filmName, iso, brand AS filmBrand,
-        filmSize, SUM(qty) AS qty
+        size AS filmSize, SUM(qty) AS qty
         FROM DeveloperLogs
         JOIN DeveloperLogFilms ON DeveloperLogFilms.userID = DeveloperLogs.userID
             AND DeveloperLogFilms.developerLogID = DeveloperLogs.developerLogID
-        JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
-        JOIN FilmBrands On FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        LEFT OUTER JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
+        LEFT OUTER JOIN FilmBrands On FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        JOIN FilmSizes ON FilmSizes.filmSizeID = DeveloperLogFilms.filmSizeID
         WHERE DeveloperLogs.userID = :userID
         AND DeveloperLogs.developerID = :developerID
         GROUP BY DeveloperLogFilms.filmTypeID
@@ -204,4 +249,107 @@ def developer(developerID):
         developer = developer,
         developer_logs = developer_logs,
         film_stats = film_stats,
-        developer_form = developer_form)
+        developer_form = developer_form,
+        developer_log_form = developer_log_form)
+
+@app.route('/developing/developer/<int:developerID>/log/<int:developerLogID>', methods = ['GET', 'POST'])
+@login_required
+def developer_log(developerID, developerLogID):
+    connection = engine.connect()
+    transaction = connection.begin()
+    userID = current_user.get_id()
+    developer_log_form = DeveloperLogForm()
+    developer_log_film_form = DeveloperLogFilmForm()
+    developer_log_film_form.populate_select_fields(connection)
+
+    if request.method == 'POST':
+        if request.form['button'] == 'updateLog':
+            qry = text("""UPDATE DeveloperLogs
+                SET loggedOn = :loggedOn, mlReplaced = :mlReplaced,
+                    mlUsed = :mlUsed, temperature = :temperature,
+                    devTime = :devTime, notes = :notes
+                WHERE userID = :userID
+                AND developerLogID = :developerLogID""")
+            connection.execute(qry,
+                userID = userID,
+                developerLogID = developerLogID,
+                loggedOn = developer_log_form.loggedOn.data,
+                mlReplaced = developer_log_form.mlReplaced.data,
+                mlUsed = developer_log_form.mlUsed.data,
+                temperature = developer_log_form.temperature.data,
+                devTime = functions.time_to_seconds(developer_log_form.devTime.data),
+                notes = developer_log_form.notes.data)
+        if request.form['button'] == 'deleteLog':
+            qry = text("""DELETE FROM DeveloperLogs
+                WHERE userID = :userID
+                AND developerLogID = :developerLogID""")
+            connection.execute(qry,
+                userID = userID,
+                developerLogID = developerLogID)
+            transaction.commit()
+            return redirect('/developing/developer/' + str(developerID))
+
+        if request.form['button'] == 'addFilm':
+            if developer_log_film_form.validate_on_submit():
+                qry = text("""REPLACE INTO DeveloperLogFilms
+                    (userID, developerLogFilmID, developerLogID, filmSizeID,
+                        filmTypeID, qty, compensation)
+                    VALUES (:userID, :developerLogFilmID, :developerLogID,
+                        :filmSizeID, :filmTypeID, :qty, :compensation)""")
+                connection.execute(qry,
+                    userID = userID,
+                    developerLogFilmID =
+                        functions.next_id(connection, 'developerLogFilmID', 'DeveloperLogFilms'),
+                    developerLogID = developerLogID,
+                    filmSizeID = developer_log_film_form.filmSizeID.data,
+                    filmTypeID = developer_log_film_form.filmTypeID.data,
+                    qty = developer_log_film_form.qty.data,
+                    compensation = developer_log_film_form.compensation.data)
+
+        if request.form['button'] == 'deleteFilm':
+            qry = text("""DELETE FROM DeveloperLogFilms
+                WHERE userID = :userID
+                AND developerLogFilmID = :developerLogFilmID""")
+            connection.execute(qry,
+                userID = userID,
+                developerLogFilmID = int(request.form['developerLogFilmID']))
+
+    # Grab the log
+    qry = text("""SELECT developerLogID, loggedOn, mlReplaced, mlUsed,
+        temperature, SECONDS_TO_DURATION(devTime) AS devTime, notes
+        FROM DeveloperLogs
+        WHERE userID = :userID
+        AND developerLogID = :developerLogID
+        ORDER BY loggedOn DESC""")
+    developer_log_results = connection.execute(qry,
+        userID = userID,
+        developerID = developerID,
+        developerLogID = developerLogID).fetchone()
+    developer_log = dict(developer_log_results)
+
+    # For each log entry we grab the films used and stuff them into the
+    # data dictionary for teh logs. I feel like there is a cleaner way
+    # but this works.
+    qry = text("""SELECT developerLogFilmID, size AS filmSize,
+        DeveloperLogFilms.filmTypeID, FilmTypes.name AS filmName, iso,
+        brand AS filmBrand, qty, compensation
+        FROM DeveloperLogFilms
+        LEFT OUTER JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
+        LEFT OUTER JOIN FilmBrands On FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        JOIN FilmSizes ON FilmSizes.filmSizeID = DeveloperLogFilms.filmSizeID
+        WHERE userID = :userID
+        AND developerLogID = :developerLogID""")
+    films = connection.execute(qry,
+        userID = userID,
+        developerLogID = developerLogID).fetchall()
+    transaction.commit()
+
+    developer_log['films'] = films
+    developer_log_form = DeveloperLogForm(data=developer_log)
+
+    return render_template('/developing/developer_log.html',
+        developerID = developerID,
+        developerLogID = developerLogID,
+        developer_log = developer_log,
+        developer_log_form = developer_log_form,
+        developer_log_film_form = developer_log_film_form)

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1 class="page-header">Modify Log Entry <small>(<a href="/developing/developer/{{ developerID }}">Go back</a>)</small></h1>
+  <ul>
+    <li><strong>Developed On:</strong> {{ developer_log.loggedOn }}</li>
+    <li><strong>Replaced (ml):</strong> {{ developer_log.mlReplaced }}</li>
+    <li><strong>Used (ml):</strong> {{ developer_log.mlUsed }}</li>
+    <li><strong>Temperature:</strong> {{ developer_log.temperature }} C</li>
+    <li><strong>Dev Time:</strong> {{ developer_log.devTime }}</li>
+  </ul>
+  <h2>Films</h2>
+  <table class="table table-striped table-bordered">
+    <tr>
+      <th>Qty</th>
+      <th>Size</th>
+      <th>Film</th>
+      <th>ISO</th>
+      <th></th>
+    </tr>
+    {% for film in developer_log.films %}
+      <tr>
+        <td>{{ film.qty }}</td>
+        <td>{{ film.filmSize }}</td>
+        <td>
+          {% if film.filmBrand %}
+            {{ film.filmBrand }} {{ film.filmName }}
+          {% else %}
+            Not Specified
+          {% endif %}
+        </td>
+        <td>
+          {% if film.iso %}
+            {{ film.iso }}
+          {% else %}
+            Not Specified
+          {% endif %}
+        </td>
+        <td class="text-right">
+          <form role="form" class="form-horizontal"
+            action="/developing/developer/{{ developerID }}/log/{{ developerLogID }}"
+            method="POST">
+            {{ developer_log_film_form.csrf_token }}
+            <button class="btn btn-danger btn-sm" name="button" action="submit" value="deleteFilm">Delete</button>
+            <input type="hidden" name="developerLogFilmID" value="{{ film.developerLogFilmID }}" >
+          </form>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">No Films Logged</td></tr>
+    {% endfor %}
+  </table>
+
+<div class="card my-4">
+  <div class="card-header">Add Films</div>
+  <div class="card-body">
+    {{ form_errors(developer_log_film_form) }}
+    <form role="form" class="form-horizontal"
+      action="/developing/developer/{{ developerID }}/log/{{ developerLogID }}"
+      method="POST">
+      {{ developer_log_film_form.csrf_token }}
+      <div class="form-group row">
+        <div class="col-sm-3">
+          {{ developer_log_film_form.filmSizeID.label }}
+          {{ developer_log_film_form.filmSizeID(class="form-control") }}
+        </div>
+        <div class="col-sm-3">
+          {{ developer_log_film_form.filmTypeID.label }}
+          {{ developer_log_film_form.filmTypeID(class="form-control") }}
+        </div>
+        <div class="col-sm-3">
+          {{ developer_log_film_form.qty.label }}
+          {{ developer_log_film_form.qty(class="form-control") }}
+        </div>
+        <div class="col-sm-3">
+          {{ developer_log_film_form.compensation.label }}
+          {{ developer_log_film_form.compensation(class="form-control", placeholder="-1,+1") }}
+        </div>
+      </div>
+      <div class="button-bar">
+        <button class="btn btn-success" name="button" action="submit" value="addFilm">Add</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <div class="card my-4">
+    <div class="card-header">Modify Log</div>
+    <div class="card-body">
+      {{ form_errors(developer_log_form) }}
+      <form role="form" class="form-horizontal"
+        action="/developing/developer/{{ developerID }}/log/{{ developerLogID }}"
+        method="POST">
+        {{ developer_log_form.csrf_token }}
+        {% include 'developing/developer_log_form.html' %}
+        <div class="button-bar">
+          <button class="btn btn-success" name="button" action="submit" value="updateLog">Update</button>
+          <button class="btn btn-danger" name="button" action="submit" value="deleteLog">Delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+<h3>
+<a href="/developing/developer/{{ developerID }}">Go back</a>
+</h3>
+
+{% endblock %}

@@ -375,13 +375,16 @@ CREATE TABLE DeveloperLogFilms(
   userID INT UNSIGNED NOT NULL,
   developerLogFilmID INT UNSIGNED NOT NULL,
   developerLogID INT UNSIGNED NOT NULL,
-  filmSize ENUM('35mm', '120', '220', '4x5', '8x10') NOT NULL,
+  filmSizeID TINYINT UNSIGNED NOT NULL,
   filmTypeID SMALLINT UNSIGNED DEFAULT NULL,
   qty TINYINT UNSIGNED NOT NULL,
-  compensation TINYINT NOT NULL DEFAULT 0,
+  compensation TINYINT DEFAULT NULL DEFAULT 0,
   PRIMARY KEY (userID, developerLogFilmID),
+  UNIQUE KEY user_developerlog_size_type_uq (userID, developerLogID, filmSizeID, filmTypeID),
   CONSTRAINT DeveloperLogFilms_DeveloperLogs_fk FOREIGN KEY (userID, developerLogID)
       REFERENCES DeveloperLogs (userID, developerLogID) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT DeveloperLogFilms_FilmSizes_fk FOREIGN KEY (filmSizeID)
+    REFERENCES FilmSizes (filmSizeID) ON UPDATE CASCADE;
 ) ENGINE='InnoDB';
 
 -- Functions

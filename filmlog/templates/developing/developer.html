@@ -58,7 +58,13 @@
     {% for film in film_stats %}
       <tr>
         <td>{{ film.filmSize }}</td>
-        <td>{{ film.filmBrand }} {{ film.filmName }} {{ film.iso }}</td>
+        <td>
+          {% if film.filmName %}
+            {{ film.filmBrand }} {{ film.filmName }} {{ film.iso }}
+          {% else %}
+            Not Specified
+          {% endif %}
+        </td>
         <td>{{ film.qty }}</td>
       </tr>
     {% else %}
@@ -71,6 +77,7 @@
     <tr>
       <th>Developed On</th>
       <th>Replenished Capacity (ml)</th>
+      <th>Used Capacity (ml)</th>
       <th>Films Developed</th>
       <th>Development Time</th>
       <th>Temperature (C)</th>
@@ -78,8 +85,11 @@
     </tr>
     {% for log in developer_logs %}
       <tr>
-        <td>{{ log.loggedOn }}</td>
+        <td>
+          <a href="/developing/developer/{{ developer.developerID }}/log/{{ log.developerLogID }}">{{ log.loggedOn }}</a>
+        </td>
         <td>{{ log.mlReplaced }}</td>
+        <td>{{ log.mlUsed }}</td>
         <td>
           {% for film in log.films %}
             {{ film.qty }}x {{ film.filmSize }} {{ film.filmBrand }} {{ film.filmName }} {{ film.iso }}
@@ -109,6 +119,22 @@
       <tr><td colspan="6">Nothing Logged</td></tr>
     {% endfor %}
   </table>
+
+  <div class="card my-4">
+    <div class="card-header">Add Log</div>
+    <div class="card-body">
+      {{ form_errors(developer_log_form) }}
+      <form role="form" class="form-horizontal"
+        action="/developing"
+        method="POST">
+        {{ developer_log_form.csrf_token }}
+        {% include 'developing/developer_log_form.html' %}
+        <div class="button-bar">
+          <button class="btn btn-success" name="button" action="submit" value="addLog">Save</button>
+        </div>
+        <small id="mixedOnHel" class="form-text text-muted">You can add films once you create the initial log entry</small>
+      </form>
+    </div>
 
 
 {% endblock %}
