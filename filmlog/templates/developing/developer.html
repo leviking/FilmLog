@@ -95,12 +95,12 @@
       <td>
         <a href="/developing/developer/{{ developer.developerID }}/log/{{ log.developerLogID }}">{{ log.loggedOn }}</a>
       </td>
-      <td>{{ log.mlReplaced }}</td>
-      <td>{{ log.mlUsed }}</td>
+      <td>{{ log.mlReplaced if log.mlReplaced}}</td>
+      <td>{{ log.mlUsed if log.mlUsed }}</td>
       <td>
         {% for film in log.films %}
           {{ film.qty }}x {{ film.filmSize }}
-          {% if film.filmbrand %}
+          {% if film.filmBrand %}
             {{ film.filmBrand }} {{ film.filmName }} {{ film.iso }}
           {% endif %}
           {% if film.compensation %}
@@ -123,9 +123,9 @@
           <br />
         {% endfor %}
       </td>
-      <td>{{ log.devTime }}</td>
-      <td>{{ log.temperature }}</td>
-      <td>{{ log.notes }}</td>
+      <td>{{ log.devTime if log.devTime }}</td>
+      <td>{{ log.temperature if log.temperature }}</td>
+      <td>{{ log.notes if log.notes }}</td>
     </tr>
   {% else %}
     <tr><td colspan="6">Nothing Logged</td></tr>
