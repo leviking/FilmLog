@@ -351,7 +351,7 @@ CREATE TABLE Developers (
   capacity SMALLINT UNSIGNED NOT NULL,
   notes TEXT DEFAULT NULL,
   PRIMARY KEY (userID, developerID),
-  UNIQUE KEY (name),
+  UNIQUE KEY (userID, name),
   CONSTRAINT Developers_userID_fk FOREIGN KEY (userID)
     REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE='InnoDB';

@@ -20,3 +20,9 @@ ALTER TABLE DeveloperLogFilms
 
 ALTER TABLE DeveloperLogFilms
   ADD UNIQUE KEY user_developerlog_size_type_uq (userID, developerLogID, filmSizeID, filmTypeID);
+
+ALTER TABLE Developers
+  DROP INDEX name;
+
+ALTER TABLE Developers
+  ADD UNIQUE KEY userID_name_uq (userID, name);
