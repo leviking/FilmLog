@@ -207,7 +207,7 @@ def developer(developerID):
             WHERE userID = :userID
             AND developerID = :developerID
             AND mlReplaced != 0
-            ORDER BY developerLogID LIMIT 1""")
+            ORDER BY developerLogID DESC LIMIT 1""")
         last_replenished = connection.execute(qry,
             userID = userID,
             developerID = developerID).fetchone()
