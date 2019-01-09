@@ -40,6 +40,7 @@ CREATE TABLE Cameras (
     userID INT UNSIGNED NOT NULL,
     cameraID SMALLINT UNSIGNED NOT NULL,
     filmSize ENUM('35mm', '120', '220', '4x5', '8x10') NOT NULL,
+    status ENUM('Active', 'Inactive') DEFAULT 'Active',
     name varchar(64) NOT NULL,
     PRIMARY KEY (userID, cameraID),
     UNIQUE user_name_eq (userID, name),

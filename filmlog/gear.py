@@ -35,6 +35,11 @@ class CameraForm(FlaskForm):
             ('220', '220'),
             ('4x5', '4x5'),
             ('8x10', '8x10')])
+    status = SelectField('Status',
+        validators=[DataRequired()],
+        choices=[
+            ('Active', 'Active'),
+            ('Inactive', 'Inactive')])
     lenses = MultiCheckboxField('Lenses',
         validators=[Optional()])
 
@@ -182,7 +187,7 @@ def cameras():
                 userID = userID,
                 lensID = int(request.form['lensID']))
 
-    qry = text("""SELECT cameraID, name, filmSize
+    qry = text("""SELECT cameraID, name, filmSize, status
         FROM Cameras
         WHERE userID = :userID ORDER BY filmSize, name""")
     cameras = connection.execute(qry, userID = userID).fetchall()
@@ -211,12 +216,14 @@ def camera(cameraID):
             camera_form = CameraForm()
             qry = text("""UPDATE Cameras
                 SET name = :name,
-                    filmSize = :filmSize
+                    filmSize = :filmSize,
+                    status = :status
                 WHERE userID = :userID
                 AND cameraID = :cameraID""")
             connection.execute(qry,
                 name = camera_form.name.data,
                 filmSize = camera_form.filmSize.data,
+                status = camera_form.status.data,
                 userID = userID,
                 cameraID = cameraID)
 

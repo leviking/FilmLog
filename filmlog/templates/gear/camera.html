@@ -23,15 +23,19 @@
         method="POST">
         {{ camera_form.csrf_token }}
         <div class="form-group">
-          <div class="col-sm-4">
+          <div class="col-sm-3">
             {{ camera_form.name.label }}
             {{ camera_form.name(class="form-control", placeholder="Minolta X-700") }}
           </div>
-          <div class="col-sm-4">
+          <div class="col-sm-3">
             {{ camera_form.filmSize.label }}
             {{ camera_form.filmSize(class="form-control") }}
           </div>
-          <div class="col-sm-4">
+          <div class="col-sm-3">
+              {{ camera_form.status.label }}
+              {{ camera_form.status(class="form-control") }}
+          </div>
+          <div class="col-sm-3">
               {{ camera_form.lenses.label }}
               {{ camera_form.lenses(class="form-control list-unstyled") }}
           </div>

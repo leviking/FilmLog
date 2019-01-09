@@ -10,11 +10,13 @@
   <tr>
       <th>Name</th>
       <th>Film Size</th>
+      <th>Status</th>
   </tr>
   {% for camera in cameras %}
       <tr>
           <td><a href="/gear/camera/{{ camera.cameraID }}">{{ camera.name }}</a></td>
           <td>{{ camera.filmSize }}</td>
+          <td>{{ camera.status }}</td>
       </tr>
   {% else %}
     <tr><td colspan="2">No Cameras Found</td></tr>

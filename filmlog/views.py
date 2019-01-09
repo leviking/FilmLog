@@ -50,7 +50,8 @@ def get_cameras(connection):
     userID = current_user.get_id()
     qry = text("""SELECT cameraID, name
         FROM Cameras
-        WHERE userID = :userID""")
+        WHERE userID = :userID
+        AND status = 'Active'""")
     return connection.execute(qry,
         userID = userID).fetchall()
 
