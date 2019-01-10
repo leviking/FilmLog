@@ -76,7 +76,7 @@ CREATE TABLE FilmTypes (
     filmBrandID TINYINT UNSIGNED NOT NULL,
     name varchar(64) NOT NULL,
     iso smallint unsigned,
-    kind ENUM ('Color Negative', 'Black & White Negative', 'Color Slide', 'Black & White Slide'),
+    kind enum('Color Negative','Black & White Negative','Color Slide','Black & White Slide', 'Motion Picture Color Negative') DEFAULT NULL,
     UNIQUE brand_name_iso_uq (filmBrandID, name, iso),
     KEY filmtypes_filmBrandID_fk (filmBrandID),
     CONSTRAINT filmtypes_filmBrandID FOREIGN KEY (filmBrandID) REFERENCES FilmBrands (filmBrandID) ON DELETE RESTRICT ON UPDATE CASCADE
