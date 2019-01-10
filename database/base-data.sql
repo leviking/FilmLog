@@ -53,7 +53,8 @@ VALUES (1,1,'Ektar',100,'Color Negative'),
 (39,1,'Vision3 250D/5207',250,'Motion Picture Color Negative'),
 (40,1,'Vision3 50D/5203',50,'Motion Picture Color Negative'),
 (41,12,'Color',800,'Color Negative'),
-(42,13,'Xtreme',100,'Black & White Negative');
+(42,13,'Xtreme',100,'Black & White Negative'),
+(43,13,'Xtreme',400,'Black & White Negative');
 
 INSERT INTO PaperFilters (name) VALUES ('00');
 INSERT INTO PaperFilters (name) VALUES ('0');

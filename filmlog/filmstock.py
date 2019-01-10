@@ -102,6 +102,7 @@ def filmstock():
         JOIN FilmSizes ON FilmSizes.filmSizeID = FilmStock.filmSizeID
         WHERE FilmSizes.type = 'Small'
         AND userID = :userID
+        AND qty != 0
         ORDER BY size, brand, type, iso""")
     stock_35mm = connection.execute(qry, userID = userID).fetchall()
 
@@ -114,6 +115,7 @@ def filmstock():
         JOIN FilmSizes ON FilmSizes.filmSizeID = FilmStock.filmSizeID
         WHERE FilmSizes.type = 'Medium'
         AND userID = :userID
+        AND qty != 0
         ORDER BY size, brand, type, iso""")
     stock_mf = connection.execute(qry, userID = userID).fetchall()
 
@@ -126,6 +128,7 @@ def filmstock():
         JOIN FilmSizes ON FilmSizes.filmSizeID = FilmStock.filmSizeID
         WHERE FilmSizes.type = 'Large'
         AND userID = :userID
+        AND qty != 0
         ORDER BY size, brand, type, iso""")
     stock_sheets = connection.execute(qry, userID = userID).fetchall()
 
