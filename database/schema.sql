@@ -266,7 +266,7 @@ CREATE TABLE Enlargers(
     enlargerID TINYINT UNSIGNED NOT NULL,
     name VARCHAR(64) NOT NULL,
     type ENUM('Condenser', 'Diffuser'),
-    lightsource ENUM('LED', 'Incandescent'),
+    lightsource ENUM('LED', 'Incandescent', 'Cold Light'),
     wattage SMALLINT UNSIGNED,
     temperature SMALLINT UNSIGNED,
     notes TEXT,

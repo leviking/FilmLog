@@ -99,7 +99,8 @@ class EnlargerForm(FlaskForm):
         validators=[DataRequired()],
         choices=[
             ('LED', 'LED'),
-            ('Incandescent', 'Incandescent')])
+            ('Incandescent', 'Incandescent'),
+            ('Cold Light', 'Cold Light')])
     wattage = IntegerField('Wattage',
             validators=[NumberRange(min=0,max=65535),
                         Optional()])
