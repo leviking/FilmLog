@@ -2,7 +2,7 @@ from flask import request, render_template, redirect, url_for, Response, \
     session, abort, flash, send_from_directory
 
 from sqlalchemy.sql import select, text, func
-import os, re
+import os, re, datetime
 
 from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
 
@@ -44,6 +44,8 @@ def format_shutter(shutter):
     elif shutter == 0:
         return "B"
     elif shutter:
+        if abs(shutter) > 60:
+            return str(datetime.timedelta(seconds=abs(shutter)))
         return str(abs(shutter)) + "\""
 
 def get_cameras(connection):
