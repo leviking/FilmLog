@@ -135,6 +135,9 @@ class PrintForm(FlaskForm):
         coerce=int)
     aperture = DecimalField('Aperture', places=1,
         validators=[Optional()])
+    nd = DecimalField('ND (Stops)', places=1,
+        validators=[NumberRange(min=0,max=20),
+                    Optional()])
     headHeight = IntegerField('Head Height',
         validators=[NumberRange(min=0,max=255),
                     Optional()])
