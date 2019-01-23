@@ -304,6 +304,7 @@ CREATE TABLE Prints (
     enlargerID TINYINT UNSIGNED DEFAULT NULL,
     fileID INT UNSIGNED DEFAULT NULL,
     aperture decimal(3,1) DEFAULT NULL,
+    ndFilter decimal(3,1) DEFAULT NULL,
     headHeight TINYINT UNSIGNED DEFAULT NULL,
     exposureTime TIME NOT NULL,
     printType ENUM('Enlargement', 'Contact') NOT NULL,

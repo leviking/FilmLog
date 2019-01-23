@@ -135,7 +135,7 @@ class PrintForm(FlaskForm):
         coerce=int)
     aperture = DecimalField('Aperture', places=1,
         validators=[Optional()])
-    nd = DecimalField('ND (Stops)', places=1,
+    ndFilter = DecimalField('ND (Stops)', places=1,
         validators=[NumberRange(min=0,max=20),
                     Optional()])
     headHeight = IntegerField('Head Height',
@@ -330,9 +330,9 @@ def prints(binderID, projectID, filmID):
 
                 qry = text("""INSERT INTO Prints
                     (printID, filmID, exposureNumber, userID, paperID, paperFilterID,
-                    enlargerLensID, enlargerID, fileID, aperture, headHeight, exposureTime, printType, size, notes)
+                    enlargerLensID, enlargerID, fileID, aperture, ndFilter, headHeight, exposureTime, printType, size, notes)
                     VALUES (:printID, :filmID, :exposureNumber, :userID, :paperID,
-                    :paperFilterID, :enlargerLensID, :enlargerID, :fileID, :aperture, :headHeight, :exposureTime,
+                    :paperFilterID, :enlargerLensID, :enlargerID, :fileID, :aperture, :ndFilter, :headHeight, :exposureTime,
                     :printType, :size, :notes)""")
                 insert(connection, qry, "Print",
                     printID = nextPrintID,
@@ -345,6 +345,7 @@ def prints(binderID, projectID, filmID):
                     enlargerLensID = zero_to_none(form.enlargerLensID.data),
                     enlargerID = zero_to_none(form.enlargerID.data),
                     aperture = form.aperture.data,
+                    ndFilter = form.ndFilter.data,
                     headHeight = form.headHeight.data,
                     exposureTime = functions.time_to_seconds(form.exposureTime.data),
                     printType = form.printType.data,
@@ -354,7 +355,7 @@ def prints(binderID, projectID, filmID):
 
     qry = text("""SELECT printID, exposureNumber, Papers.name AS paperName,
         PaperBrands.name AS paperBrand, PaperFilters.name AS paperFilterName,
-        printType, size, aperture, headHeight, Prints.notes, fileID,
+        printType, size, aperture, ndFilter, headHeight, Prints.notes, fileID,
         EnlargerLenses.name AS lens,
         Enlargers.name AS enlarger,
         SECONDS_TO_DURATION(exposureTime) AS exposureTime
@@ -423,9 +424,9 @@ def print_exposure(binderID, projectID, filmID, printID):
                         files.upload_file(request, connection, transaction, fileID)
                 qry = text("""REPLACE INTO Prints
                     (printID, filmID, exposureNumber, userID, paperID, paperFilterID,
-                    enlargerLensID, enlargerID, fileID, aperture, headHeight, exposureTime, printType, size, notes)
+                    enlargerLensID, enlargerID, fileID, aperture, ndFilter, headHeight, exposureTime, printType, size, notes)
                     VALUES (:printID, :filmID, :exposureNumber, :userID, :paperID,
-                    :paperFilterID, :enlargerLensID, :enlargerID, :fileID, :aperture, :headHeight, :exposureTime,
+                    :paperFilterID, :enlargerLensID, :enlargerID, :fileID, :aperture, :ndFilter, :headHeight, :exposureTime,
                     :printType, :size, :notes)""")
                 insert(connection, qry, "Print",
                     printID = printID,
@@ -438,6 +439,7 @@ def print_exposure(binderID, projectID, filmID, printID):
                     enlargerLensID = zero_to_none(form.enlargerLensID.data),
                     enlargerID = zero_to_none(form.enlargerID.data),
                     aperture = form.aperture.data,
+                    ndFilter = form.ndFilter.data,
                     headHeight = form.headHeight.data,
                     exposureTime = functions.time_to_seconds(form.exposureTime.data),
                     printType = form.printType.data,
@@ -453,7 +455,7 @@ def print_exposure(binderID, projectID, filmID, printID):
     qry = text("""SELECT printID, exposureNumber, Papers.name AS paperName,
         Papers.paperID, PaperFilters.paperFilterID, EnlargerLenses.enlargerLensID,
         Enlargers.enlargerID,
-        printType, size, aperture, headHeight, Prints.notes, fileID,
+        printType, size, aperture, ndFilter, headHeight, Prints.notes, fileID,
         SECONDS_TO_DURATION(exposureTime) AS exposureTime
         FROM Prints
         LEFT OUTER JOIN Papers ON Papers.paperID = Prints.paperID
