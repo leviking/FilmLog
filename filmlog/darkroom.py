@@ -473,7 +473,7 @@ def print_exposure(binderID, projectID, filmID, printID):
     transaction.commit()
     form = PrintForm(data=print_details)
     form.populate_select_fields(connection, filmID)
-    return render_template('darkroom/edit-print.html',
+    return render_template('darkroom/print.html',
         form = form,
         film = film,
         binderID = binderID,

@@ -22,7 +22,11 @@
       </tr>
       {% for print in prints %}
         <tr>
-          <td>{{ print.exposureNumber }}</td>
+          <td>
+            <a href="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}/prints/{{ print.printID }}">
+              {{ print.exposureNumber }}
+            </a>
+          </td>
           <td>{{ print.printType }}</td>
           <td>{{ print.size }}</td>
           <td>{{ print.paperbrand }} {{ print.paperName }}</td>
@@ -61,7 +65,7 @@
           {% else %}
             <td colspan="6">&nbsp;</td>
           {% endif %}
-          <td colspan="4">
+          <td colspan="6">
             {% if print.fileID %}
               <a href="/files/full/{{ print.fileID }}">
                 <img class="img-fluid mx-auto d-block" src="/files/thumb/{{ print.fileID }}" />
@@ -86,7 +90,7 @@
         method="POST"
         enctype=multipart/form-data>
         {{ form.csrf_token }}
-        {% include 'darkroom/print.html' %}
+        {% include 'darkroom/print_form.html' %}
         <div class="button-bar">
           <button class="btn btn-success" name="button" value="addPrint" action="submit">Add</button>
         </div>
