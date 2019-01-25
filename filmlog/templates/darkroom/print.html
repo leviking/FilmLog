@@ -2,6 +2,44 @@
 
 {% block content %}
 
+
+<table class="table table-bordered" id="exposures">
+  <tr><th>Number</th><td>{{ print_details.exposureNumber }}</td></tr>
+  <tr><th>Type</th><td>{{ print_details.printType }}</td></tr>
+  <tr><th>Size</th><td>{{ print_details.size }}</td></tr>
+  {% if print_details.paperName %}
+    <tr><th>Paper</th><td>{{ print_details.paperName }}</td></tr>
+  {% endif %}
+  {% if print_details.paperFilterName %}
+    <tr><th>Contrast Filter</th><td>{{ print_details.paperFilterName }}</td></tr>
+  {% endif %}
+  {% if print_details.enlargerName %}
+    <tr><th>Enlarger</th><td>{{ print_details.enlargerName }}</td></tr>
+  {% endif %}
+  {% if print_details.enlargerLensName %}
+    <tr><th>Lens</th><td>{{ print_details.enlargerLensName }}</td></tr>
+  {% endif %}
+  {% if print_details.aperture %}
+    <tr><th>Aperture</th><td>{{ print_details.aperture }}</td></tr>
+  {% endif %}
+  {% if print_details.ndFilter %}
+    <tr><th>ND Filter</th><td>{{ print_details.ndFilter }}</td></tr>
+  {% endif %}
+  {% if print_details.headHeight %}
+    <tr><th>Head Height</th><td>{{ print_details.headHeight }}</td></tr>
+  {% endif %}
+  <tr><th>Exposure Time</th><td>{{ print_details.exposureTime }}</td></tr>
+</table>
+
+{% if print_details.notes %}
+<h3>Notes</h3>
+<pre>{{ print_details.notes }}</pre>
+{% endif %}
+
+<h3>Images</h3>
+<pre>Images Go Here</pre>
+
+
 <div class="card">
   <div class="card-header">Edit Print</div>
     <div class="card-body">

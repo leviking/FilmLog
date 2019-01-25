@@ -453,8 +453,9 @@ def print_exposure(binderID, projectID, filmID, printID):
 
     film = functions.get_film_details(connection, binderID, projectID, filmID)
     qry = text("""SELECT printID, exposureNumber, Papers.name AS paperName,
-        Papers.paperID, PaperFilters.paperFilterID, EnlargerLenses.enlargerLensID,
-        Enlargers.enlargerID,
+        Papers.paperID, PaperFilters.paperFilterID, PaperFilters.name AS paperFilterName,
+        EnlargerLenses.enlargerLensID, EnlargerLenses.name AS enlargerLensName,
+        Enlargers.enlargerID, Enlargers.name AS enlargerName,
         printType, size, aperture, ndFilter, headHeight, Prints.notes, fileID,
         SECONDS_TO_DURATION(exposureTime) AS exposureTime
         FROM Prints
