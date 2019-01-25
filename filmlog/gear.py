@@ -53,6 +53,10 @@ class CameraForm(FlaskForm):
             selected_lenses.append(lens.lensID)
         self.lenses.process_data(selected_lenses)
 
+class LensForm(FlaskForm):
+    name = StringField('Name',
+        validators=[DataRequired(), Length(min=1, max=64)])
+
 class FilterForm(FlaskForm):
     name = StringField('Name',
         validators=[DataRequired(), Length(min=1, max=64)])
@@ -274,6 +278,36 @@ def camera(cameraID):
         camera = camera,
         camera_lenses = camera_lenses,
         lenses = lenses)
+
+@app.route('/gear/lens/<int:lensID>',  methods = ['GET', 'POST'])
+@login_required
+def lens(lensID):
+    connection = engine.connect()
+    transaction = connection.begin()
+    userID = current_user.get_id()
+
+    qry = text("""SELECT name
+        FROM Lenses
+        WHERE userID = :userID
+        AND lensID = :lensID""")
+    lens = connection.execute(qry,
+        userID = userID,
+        lensID = lensID).fetchone()
+
+    qry = text("""SELECT CONCAT('1/', speed) AS speed,
+        idealSpeedMS, measuredSpeedMS,
+        differencePercent, differenceStops
+        FROM ShutterSpeeds
+        WHERE userID = :userID
+        AND lensID = :lensID""")
+    shutter_speeds = connection.execute(qry,
+        userID = userID,
+        lensID = lensID).fetchall()
+
+    transaction.commit()
+    return render_template('/gear/lens.html',
+        lens = lens,
+        shutter_speeds = shutter_speeds)
 
 @app.route('/gear/holders',  methods = ['GET', 'POST'])
 @login_required

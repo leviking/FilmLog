@@ -56,7 +56,7 @@
   </tr>
   {% for lens in cameraLenses %}
     <tr>
-      <td>{{ lens.name }}</td>
+      <td><a href="/gear/lens/{{ lens.lensID }}">{{ lens.name }}</a></td>
       <td>
         <form role="form" class="form-horizontal"
           action="/gear/cameras"
