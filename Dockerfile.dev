@@ -4,13 +4,14 @@ ENV FLASH_APP="filmlog"
 ENV FLASK_DEBUG=1
 
 RUN apt-get update -y && \
-    apt-get install -y python-pip python-dev build-essential mariadb-client-10.1 libmysqlclient-dev
+    apt-get install -y python-pip python-dev build-essential mariadb-client libmysqlclient-dev
 
 COPY requirements.txt /
 RUN pip install -r requirements.txt
 COPY . /srv/filmlog.org
 WORKDIR /srv/filmlog.org
-COPY ./docker/config.ini.dev ./config.ini
+#COPY ./docker/config.ini.dev ./config.ini
+COPY config.ini ./config.ini
 CMD python wsgi.py
 
 #CMD flask run --host=0.0.0.0

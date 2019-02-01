@@ -1,8 +1,19 @@
-[global]
-docker=1
+[app]
+testing=True
+
+[session]
+secret_key = avkjiwwoqowgjqbojb;lkjbpqe
 
 [database]
-url=mysql+mysqldb://tim:e9xlb18@192.168.100.2/FilmLogDev?charset=utf8
-#url=mysql+mysqldb://filmlog:filmlogpw@mariadb/FilmLog
-
+url=mysql+mysqldb://tim:e9xlb18@filedawg.moocow.home/FilmLogDev?charset=utf8
+#url=mysql+mysqldb://tim:e9xlb18@localhost/FilmLogDev?charset=utf8
 pool_recycle=3600
+
+[files]
+user_files=files
+thumbnail_size=480
+
+[recaptcha]
+public_key = abcd
+private_key = abcd
+

@@ -213,7 +213,7 @@ CREATE TABLE Exposures(
     CONSTRAINT Exposures_Films_fk FOREIGN KEY (userID, filmID) REFERENCES Films (userID, filmID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Exposures_Lenses_fk FOREIGN KEY (userID, lensID) REFERENCES Lenses (userID, lensID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Exposures_filmSizeID_fk FOREIGN KEY (filmSizeID) REFERENCES FilmSizes (filmSizeID) ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT Exposure_Holders_fk FOREIGN KEY (userID, holderID) REFERENCES Holders (userID, holderID) ON UPDATE CASCADE;
+    CONSTRAINT Exposure_Holders_fk FOREIGN KEY (userID, holderID) REFERENCES Holders (userID, holderID) ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
 CREATE TABLE Filters(
@@ -294,7 +294,7 @@ CREATE TABLE ContactSheets(
     paperID TINYINT UNSIGNED DEFAULT NULL,
     paperFilterID TINYINT UNSIGNED DEFAULT NULL,
     enlargerLensID TINYINT UNSIGNED DEFAULT NULL,
-    COLUMN enlargerID TINYINT UNSIGNED DEFAULT NULL,
+    enlargerID TINYINT UNSIGNED DEFAULT NULL,
     aperture decimal(3,1) DEFAULT NULL,
     headHeight TINYINT UNSIGNED,
     exposureTime SMALLINT UNSIGNED NOT NULL,
@@ -396,9 +396,9 @@ CREATE TABLE DeveloperLogFilms(
   PRIMARY KEY (userID, developerLogFilmID),
   UNIQUE KEY user_developerlog_size_type_uq (userID, developerLogID, filmSizeID, filmTypeID),
   CONSTRAINT DeveloperLogFilms_DeveloperLogs_fk FOREIGN KEY (userID, developerLogID)
-      REFERENCES DeveloperLogs (userID, developerLogID) ON DELETE CASCADE ON UPDATE CASCADE
+      REFERENCES DeveloperLogs (userID, developerLogID) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT DeveloperLogFilms_FilmSizes_fk FOREIGN KEY (filmSizeID)
-    REFERENCES FilmSizes (filmSizeID) ON UPDATE CASCADE;
+    REFERENCES FilmSizes (filmSizeID) ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
 -- Functions
