@@ -53,10 +53,6 @@ class CameraForm(FlaskForm):
             selected_lenses.append(lens.lensID)
         self.lenses.process_data(selected_lenses)
 
-class LensForm(FlaskForm):
-    name = StringField('Name',
-        validators=[DataRequired(), Length(min=1, max=64)])
-
 class FilterForm(FlaskForm):
     name = StringField('Name',
         validators=[DataRequired(), Length(min=1, max=64)])
@@ -70,6 +66,17 @@ class FilterForm(FlaskForm):
 class CameraLensForm(FlaskForm):
     name = StringField('Name',
         validators=[DataRequired(), Length(min=1, max=64)])
+    shutter = SelectField('Integrated Shutter',
+        validators=[Optional()],
+        choices=[
+            ('No', 'No'),
+            ('Yes', 'Yes')])
+
+class LensShutterSpeedsForm(FlaskForm):
+    speed = IntegerField('Rated Speed',
+        validators=[DataRequired(), NumberRange(min=1, max=1000)])
+    measuredSpeedMS = IntegerField('Measured Speed (ms)',
+        validators=[DataRequired(), NumberRange(min=1, max=65535)])
 
 class HolderForm(FlaskForm):
     name = StringField('Name',
@@ -117,7 +124,6 @@ def filters():
     filter_form = FilterForm()
 
     if request.method == 'POST':
-        app.logger.debug('POST')
         # Filters
         if request.form['button'] == 'addFilter':
             nextFilterID = next_id(connection, 'filterID', 'Filters')
@@ -176,12 +182,13 @@ def cameras():
         if request.form['button'] == 'addCameraLens':
             nextLensID = next_id(connection, 'lensID', 'Lenses')
             qry = text("""INSERT INTO Lenses
-                (lensID, userID, name)
-                VALUES (:lensID, :userID, :name)""")
+                (lensID, userID, name, shutter)
+                VALUES (:lensID, :userID, :name, :shutter)""")
             insert(connection, qry, "Lens",
                 lensID = nextLensID,
                 userID = userID,
-                name = camera_lens_form.name.data)
+                name = camera_lens_form.name.data,
+                shutter = camera_lens_form.shutter.data)
 
         if request.form['button'] == 'deleteCameraLens':
             qry = text("""DELETE FROM Lenses
@@ -196,7 +203,7 @@ def cameras():
         WHERE userID = :userID ORDER BY filmSize, name""")
     cameras = connection.execute(qry, userID = userID).fetchall()
 
-    qry = text("""SELECT lensID, name
+    qry = text("""SELECT lensID, name, shutter
         FROM Lenses
         WHERE userID = :userID ORDER BY name""")
     cameraLenses = connection.execute(qry, userID = userID).fetchall()
@@ -285,8 +292,30 @@ def lens(lensID):
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
+    shutter_speed_form = LensShutterSpeedsForm()
 
-    qry = text("""SELECT name
+    if request.method == 'POST':
+        if request.form['button'] == 'addSpeed':
+            if shutter_speed_form.validate_on_submit():
+                qry = text("""REPLACE INTO LensShutterSpeeds
+                    (userID, lensID, speed, measuredSpeedMS)
+                    VALUES (:userID, :lensID, :speed, :measuredSpeedMS)""")
+                connection.execute(qry,
+                    speed = shutter_speed_form.speed.data,
+                    measuredSpeedMS = shutter_speed_form.measuredSpeedMS.data,
+                    userID = userID,
+                    lensID = lensID)
+        if request.form['button'] == 'deleteSpeed':
+            qry = text("""DELETE FROM LensShutterSpeeds
+                WHERE userID = :userID
+                AND lensID = :lensID
+                AND speed = :speed""")
+            connection.execute(qry,
+                userID = userID,
+                lensID = lensID,
+                speed = shutter_speed_form.speed.data)
+
+    qry = text("""SELECT lensID, name, shutter
         FROM Lenses
         WHERE userID = :userID
         AND lensID = :lensID""")
@@ -294,10 +323,10 @@ def lens(lensID):
         userID = userID,
         lensID = lensID).fetchone()
 
-    qry = text("""SELECT CONCAT('1/', speed) AS speed,
+    qry = text("""SELECT speed,
         idealSpeedMS, measuredSpeedMS,
         differencePercent, differenceStops
-        FROM ShutterSpeeds
+        FROM LensShutterSpeeds
         WHERE userID = :userID
         AND lensID = :lensID""")
     shutter_speeds = connection.execute(qry,
@@ -307,7 +336,8 @@ def lens(lensID):
     transaction.commit()
     return render_template('/gear/lens.html',
         lens = lens,
-        shutter_speeds = shutter_speeds)
+        shutter_speeds = shutter_speeds,
+        shutter_speed_form = shutter_speed_form)
 
 @app.route('/gear/holders',  methods = ['GET', 'POST'])
 @login_required

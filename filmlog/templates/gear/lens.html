@@ -5,7 +5,7 @@
 {% include "gear/sidebar.html" %}
 <div class="col-10">
   <h1>{{ lens.name }}</h1>
-  {% if shutter_speeds %}
+  {% if lens.shutter == 'Yes' %}
     <h2>Shutter Speeds</h2>
     <table class="table table-striped table-bordered" id="shutterSpeeds">
       <tr>
@@ -14,17 +14,52 @@
         <th>Measured MS</th>
         <th>Deviation %</th>
         <th>Stops</th>
+        <th></th>
       </tr>
       {% for speed in shutter_speeds %}
         <tr>
-          <td>{{ speed.speed }}</td>
+          <td>1/{{ speed.speed }}</td>
           <td>{{ speed.idealSpeedMS }}</td>
           <td>{{ speed.measuredSpeedMS }}</td>
           <td>{{ speed.differencePercent }}</td>
           <td>{{ speed.differenceStops }}</td>
+          <td>
+            <form role="form" class="form-horizontal"
+              action="/gear/lens/{{ lens.lensID }}"
+              method="POST">
+              {{ shutter_speed_form.csrf_token }}
+              <button name="button" value="deleteSpeed" action="submit" class="btn btn-sm btn-danger">Delete</button>
+              <input type="hidden" name="speed" value="{{ speed.speed }}" >
+            </form>
+          </td>
         </tr>
+      {% else %}
+        <tr><td colspan="6">No Speeds Entered</td></tr>
       {% endfor %}
     </table>
+  {% endif %}
+
+  {% if lens.shutter == 'Yes' %}
+  {{ form_errors(shutter_speed_form) }}
+  <form role="form" class="form-horizontal"
+    action="/gear/lens/{{ lens.lensID }}"
+    method="POST">
+    {{ shutter_speed_form.csrf_token }}
+    <div class="form-group">
+      <div class="col-sm-3">
+          {{ shutter_speed_form.speed.label }}
+          1/{{ shutter_speed_form.speed(class="form-control") }}
+      </div>
+      <div class="col-sm-3">
+          {{ shutter_speed_form.measuredSpeedMS.label }}
+          {{ shutter_speed_form.measuredSpeedMS(class="form-control") }}
+      </div>
+    </div>
+
+    <div class="button-bar">
+      <button class="btn btn-success" name="button" action="submit" value="addSpeed">Add Speed</button>
+    </div>
+  </form>
   {% endif %}
 </div>
 

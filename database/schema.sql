@@ -51,6 +51,7 @@ CREATE TABLE Lenses(
     userID INT UNSIGNED NOT NULL,
     lensID SMALLINT UNSIGNED NOT NULL,
     name VARCHAR(64) NOT NULL,
+    shutter ENUM ('Yes', 'No') DEFAULT 'No',
     PRIMARY KEY(userID, lensID),
     UNIQUE user_name_uq (userID, name),
     CONSTRAINT Lenses_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE
@@ -65,15 +66,15 @@ CREATE TABLE CameraLenses(
     CONSTRAINT CameraLenses_Lenses FOREIGN KEY (userID, lensID) REFERENCES Lenses (userID, lensID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
-CREATE TABLE ShutterSpeeds(
+CREATE TABLE LensShutterSpeeds(
     userID INT UNSIGNED NOT NULL,
     lensID SMALLINT UNSIGNED NOT NULL,
     speed SMALLINT UNSIGNED NOT NULL,
-    ratedSpeedMS SMALLINT UNSIGNED NOT NULL,
-    differencePercent SMALLINT UNSIGNED AS ((1/((1/speed * 1000) / ratedSpeedMS)) * 100) VIRTUAL,
-    differenceStops DECIMAL(4,2) UNSIGNED AS ((((1/((1/speed * 1000) / ratedSpeedMS)) * 100) / 100) - 1) VIRTUAL,
-    PRIMARY KEY (userID, lensID, speed),
-    CONSTRAINT ShutterSpeeds_Lenses FOREIGN KEY (userID, lensID) REFERENCES Lenses
+    idealSpeedMS SMALLINT UNSIGNED AS ((1/speed) * 1000) VIRTUAL,
+    measuredSpeedMS SMALLINT UNSIGNED NOT NULL,
+    differencePercent SMALLINT AS ((1/((1/speed * 1000) / measuredSpeedMS)) * 100) VIRTUAL,
+    differenceStops FLOAT AS ((((1/((1/speed * 1000) / measuredSpeedMS)) * 100) / 100) - 1) VIRTUAL,    PRIMARY KEY (userID, lensID, speed),
+    CONSTRAINT LensShutterSpeeds_Lenses FOREIGN KEY (userID, lensID) REFERENCES Lenses
         (userID, lensID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
