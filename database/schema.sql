@@ -360,7 +360,7 @@ CREATE TABLE Developers (
   developerID TINYINT UNSIGNED NOT NULL,
   name VARCHAR(64) NOT NULL,
   mixedOn TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  type ENUM('Black and White', 'C-41', 'E-6', 'ECN2') NOT NULL DEFAULT 'Black and White',
+  type ENUM('Black & White', 'C-41', 'E-6', 'ECN2') NOT NULL DEFAULT 'Black & White',
   kind ENUM('One-Shot', 'Multi-User', 'Replenishment') DEFAULT 'One-Shot',
   state ENUM('Active', 'Retired') DEFAULT 'Active',
   capacity SMALLINT UNSIGNED NOT NULL,
