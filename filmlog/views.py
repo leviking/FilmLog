@@ -471,7 +471,7 @@ def film(binderID, projectID, filmID):
     cameraID = extras_result[0]
     filmFormat = extras_result[1]
 
-    qry = text("""SELECT exposureNumber, shutter, aperture,
+    qry = text("""SELECT exposureNumber, Exposures.shutter AS shutter, aperture,
         Lenses.name AS lens, flash, metering, subject, Exposures.notes, development,
         Exposures.iso AS shotISO,
         FilmTypes.name AS filmType, FilmTypes.iso AS filmISO,

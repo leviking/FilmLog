@@ -79,6 +79,8 @@ INSERT INTO PaperBrands VALUES (5, 'Fomapan');
 INSERT INTO Papers VALUES (1, 1, 'Resin Coated', 'Multi', 'Satin', 'Neutral', 'MULTIGRADE IV RC DELUXE Satin');
 INSERT INTO Papers VALUES (2, 1, 'Resin Coated', 'Multi', 'Glossy', 'Neutral', 'MULTIGRADE IV RC DELUXE Glossy');
 INSERT INTO Papers VALUES (3, 2, 'Resin Coated', 'Multi', 'Pearl', 'Neutral', 'RC Perle');
+INSERT INTO Papers VALUES (4, 1, 'Resin Coated', 'Multi', 'Pearl', 'Neutral', 'MULTIGRADE RC Cooltone Pearl');
+INSERT INTO Papers VALUES (5, 1, 'Resin Coated', 'Multi', 'Glossy', 'Neutral', 'MULTIGRADE RC Cooltone Glossy');
 
 INSERT INTO FilmSizes VALUES (1, '35mm 12', 'Small', 'Roll');
 INSERT INTO FilmSizes VALUES (2, '35mm 24', 'Small', 'Roll');
