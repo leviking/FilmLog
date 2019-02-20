@@ -264,7 +264,7 @@ def developer(developerID):
         JOIN FilmSizes ON FilmSizes.filmSizeID = DeveloperLogFilms.filmSizeID
         WHERE DeveloperLogs.userID = :userID
         AND DeveloperLogs.developerID = :developerID
-        GROUP BY DeveloperLogFilms.filmTypeID
+        GROUP BY DeveloperLogFilms.filmTypeID, DeveloperLogFilms.filmSizeID
         ORDER BY brand, filmName""")
     film_stats = connection.execute(qry,
         userID = userID,
