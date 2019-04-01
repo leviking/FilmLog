@@ -519,13 +519,14 @@ def contactsheet(binderID, projectID, filmID):
         elif request.form['button'] == 'updateCS' and form.validate_on_submit():
             # If user included a file, let's upload it. Otherwise skip it.
             if 'file' in request.files:
-                print "here"
+                print "file found here"
                 nextFileID = functions.next_id(connection, 'fileID', 'Files')
                 files.upload_file(request, connection, transaction, nextFileID)
             # If we're updating an existing sheet and the user didn't upload
             # a new file, use the old one.
             else:
                 nextFileID = fileID
+                print fileID
             qry = text("""REPLACE INTO ContactSheets (filmID, userID, fileID, paperID, paperFilterID, enlargerLensID, enlargerID, aperture, headHeight, exposureTime, notes)
                 VALUES (:filmID, :userID, :fileID, :paperID, :paperFilterID, :enlargerLensID, :enlargerID, :aperture, :headHeight, :exposureTime, :notes)""")
             connection.execute(qry,
