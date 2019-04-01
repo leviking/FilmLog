@@ -16,6 +16,7 @@ config.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../config.
 
 app.secret_key = config.get('session','secret_key')
 app.config['TESTING'] = config.getboolean('app','testing')
+app.debug = config.getboolean('app','debug')
 
 
 user_files = os.path.join(os.path.abspath(os.path.dirname(__file__)),
