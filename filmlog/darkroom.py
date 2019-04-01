@@ -545,7 +545,6 @@ def contactsheet(binderID, projectID, filmID):
                 headHeight = form.headHeight.data,
                 exposureTime = functions.time_to_seconds(form.exposureTime.data),
                 notes = form.notes.data)
-    app.logger.debug("After Upload")
     film = functions.get_film_details(connection, binderID, projectID, filmID)
 
     # Get contact sheet info
