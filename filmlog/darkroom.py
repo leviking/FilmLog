@@ -519,7 +519,7 @@ def contactsheet(binderID, projectID, filmID):
         elif request.form['button'] == 'updateCS' and form.validate_on_submit():
             # If user included a file, let's upload it. Otherwise skip it.
             if 'file' in request.files:
-                file = requests.files['file']
+                file = request.files['file']
                 if file.filename != '':
                     print "file found here"
                     nextFileID = functions.next_id(connection, 'fileID', 'Files')
