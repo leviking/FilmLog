@@ -494,6 +494,7 @@ def contactsheet(binderID, projectID, filmID):
 
     # Upload a new contact sheet
     if request.method == 'POST':
+        nextFileID = None
         # See if there is a contact sheet already
         qry = text("""SELECT fileID FROM ContactSheets
             WHERE filmID = :filmID AND userID = :userID""")
@@ -528,7 +529,6 @@ def contactsheet(binderID, projectID, filmID):
             # a new file, use the old one.
             else:
                 nextFileID = fileID
-                print fileID
             qry = text("""REPLACE INTO ContactSheets (filmID, userID, fileID, paperID, paperFilterID, enlargerLensID, enlargerID, aperture, headHeight, exposureTime, notes)
                 VALUES (:filmID, :userID, :fileID, :paperID, :paperFilterID, :enlargerLensID, :enlargerID, :aperture, :headHeight, :exposureTime, :notes)""")
             connection.execute(qry,
