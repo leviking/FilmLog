@@ -501,7 +501,10 @@ def contactsheet(binderID, projectID, filmID):
             filmID = filmID,
             userID = userID).fetchone()
         if(result):
-            fileID = int(result[0])
+            if(result[0]):
+                fileID = int(result[0])
+            else:
+                fileID = None
         else:
             fileID = None
         if request.form['button'] == 'deleteCS':
@@ -516,6 +519,7 @@ def contactsheet(binderID, projectID, filmID):
         elif request.form['button'] == 'updateCS' and form.validate_on_submit():
             # If user included a file, let's upload it. Otherwise skip it.
             if 'file' in request.files:
+                print "here"
                 nextFileID = functions.next_id(connection, 'fileID', 'Files')
                 files.upload_file(request, connection, transaction, nextFileID)
             # If we're updating an existing sheet and the user didn't upload
