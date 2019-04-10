@@ -691,7 +691,7 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
 
     qry = text("""SELECT exposureNumber, shutter, aperture,
         lensID, flash, notes, metering, subject, development, filmTypeID,
-        iso AS shotISO
+        iso AS shotISO, holderID
         FROM Exposures
         WHERE filmID = :filmID
         AND exposureNumber = :exposureNumber
