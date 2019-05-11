@@ -1,0 +1,46 @@
+{% extends "print.html" %}
+
+{% block content %}
+
+<div class="row">
+<div class="col-12">
+  <h1>{{ lens.name }}</h1>
+  {% if lens.shutter == 'Yes' %}
+    <h4>Shutter Speeds</h4>
+    <table class="table table-bordered" id="shutterSpeeds">
+      <tr>
+        <th>Speed</th>
+        <th>Ideal Microseconds</th>
+        <th>Measured Microseconds</th>
+        <th>Deviation %</th>
+        <th>Stops</th>
+      </tr>
+      {% for speed in shutter_speeds %}
+        <tr
+          {% if speed.differenceStops >= -0.25 and speed.differenceStops <= 0 %}
+            class="shutterTestGood"
+          {% elif speed.differenceStops < -0.25 and speed.differenceStops > -0.50 %}
+            class="shutterTestFair"
+          {% elif speed.differenceStops <= -0.50 %}
+            class="shutterTestPoor"
+          {% elif speed.differenceStops >= 0 and speed.differenceStops <= 0.25 %}
+            class="shutterTestGood"
+          {% elif speed.differenceStops > 0.25 and speed.differenceStops < 0.50 %}
+            class="shutterTestFair"
+          {% elif speed.differenceStops >= 0.50 %}
+            class="shutterTestPoor"
+          {% endif %}
+        >
+          <td>1/{{ speed.speed }}</td>
+          <td>{{ speed.idealSpeedMicroseconds }}</td>
+          <td>{{ speed.measuredSpeedMicroseconds }}</td>
+          <td>{{ speed.differencePercent }}</td>
+          <td>{{ speed.differenceStops }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="6">No Speeds Entered</td></tr>
+      {% endfor %}
+    </table>
+  {% endif %}
+
+{% endblock %}

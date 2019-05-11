@@ -334,7 +334,13 @@ def lens(lensID):
         lensID = lensID).fetchall()
 
     transaction.commit()
-    return render_template('/gear/lens.html',
+
+    if request.args.get('print'):
+        template = '/gear/lens-print.html'
+    else:
+        template = '/gear/lens.html'
+
+    return render_template(template,
         lens = lens,
         shutter_speeds = shutter_speeds,
         shutter_speed_form = shutter_speed_form)
