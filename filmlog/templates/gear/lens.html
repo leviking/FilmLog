@@ -11,6 +11,7 @@
     <table class="table table-bordered" id="shutterSpeeds">
       <tr>
         <th>Speed</th>
+        <th>Measured Speed</th>
         <th>Ideal Microseconds</th>
         <th>Measured Microseconds</th>
         <th>Deviation %</th>
@@ -34,6 +35,7 @@
           {% endif %}
         >
           <td>1/{{ speed.speed }}</td>
+          <td>1/{{ speed.measuredSpeed }}</td>
           <td>{{ speed.idealSpeedMicroseconds }}</td>
           <td>{{ speed.measuredSpeedMicroseconds }}</td>
           <td>{{ speed.differencePercent }}</td>
