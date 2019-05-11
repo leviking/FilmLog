@@ -57,17 +57,17 @@ pre{
 }
 
 .shutterTestGood{
-  background-color: #ccffcc;
+  background-color: #ccffcc !important;
   font-weight: bold;
 }
 
 .shutterTestFair{
-  background-color: #ffffcc;
+  background-color: #ffffcc !important;
   font-weight: bold;
 }
 
 .shutterTestPoor{
-  background-color: #ffcccc;
+  background-color: #ffcccc !important;
   font-weight: bold;
 }
 
