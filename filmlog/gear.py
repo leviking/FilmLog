@@ -75,8 +75,8 @@ class CameraLensForm(FlaskForm):
 class LensShutterSpeedsForm(FlaskForm):
     speed = IntegerField('Rated Speed',
         validators=[DataRequired(), NumberRange(min=1, max=1000)])
-    measuredSpeedMS = IntegerField('Measured Speed (ms)',
-        validators=[DataRequired(), NumberRange(min=1, max=65535)])
+    measuredSpeedMicroseconds = IntegerField('Measured Speed (microseconds)',
+        validators=[DataRequired(), NumberRange(min=1, max=64000000)])
 
 class HolderForm(FlaskForm):
     name = StringField('Name',
@@ -298,11 +298,11 @@ def lens(lensID):
         if request.form['button'] == 'addSpeed':
             if shutter_speed_form.validate_on_submit():
                 qry = text("""REPLACE INTO LensShutterSpeeds
-                    (userID, lensID, speed, measuredSpeedMS)
-                    VALUES (:userID, :lensID, :speed, :measuredSpeedMS)""")
+                    (userID, lensID, speed, measuredSpeedMicroseconds)
+                    VALUES (:userID, :lensID, :speed, :measuredSpeedMicroseconds)""")
                 connection.execute(qry,
                     speed = shutter_speed_form.speed.data,
-                    measuredSpeedMS = shutter_speed_form.measuredSpeedMS.data,
+                    measuredSpeedMicroseconds = shutter_speed_form.measuredSpeedMicroseconds.data,
                     userID = userID,
                     lensID = lensID)
         if request.form['button'] == 'deleteSpeed':
@@ -324,7 +324,7 @@ def lens(lensID):
         lensID = lensID).fetchone()
 
     qry = text("""SELECT speed,
-        idealSpeedMS, measuredSpeedMS,
+        idealSpeedMicroseconds, measuredSpeedMicroseconds,
         differencePercent, differenceStops
         FROM LensShutterSpeeds
         WHERE userID = :userID

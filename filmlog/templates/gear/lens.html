@@ -10,8 +10,8 @@
     <table class="table table-bordered" id="shutterSpeeds">
       <tr>
         <th>Speed</th>
-        <th>Ideal MS</th>
-        <th>Measured MS</th>
+        <th>Ideal Microseconds</th>
+        <th>Measured Microseconds</th>
         <th>Deviation %</th>
         <th>Stops</th>
         <th></th>
@@ -33,8 +33,8 @@
           {% endif %}
         >
           <td>1/{{ speed.speed }}</td>
-          <td>{{ speed.idealSpeedMS }}</td>
-          <td>{{ speed.measuredSpeedMS }}</td>
+          <td>{{ speed.idealSpeedMicroseconds }}</td>
+          <td>{{ speed.measuredSpeedMicroseconds }}</td>
           <td>{{ speed.differencePercent }}</td>
           <td>{{ speed.differenceStops }}</td>
           <td>
@@ -65,8 +65,8 @@
           1/{{ shutter_speed_form.speed(class="form-control") }}
       </div>
       <div class="col-sm-3">
-          {{ shutter_speed_form.measuredSpeedMS.label }}
-          {{ shutter_speed_form.measuredSpeedMS(class="form-control") }}
+          {{ shutter_speed_form.measuredSpeedMicroseconds.label }}
+          {{ shutter_speed_form.measuredSpeedMicroseconds(class="form-control") }}
       </div>
     </div>
 
