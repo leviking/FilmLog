@@ -25,7 +25,6 @@
             <th>Measured Speed</th>
             <th>Ideal Microseconds</th>
             <th>Measured Microseconds</th>
-            <th>Deviation %</th>
             <th>Stops</th>
           </tr>
           {% for speed in shutter_speeds %}
@@ -48,7 +47,6 @@
               <td>1/{{ speed.measuredSpeed }}</td>
               <td>{{ speed.idealSpeedMicroseconds }}</td>
               <td>{{ speed.measuredSpeedMicroseconds }}</td>
-              <td>{{ speed.differencePercent }}</td>
               <td>{{ speed.differenceStops }}</td>
             </tr>
           {% else %}
