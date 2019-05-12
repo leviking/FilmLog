@@ -325,7 +325,7 @@ def lens(lensID):
 
     qry = text("""SELECT speed, measuredSpeed,
         idealSpeedMicroseconds, measuredSpeedMicroseconds,
-        differencePercent, ROUND(differenceStops, 2) AS differenceStops
+        differenceStops
         FROM LensShutterSpeeds
         WHERE userID = :userID
         AND lensID = :lensID""")
