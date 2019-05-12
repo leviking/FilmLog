@@ -18,13 +18,11 @@
     <div class="col-12">
       <h1>{{ lens.name }}</h1>
       {% if lens.shutter == 'Yes' %}
-        <h4>Shutter Speeds</h4>
-        <table class="table table-bordered" id="shutterSpeeds">
+        <h3>Shutter Speeds</h3>
+        <table id="shutterSpeeds">
           <tr>
             <th>Speed</th>
             <th>Measured Speed</th>
-            <th>Ideal Microseconds</th>
-            <th>Measured Microseconds</th>
             <th>Stops</th>
           </tr>
           {% for speed in shutter_speeds %}
@@ -45,12 +43,10 @@
             >
               <td>1/{{ speed.speed }}</td>
               <td>1/{{ speed.measuredSpeed }}</td>
-              <td>{{ speed.idealSpeedMicroseconds }}</td>
-              <td>{{ speed.measuredSpeedMicroseconds }}</td>
               <td>{{ speed.differenceStops }}</td>
             </tr>
           {% else %}
-            <tr><td colspan="6">No Speeds Entered</td></tr>
+            <tr><td colspan="3">No Speeds Entered</td></tr>
           {% endfor %}
         </table>
       {% endif %}

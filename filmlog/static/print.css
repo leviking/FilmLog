@@ -2,6 +2,14 @@ h1{
   font-size: 2.5em;
 }
 
+h2{
+  font-size: 2em;
+}
+
+h3{
+  font-size: 1.5em;
+}
+
 body{
   /* Moving over a bit so there's room for punching holes in the paper */
   margin-left: 20px;
@@ -20,7 +28,24 @@ body{
 
 /* Chrome hack to print background shades for the tables */
 body, span, div, table, tr, tbody, tfoot, td, hr {
-    -webkit-print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+table{
+  border-collapse: collapse;
+}
+
+th{
+  font-weight: bold;
+}
+
+td{
+  font-weight: normal;
+}
+
+th, td{
+  border-collapse: collapse;
+  border: 1px solid #000000 !important;
 }
 
 .print{
@@ -51,6 +76,8 @@ body, span, div, table, tr, tbody, tfoot, td, hr {
 .table-striped > tbody > tr:nth-of-type(odd) {
   background-color: #f9f9f9 !important;
 }
+
+
 
 /* Taken from https://gist.github.com/donnierayjones/6fd9802d992b2d8d6cfd */
 @media print {
