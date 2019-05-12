@@ -73,7 +73,7 @@ CREATE TABLE LensShutterSpeeds(
     measuredSpeed SMALLINT AS (1/(measuredSpeedMicroseconds / 1000000)) VIRTUAL,
     idealSpeedMicroseconds INT UNSIGNED AS ((1/speed) * 1000000) VIRTUAL,
     measuredSpeedMicroseconds INT UNSIGNED NOT NULL,
-    differenceStops FLOAT GENERATED ALWAYS AS ((ROUND(LOG2(idealSpeedMicroseconds / measuredSpeedMicroseconds),2)) * -1) VIRTUAL,
+    differenceStops FLOAT GENERATED ALWAYS AS ((ROUND(LOG2((1 / speed * 1000000) / measuredSpeedMicroseconds),2)) * -1),
     PRIMARY KEY (userID, lensID, speed),
     CONSTRAINT LensShutterSpeeds_Lenses FOREIGN KEY (userID, lensID) REFERENCES Lenses
         (userID, lensID) ON DELETE RESTRICT ON UPDATE CASCADE
