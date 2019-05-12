@@ -43,7 +43,7 @@
             >
               <td>1/{{ speed.speed }}</td>
               <td>1/{{ speed.measuredSpeed }}</td>
-              <td>{{ speed.differenceStops }}</td>
+              <td>{{ '%.2f' % speed.differenceStops }}</td>
             </tr>
           {% else %}
             <tr><td colspan="3">No Speeds Entered</td></tr>
