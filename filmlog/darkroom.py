@@ -522,11 +522,8 @@ def contactsheet(binderID, projectID, filmID):
             if 'file' in request.files:
                 file = request.files['file']
                 if file.filename != '':
-                    app.logger.debug("File Found")
                     nextFileID = functions.next_id(connection, 'fileID', 'Files')
-                    app.logger.debug("Next File ID: " + nextFileID)
                     files.upload_file(request, connection, transaction, nextFileID)
-                    app.logger.debug("After Upload")
             # If we're updating an existing sheet and the user didn't upload
             # a new file, use the old one.
             else:
