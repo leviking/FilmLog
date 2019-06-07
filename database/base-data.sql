@@ -11,6 +11,7 @@ INSERT INTO `FilmBrands` VALUES (6,'Adox'),
 (11,'Rollei'),
 (12,'Lomography'),
 (13,'Ultrafine');
+(14,'CatLABS');
 
 INSERT INTO `FilmTypes`
 VALUES (1,1,'Ektar',100,'Color Negative'),
@@ -55,7 +56,8 @@ VALUES (1,1,'Ektar',100,'Color Negative'),
 (41,12,'Color',800,'Color Negative'),
 (42,13,'Xtreme',100,'Black & White Negative'),
 (43,13,'Xtreme',400,'Black & White Negative'),
-(44,6,'CHS ii',100,'Black & White Negative');
+(44,6,'CHS ii',100,'Black & White Negative'),
+(45,14,'X FILM', 80, 'Black & White Negative');
 
 INSERT INTO PaperFilters (name) VALUES ('00');
 INSERT INTO PaperFilters (name) VALUES ('0');
