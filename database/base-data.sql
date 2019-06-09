@@ -57,7 +57,9 @@ VALUES (1,1,'Ektar',100,'Color Negative'),
 (42,13,'Xtreme',100,'Black & White Negative'),
 (43,13,'Xtreme',400,'Black & White Negative'),
 (44,6,'CHS ii',100,'Black & White Negative'),
-(45,14,'X FILM', 80, 'Black & White Negative');
+(45,14,'X FILM', 80, 'Black & White Negative'),
+(46,6,'Silvermax',100,'Black & White Negative'),
+(47,6,'HR-50',50,'Black & White Negative');
 
 INSERT INTO PaperFilters (name) VALUES ('00');
 INSERT INTO PaperFilters (name) VALUES ('0');
