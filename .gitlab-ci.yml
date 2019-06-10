@@ -1,6 +1,6 @@
 before_script:
     - apt-get update -y
-    - apt-get install -y python-pip python-dev build-essential mariadb-client libmysqlclient-dev
+    - apt-get install -y python-pip python-dev build-essential mariadb-client libmariadbclient-dev-compat
     - pip install -r requirements.txt
 
 job1:
