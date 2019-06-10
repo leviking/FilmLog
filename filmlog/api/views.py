@@ -5,7 +5,8 @@ from filmlog import database, functions
 from flask import Blueprint, jsonify, request, make_response
 from flask_api import status
 from filmlog.api import api_blueprint, binders, projects, filmstock
-from filmlog import engine
+
+engine = database.engine
 
 # http://jsonapi.org/format/
 

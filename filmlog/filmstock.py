@@ -1,3 +1,4 @@
+from flask import Flask
 from flask import request, render_template, redirect, url_for, abort
 from sqlalchemy.sql import select, text, func
 import os, re
@@ -11,9 +12,12 @@ from wtforms import Form, StringField, DateField, SelectField, IntegerField, \
 from wtforms.validators import DataRequired, Optional, Length, NumberRange
 from wtforms import widgets
 
-from filmlog import app
-from filmlog import database, engine
+from filmlog import config
+from filmlog import database
 from filmlog.functions import get_film_types, get_film_sizes
+
+app = config.app
+engine = config.engine
 
 class FilmStockForm(FlaskForm):
     filmTypeID = SelectField('Film',

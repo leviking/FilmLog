@@ -1,3 +1,4 @@
+from flask import Flask
 from flask import request, render_template, redirect, url_for, flash, abort
 from sqlalchemy.sql import select, text, func
 import os, re, string, random
@@ -11,9 +12,11 @@ from wtforms.validators import DataRequired, Length
 from werkzeug.security import generate_password_hash, \
      check_password_hash
 
-from filmlog import app
-from filmlog import database, engine
+from filmlog import config, database
 #from filmlog.functions import insert
+
+app = config.app
+engine = config.engine
 
 ### Functions
 def generate_registration_code(size=64, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):

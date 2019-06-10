@@ -4,8 +4,9 @@ from sqlalchemy.sql import select, text, func
 from sqlalchemy.exc import IntegrityError
 from filmlog import database, functions
 from flask_api import status
-from filmlog import engine
 from filmlog.functions import next_id
+
+engine = database.engine
 
 ## Film Stock
 def get_all(connection, transaction):

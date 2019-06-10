@@ -1,11 +1,15 @@
+from flask import Flask
 from flask import request, render_template, redirect, url_for, abort
 from sqlalchemy.sql import select, text, func
 import os, re
 
 from flask_login import LoginManager, login_required, current_user
 
-from filmlog import app
-from filmlog import database, engine
+from filmlog import config
+from filmlog import database
+
+app = config.app
+engine = config.engine
 
 @app.route('/search',  methods = ['GET'])
 @login_required

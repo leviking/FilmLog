@@ -1,6 +1,6 @@
+from flask import Flask
 from flask import request, render_template, redirect, url_for, Response, \
     session, abort, flash, send_from_directory
-
 from sqlalchemy.sql import select, text, func
 import os, re, datetime
 
@@ -8,21 +8,27 @@ from flask_login import LoginManager, login_required, current_user, login_user, 
 
 # Forms
 from flask_wtf import FlaskForm
+from flask_wtf.csrf import CSRFProtect
 from wtforms import Form, StringField, DateField, SelectField, IntegerField, \
     TextAreaField, DecimalField, SelectMultipleField, BooleanField
 from wtforms.validators import DataRequired, Optional, Length, NumberRange
 from wtforms import widgets
 
-from filmlog import app, csrf, database
+from filmlog import config, database
 from filmlog.functions import next_id, result_to_dict, get_film_details, \
     optional_choices, zero_to_none, get_film_types, get_film_sizes, \
     insert, delete
 from filmlog.classes import MultiCheckboxField
 from filmlog import users, filmstock, darkroom, files, stats, gear, help, \
-    engine, search, developing
+    search, developing
 
 ## Blueprints
 from filmlog.api import api_blueprint
+
+app = config.app
+engine = config.engine
+csrf = config.csrf
+
 app.register_blueprint(api_blueprint, url_prefix='/api/v1', engine=engine)
 csrf.exempt(api_blueprint)
 

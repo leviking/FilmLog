@@ -1,3 +1,4 @@
+from flask import Flask
 from flask import request, render_template, redirect, url_for, flash, abort
 from sqlalchemy.sql import select, text, func
 import os, re
@@ -10,10 +11,13 @@ from wtforms import Form, StringField, DateField, DateTimeField, SelectField, In
 from wtforms.validators import DataRequired, Optional, Length, NumberRange
 from wtforms import widgets
 
-from filmlog import app
-from filmlog import database, engine
+from filmlog import config
+from filmlog import database
 from filmlog import functions
 from filmlog import files
+
+app = config.app
+engine = config.engine
 
 class DeveloperForm(FlaskForm):
     name = StringField('Name',

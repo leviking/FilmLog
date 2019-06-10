@@ -1,12 +1,15 @@
 import os
+from flask import Flask
 from flask import send_from_directory, flash, abort
 from sqlalchemy.sql import select, text, func
 from PIL import Image
 from werkzeug.utils import secure_filename
 from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
-from filmlog import app
+from filmlog import config
 from filmlog import database
 from shutil import rmtree
+
+app = config.app
 
 def is_file_allowed(filename):
     return '.' in filename and \

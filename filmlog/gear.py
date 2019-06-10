@@ -1,3 +1,4 @@
+from flask import Flask
 from flask import request, render_template, redirect, url_for, Response, session, abort, send_from_directory
 from sqlalchemy.sql import select, text, func
 import os, re
@@ -11,10 +12,13 @@ from wtforms import Form, StringField, DateField, SelectField, IntegerField, \
 from wtforms.validators import DataRequired, Optional, Length, NumberRange
 from wtforms import widgets
 
-from filmlog import app
-from filmlog import database, engine
+from filmlog import config
+from filmlog import database
 from filmlog.functions import next_id, insert, delete, optional_choices, get_film_types
 from filmlog.classes import MultiCheckboxField
+
+app = config.app
+engine = config.engine
 
 def get_lenses(connection):
     userID = current_user.get_id()

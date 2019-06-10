@@ -1,6 +1,9 @@
+from flask import Flask
 from flask import request, render_template, redirect, url_for, flash, abort
-from filmlog import app
+from filmlog import config
 
+app = config.app
+engine = config.engine
 
 @app.route('/help', methods=['GET', 'POST'])
 def help():

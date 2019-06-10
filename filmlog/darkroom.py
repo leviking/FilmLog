@@ -1,3 +1,4 @@
+from flask import Flask
 from flask import request, render_template, redirect, url_for, flash, abort
 from sqlalchemy.sql import select, text, func
 import os, re
@@ -11,14 +12,16 @@ from wtforms import Form, StringField, IntegerField, SelectField, RadioField, \
 from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError, Length
 from flask_wtf.file import FileAllowed
 
-from filmlog import app
-from filmlog import database, engine
+from filmlog import config
+from filmlog import database
 from filmlog import functions
 from filmlog import files
 
 from filmlog.functions import optional_choices, zero_to_none, insert, result_to_dict, next_id
 
-engine = database.engine
+app = config.app
+engine = config.engine
+
 
 ## Functions
 def get_paper_filters(connection):

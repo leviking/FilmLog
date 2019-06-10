@@ -1,28 +1,34 @@
-from filmlog import app, abort
+""" A set of usable generic helper functions """
 from flask import flash
-from sqlalchemy.sql import text
 from flask_login import current_user
+from sqlalchemy.sql import text
 from sqlalchemy.exc import IntegrityError
-
-from wtforms import validators
 from wtforms.validators import ValidationError
+from filmlog import config, abort
+
+app = config.app
 
 # Functions
 def result_to_dict(result_set):
+    """ Return a dictionary from a DB result set """
     return [dict(row) for row in result_set]
 
-# This allows for SQL injection if yuo're not careful!
 def next_id(connection, field, table):
-    qry = text("""SELECT MAX(""" + field + """) AS currentID FROM """ + table + """ WHERE userID = :userID""")
+    """
+        Grab the next id based on the max ID of the provided table and field.
+        Be careful as this could allow for sql-injection!
+    """
+    qry = text("""SELECT MAX(""" + field + """) AS currentID FROM """ + table + \
+               """ WHERE userID = :userID""")
     result = connection.execute(qry,
-        userID = int(current_user.get_id())).fetchone()
+                                userID=int(current_user.get_id())).fetchone()
     app.logger.info('Current ID: %s', result.currentID)
     if result.currentID is not None:
         return int(result.currentID) + 1
-    else:
-        return 1
+    return 1
 
 def get_film_types(connection):
+    """ Get a friendly output of the film types (e.g. Kodak T-Max 100) """
     qry = text("""SELECT filmTypeID,
         CONCAT(brand, " ", name, " ", iso)
         FROM FilmTypes
@@ -31,11 +37,14 @@ def get_film_types(connection):
     return connection.execute(qry).fetchall()
 
 def get_film_sizes(connection):
+    """ Get all the available film sizes (e.g. 35mm, 4x5) """
     qry = text("""SELECT filmSizeID, size
         FROM FilmSizes""")
     return connection.execute(qry).fetchall()
 
 def get_film_details(connection, binderID, projectID, filmID):
+    """ Get detailed informatiln of a particular film shot.
+        For sheets, each "film" is more of a sub project. """
     userID = current_user.get_id()
 
     qry = text("""SELECT filmID, Films.projectID, Projects.name AS project, brand,
@@ -64,10 +73,10 @@ def get_film_details(connection, binderID, projectID, filmID):
         AND Binders.userID = :userID""")
 
     film = connection.execute(qry,
-        userID = userID,
-        binderID = binderID,
-        projectID=projectID,
-        filmID=filmID).fetchone()
+                              userID=userID,
+                              binderID=binderID,
+                              projectID=projectID,
+                              filmID=filmID).fetchone()
 
     if not film:
         abort(404)
@@ -75,41 +84,40 @@ def get_film_details(connection, binderID, projectID, filmID):
     return film
 
 def optional_choices(name, choices):
+    """ Helper function to append extra choices to a form.
+        This is typically used to inject "None" as a choice. """
     new_choices = [(0, name)]
     for row in choices:
         new_choices.append(row)
     return new_choices
 
 def zero_to_none(value):
+    """ Helper function to set 0 or '0' (the string) to None or null. """
     if value == 0 or value == '0':
         return None
     return value
 
-# Try an insert (really could be any query),
-# catch the error and provide info.
-# An error causes an implicit rollback.
 def insert(connection, qry, item, **args):
+    """ Helper function to make insert checks easier and more consistent.
+        An error causes an implicit rollback. """
     try:
-         connection.execute(qry, args)
+        connection.execute(qry, args)
     except IntegrityError:
         flash(item + " of the same name already exists.")
 
-# Attempt a delete (or really any query),
-# catch the error and provide info.
-# An error causes an implicty rollback.
-# Delete exceptions will typically be if there
-# are foreign key relationships that do not
-# have cascading deletes.
 def delete(connection, qry, item, **args):
+    """ Attempt a delete (or really any query) and catch the error.
+        Delete exceptions will typically be if there are any foreign key
+        relationships that do not have cascading deletes. """
     try:
-         connection.execute(qry, args)
+        connection.execute(qry, args)
     except IntegrityError:
         flash("Cannot delete " + item +
-            ". Could be you may have stuff that depends on it.")
+              ". Could be you may have stuff that depends on it.")
 
 def time_to_seconds(time):
-    # If time is in MM:SS format, calculate the raw seconds
-    # Otherwise just return the time as-is
+    """ If time is in MM:SS format, calculate the raw seconds.
+        Otherwise just return the time as-is. """
     if time:
         if ':' not in time:
             if int(time) > 0:
@@ -120,6 +128,10 @@ def time_to_seconds(time):
     raise ValidationError('Time in wrong format, it should be MM:SS.')
 
 def validate_exposure_time(form, field):
+    """ Make sure the provided exposure time is in a convertable format. """
+    # pylint: disable=unused-argument
+    # Disabling unused argument due to
+    # https://wtforms.readthedocs.io/en/stable/validators.html
     try:
         time_to_seconds(field.data)
     except Exception:

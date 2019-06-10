@@ -1,13 +1,17 @@
+from flask import Flask
 from flask import request, render_template, redirect, url_for, flash, abort
 from sqlalchemy.sql import select, text, func
 import os, re
 
 from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
 
-from filmlog import app
-from filmlog import database, engine
+from filmlog import config
+from filmlog import database
 from filmlog import functions
 from filmlog import files
+
+app = config.app
+engine = config.engine
 
 @app.route('/stats/', methods = ['GET'])
 @login_required
