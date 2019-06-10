@@ -14,13 +14,13 @@ app = Flask(__name__)
 config = ConfigParser.ConfigParser()
 config.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../config.ini'))
 
-app.secret_key = config.get('session','secret_key')
-app.config['TESTING'] = config.getboolean('app','testing')
-app.debug = config.getboolean('app','debug')
+app.secret_key = config.get('session', 'secret_key')
+app.config['TESTING'] = config.getboolean('app', 'testing')
+app.debug = config.getboolean('app', 'debug')
 
 
 user_files = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-    config.get('files', 'user_files'))
+                          config.get('files', 'user_files'))
 
 app.config['ALLOWED_EXTENSIONS'] = set(['jpg', 'jpeg'])
 app.config['UPLOAD_FOLDER'] = user_files

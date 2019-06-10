@@ -1,2 +1,2 @@
 #!/bin/bash
-echo 0
+pylint --load-plugins pylint_flask filmlog

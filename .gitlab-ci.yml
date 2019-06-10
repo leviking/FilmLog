@@ -2,6 +2,7 @@ before_script:
     - apt-get update -y
     - apt-get install -y python-pip python-dev build-essential mariadb-client libmariadbclient-dev-compat
     - pip install -r requirements.txt
+    - pip install pylint-flask
 
 job1:
     script: "./test.sh"
