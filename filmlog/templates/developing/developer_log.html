@@ -33,6 +33,7 @@
       <th>Size</th>
       <th>Film</th>
       <th>ISO</th>
+      <th>Compensation</th>
       <th></th>
     </tr>
     {% for film in developer_log.films %}
@@ -53,6 +54,13 @@
             Not Specified
           {% endif %}
         </td>
+        <td>
+          {% if film.compensation %}
+            {{ film.compensation }}
+          {% else %}
+            &nbsp;
+          {% endif %}
+        </td>
         <td class="text-right">
           <form role="form" class="form-horizontal"
             action="/developing/developer/{{ developerID }}/log/{{ developerLogID }}"
@@ -64,7 +72,7 @@
         </td>
       </tr>
     {% else %}
-      <tr><td colspan="5">No Films Logged</td></tr>
+      <tr><td colspan="6">No Films Logged</td></tr>
     {% endfor %}
   </table>
 
