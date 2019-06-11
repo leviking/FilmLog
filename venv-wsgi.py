@@ -1,11 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/python
+import sys
+sys.path.insert(0,"/srv/filmlog")
 
-#import sys
-#sys.path.insert(0, '/path/to/the/application')
-
-# If installing filmlog in a virtualenv and using Apache WSGI, use this
-# Be sure to chage the path below to the path of your virtual env
-activate_this = '/path/to/venv/bin/activate_this.py'
-execfile(activate_this, dict(__file__=activate_this))
+activate_this = '/srv/filmlog/venv/bin/activate_this.py'
+with open(activate_this) as file_:
+    exec(file_.read(), dict(__file__=activate_this))
 from filmlog import app as application
-
