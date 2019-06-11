@@ -1,3 +1,10 @@
+services:
+    - mariadb:latest
+
+variables:
+    MYSQL_DATABASE: filmlogdev
+    MYSQL_PASSWORD: filmlogdevtestrunnerpassword
+
 before_script:
     - apt-get update -y
     - apt-get install -y python-pip python-dev build-essential mariadb-client libmariadbclient-dev-compat virtualenv
@@ -7,5 +14,8 @@ before_script:
     - pip install pylint==1.9.2
     - pip install pylint-flask
 
-job1:
-    script: "./lint.sh"
+lint:
+    script: "tests/lint.sh"
+
+import_database:
+    script: "tests/import_database.sh"
