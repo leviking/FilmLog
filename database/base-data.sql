@@ -32,7 +32,7 @@ INSERT INTO `FilmBrands` VALUES (6,'Adox'),
 (1,'Kodak'),
 (11,'Rollei'),
 (12,'Lomography'),
-(13,'Ultrafine');
+(13,'Ultrafine'),
 (14,'CatLABS');
 
 INSERT INTO `FilmTypes`
