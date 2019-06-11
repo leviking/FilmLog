@@ -1,4 +1,4 @@
-import ConfigParser
+import configparser
 import os
 import re
 
@@ -9,7 +9,7 @@ from filmlog import database
 app = Flask('filmlog')
 engine = database.engine
 
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 config.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../config.ini'))
 
 app.secret_key = config.get('session', 'secret_key')

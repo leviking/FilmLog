@@ -1,7 +1,7 @@
 # from filmlog import app
 
 import os, re
-import ConfigParser
+import configparser
 from flask import Flask
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -9,7 +9,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 app = Flask('filmlog')
 
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 config.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../config.ini'))
 
 #if(config.get('global', 'docker') == 1):

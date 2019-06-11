@@ -518,7 +518,6 @@ def contactsheet(binderID, projectID, filmID):
                 filmID = filmID,
                 userID = userID)
             if fileID:
-                print fileID
                 files.delete_file(request, connection, transaction, fileID)
         elif request.form['button'] == 'updateCS' and form.validate_on_submit():
             # If user included a file, let's upload it. Otherwise skip it.

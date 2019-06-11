@@ -28,7 +28,7 @@ class User(UserMixin):
         self.id = userID
 
     def get_id(self):
-        return unicode(self.id)
+        return str(self.id)
 
     def get(userID):
         return self.id
