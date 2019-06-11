@@ -1,21 +1,14 @@
-from flask import Flask
-from flask import request, render_template, redirect, url_for, flash, abort
-from sqlalchemy.sql import select, text, func
-import os, re
+""" Statistics section (/stats) """
+from flask import render_template
+from flask_login import login_required, current_user
+from sqlalchemy.sql import text
 
-from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
+from filmlog.config import app, engine
 
-from filmlog import config
-from filmlog import database
-from filmlog import functions
-from filmlog import files
-
-app = config.app
-engine = config.engine
-
-@app.route('/stats/', methods = ['GET'])
+@app.route('/stats/', methods=['GET'])
 @login_required
 def stats():
+    """ Index page for stats section """
     connection = engine.connect()
     userID = current_user.get_id()
 
@@ -26,7 +19,7 @@ def stats():
         WHERE Cameras.userID=:userID
         GROUP BY Films.cameraID
         ORDER BY COUNT(Films.cameraID) DESC""")
-    cameras =  connection.execute(qry, userID = userID)
+    cameras = connection.execute(qry, userID=userID)
 
     qry = text("""SELECT
         FilmBrands.brand AS brand, FilmTypes.name AS type, FilmTypes.iso AS iso,
@@ -37,7 +30,7 @@ def stats():
         AND userID = :userID
         GROUP BY Films.filmTypeID
         ORDER BY COUNT(Films.filmTypeID) DESC""")
-    favoriteRolls =  connection.execute(qry, userID = userID)
+    favoriteRolls = connection.execute(qry, userID=userID)
 
     qry = text("""SELECT
         FilmBrands.brand AS brand, FilmTypes.name AS type, FilmTypes.iso AS iso,
@@ -50,9 +43,9 @@ def stats():
         AND Exposures.userID = :userID
         GROUP BY Exposures.filmTypeID
         ORDER BY COUNT(Exposures.filmTypeID) DESC""")
-    favoriteSheets =  connection.execute(qry, userID = userID)
+    favoriteSheets = connection.execute(qry, userID=userID)
 
     return render_template('/stats.html',
-        cameras=cameras,
-        favoriteRolls = favoriteRolls,
-        favoriteSheets = favoriteSheets)
+                           cameras=cameras,
+                           favoriteRolls=favoriteRolls,
+                           favoriteSheets=favoriteSheets)

@@ -22,7 +22,7 @@ jobs=1
 
 # List of plugins (as comma separated values of python modules names) to load,
 # usually to register additional checkers.
-load-plugins=
+load-plugins=pylint_flask
 
 # Pickle collected data for later comparisons.
 persistent=yes
@@ -54,7 +54,10 @@ confidence=
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
-disable=invalid-name, # Using camel case to comply with DB naming conventions
+disable=similarities, # Catches looks of similar, but not exact, SQL
+        cyclic-import, # Seems to cause a false positive, or isn't clear on the issue
+        no-member, # Avoid the issue with app.logger.error
+        invalid-name, # Using camel case to comply with DB naming conventions
         print-statement,
         parameter-unpacking,
         unpacking-in-except,

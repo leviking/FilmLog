@@ -1,19 +1,19 @@
-from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
-from flask import Blueprint, jsonify, request, make_response, url_for
-from sqlalchemy.sql import select, text, func
-from sqlalchemy.exc import IntegrityError
-from filmlog import database, functions
+""" Binder interactions for API """
+from flask import jsonify, request, make_response, url_for
+from flask_login import current_user
 from flask_api import status
+from sqlalchemy.sql import text
+from sqlalchemy.exc import IntegrityError
+
 from filmlog.functions import next_id
 
-engine = database.engine
-
 ## Binders
-def get_all(connection, transaction):
+def get_all(connection):
+    """ Get all user's binders """
     userID = current_user.get_id()
     qry = text("""SELECT binderID, name, projectCount, createdOn
         FROM Binders WHERE userID = :userID""")
-    binders_query = connection.execute(qry, userID = userID).fetchall()
+    binders_query = connection.execute(qry, userID=userID).fetchall()
 
     binders = {
         "data": []
@@ -28,13 +28,14 @@ def get_all(connection, transaction):
                 "created_on" : row['createdOn']
             },
             "links" : {
-                "self" : url_for("api.binder_details", binderID = row['binderID'])
+                "self" : url_for("api.binder_details", binderID=row['binderID'])
             }
         }
         binders["data"].append(binder)
     return jsonify(binders), status.HTTP_200_OK
 
-def post(connection, transaction):
+def post(connection):
+    """ Insert a new binder """
     userID = current_user.get_id()
     json = request.get_json()
     nextBinderID = next_id(connection, 'binderID', 'Binders')
@@ -42,12 +43,12 @@ def post(connection, transaction):
         (binderID, userID, name) VALUES (:binderID, :userID, :name)""")
     try:
         connection.execute(qry,
-            binderID = nextBinderID,
-            userID = userID,
-            name = json['data']['attributes']['name'])
+                           binderID=nextBinderID,
+                           userID=userID,
+                           name=json['data']['attributes']['name'])
     except IntegrityError:
-       return "FAILED", status.HTTP_409_CONFLICT
-    location_url = url_for('api.binder_details', binderID = nextBinderID)
+        return "FAILED", status.HTTP_409_CONFLICT
+    location_url = url_for('api.binder_details', binderID=nextBinderID)
     json['data']['id'] = str(nextBinderID)
     json['data']['attributes']['project_count'] = str(0)
     json['data']['links'] = {
@@ -58,20 +59,21 @@ def post(connection, transaction):
     return resp, status.HTTP_201_CREATED
 
 ## Binder (Singular)
-def get(connection, transaction, binderID):
+def get(connection, binderID):
+    """ Get a binder """
     userID = current_user.get_id()
     qry = text("""SELECT binderID, name, projectCount, createdOn
         FROM Binders WHERE userID = :userID AND binderID = :binderID""")
     binder_query = connection.execute(qry,
-        userID = userID,
-        binderID = binderID).fetchone()
+                                      userID=userID,
+                                      binderID=binderID).fetchone()
     qry = text("""SELECT projectID, name, filmCount, createdOn FROM Projects
         WHERE binderID = :binderID
         AND userID = :userID
         ORDER BY createdOn""")
     projects_query = connection.execute(qry,
-        userID = userID,
-        binderID = binderID).fetchall()
+                                        userID=userID,
+                                        binderID=binderID).fetchall()
 
     binder = {
         "data" : {
@@ -83,11 +85,11 @@ def get(connection, transaction, binderID):
                 "created_on" : binder_query['createdOn']
             },
             "links" : {
-                "self" : url_for("api.binder_details", binderID = binderID)
+                "self" : url_for("api.binder_details", binderID=binderID)
             },
             "relationships": {
                 "project": {
-                    "data" : [ ]
+                    "data" : []
                     }
                 }
             }
@@ -103,37 +105,40 @@ def get(connection, transaction, binderID):
                 "created_on" : row['createdOn']
             },
             "links" : {
-                "self" : url_for('api.project_details', binderID = binderID, projectID = row['projectID'])
+                "self" : url_for('api.project_details',
+                                 binderID=binderID,
+                                 projectID=row['projectID'])
             }
         }
         binder["data"]["relationships"]["project"]["data"].append(project)
 
     return jsonify(binder), status.HTTP_200_OK
 
-def patch(connection, transaction, binderID):
+def patch(connection, binderID):
+    """ Update a binder """
     userID = current_user.get_id()
     json = request.get_json()
     qry = text("""UPDATE Binders SET name = :name
         WHERE userID = :userID AND binderID = :binderID""")
     try:
         connection.execute(qry,
-            name = json['data']['attributes']['name'],
-            userID = userID,
-            binderID = binderID)
+                           name=json['data']['attributes']['name'],
+                           userID=userID,
+                           binderID=binderID)
     except IntegrityError:
-       return "FAILED", status.HTTP_409_CONFLICT
+        return "FAILED", status.HTTP_409_CONFLICT
     resp = make_response(jsonify(json))
     resp.headers['Location'] = "/binders/" + str(binderID)
     return resp, status.HTTP_200_OK
 
-def delete(connection, transaction, binderID):
+def delete(connection, binderID):
+    """ Delete a binder """
     userID = current_user.get_id()
     qry = text("""DELETE FROM Binders WHERE userID = :userID AND binderID = :binderID""")
     try:
         connection.execute(qry,
-            binderID = binderID,
-            userID = userID)
+                           binderID=binderID,
+                           userID=userID)
     except IntegrityError:
-        transaction.rollback()
         return "FAILED", status.HTTP_403_FORBIDDEN
     return "OK", status.HTTP_204_NO_CONTENT

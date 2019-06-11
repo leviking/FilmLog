@@ -1,23 +1,24 @@
-from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
-from flask import Blueprint, jsonify, request, make_response, url_for
-from sqlalchemy.sql import select, text, func
-from sqlalchemy.exc import IntegrityError
-from filmlog import database, functions
+""" Project interactions for API """
+
+from flask import jsonify, request, make_response, url_for
 from flask_api import status
+from flask_login import current_user
+from sqlalchemy.sql import text
+from sqlalchemy.exc import IntegrityError
+
 from filmlog.functions import next_id
 
-engine = database.engine
-
 ## Projects
-def get_all(connection, transaction, binderID):
+def get_all(connection, binderID):
+    """ Get all projects """
     userID = current_user.get_id()
     qry = text("""SELECT projectID, name, filmCount, createdOn FROM Projects
         WHERE binderID = :binderID
         AND userID = :userID
         ORDER BY createdOn""")
     projects_query = connection.execute(qry,
-        binderID = binderID,
-        userID = userID).fetchall()
+                                        binderID=binderID,
+                                        userID=userID).fetchall()
     projects = {
         "data": []
     }
@@ -36,14 +37,15 @@ def get_all(connection, transaction, binderID):
             },
             "links" : {
                 "self" : url_for("api.project_details",
-                    binderID = binderID,
-                    projectID = row['projectID'])
+                                 binderID=binderID,
+                                 projectID=row['projectID'])
             }
         }
         projects['data'].append(project)
     return jsonify(projects), status.HTTP_200_OK
 
-def get(connection, transaction, binderID, projectID):
+def get(connection, binderID, projectID):
+    """ Get specific project """
     userID = current_user.get_id()
     qry = text("""SELECT projectID, name, filmCount, createdOn FROM Projects
         WHERE binderID = :binderID
@@ -51,9 +53,9 @@ def get(connection, transaction, binderID, projectID):
         AND userID = :userID
         ORDER BY createdOn""")
     projects_query = connection.execute(qry,
-        binderID = binderID,
-        projectID = projectID,
-        userID = userID).fetchone()
+                                        binderID=binderID,
+                                        projectID=projectID,
+                                        userID=userID).fetchone()
     projects = {
         "data": {
             "type" : "projects",
@@ -69,14 +71,15 @@ def get(connection, transaction, binderID, projectID):
             },
             "links" : {
                 "self" : url_for("api.project_details",
-                    binderID = binderID,
-                    projectID = projectID)
+                                 binderID=binderID,
+                                 projectID=projectID)
             }
         }
     }
     return jsonify(projects), status.HTTP_200_OK
 
-def post(connection, transaction, binderID):
+def post(connection, binderID):
+    """ Insert new project """
     userID = current_user.get_id()
     json = request.get_json()
     nextProjectID = next_id(connection, 'projectID', 'Projects')
@@ -85,16 +88,16 @@ def post(connection, transaction, binderID):
         VALUES (:projectID, :binderID, :userID, :name)""")
     try:
         connection.execute(qry,
-            projectID = nextProjectID,
-            binderID = binderID,
-            userID = userID,
-            name = json['data']['attributes']['name'])
+                           projectID=nextProjectID,
+                           binderID=binderID,
+                           userID=userID,
+                           name=json['data']['attributes']['name'])
     except IntegrityError:
-       return "FAILED", status.HTTP_409_CONFLICT
+        return "FAILED", status.HTTP_409_CONFLICT
     location_url = url_for('api.project_details',
-        binderID = binderID,
-        projectID = nextProjectID)
-    json['data']['id'] = str(binderID) + ":" + str(nextProjectID),
+                           binderID=binderID,
+                           projectID=nextProjectID)
+    json['data']['id'] = str(binderID) + ":" + str(nextProjectID)
     json['data']['attributes']['film_count'] = str(0)
     json['data']['links'] = {
         "self" : location_url

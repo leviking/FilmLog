@@ -1,34 +1,28 @@
-from flask import Flask
-from flask import request, render_template, redirect, url_for, abort
-from sqlalchemy.sql import select, text, func
-import os, re
-
-from flask_login import LoginManager, login_required, current_user
+""" Filmstock inventory section (/filmstock) """
+from flask import request, render_template
+from flask_login import login_required, current_user
+from sqlalchemy.sql import text
 
 # Forms
 from flask_wtf import FlaskForm
-from wtforms import Form, StringField, DateField, SelectField, IntegerField, \
-    TextAreaField, DecimalField, SelectMultipleField, BooleanField
-from wtforms.validators import DataRequired, Optional, Length, NumberRange
-from wtforms import widgets
+from wtforms import SelectField, IntegerField
+from wtforms.validators import DataRequired, Optional, NumberRange
 
-from filmlog import config
-from filmlog import database
+# Filmlog
+from filmlog.config import app, engine
 from filmlog.functions import get_film_types, get_film_sizes
 
-app = config.app
-engine = config.engine
-
 class FilmStockForm(FlaskForm):
+    """ Film stock form """
     filmTypeID = SelectField('Film',
-        validators=[DataRequired()],
-        coerce=int)
+                             validators=[DataRequired()],
+                             coerce=int)
     filmSizeID = SelectField('Film Size',
-        validators=[Optional()],
-        coerce=int)
+                             validators=[Optional()],
+                             coerce=int)
     qty = IntegerField('Qty',
-        validators=[NumberRange(min=-32768,max=32767),
-                    DataRequired()])
+                       validators=[NumberRange(min=-32768, max=32767),
+                                   DataRequired()])
 
     def __init__(self, connection):
         super(FilmStockForm, self).__init__()
@@ -37,9 +31,10 @@ class FilmStockForm(FlaskForm):
         self.filmSizeID.choices = get_film_sizes(connection)
 
 
-@app.route('/filmstock',  methods = ['GET', 'POST'])
+@app.route('/filmstock', methods=['GET', 'POST'])
 @login_required
 def filmstock():
+    """ Filmstock Index """
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
@@ -53,9 +48,9 @@ def filmstock():
                     AND filmSizeID = :filmSizeID
                     AND userID = :userID""")
                 connection.execute(qry,
-                    filmTypeID=request.form.get('filmTypeID'),
-                    filmSizeID=request.form.get('filmSizeID'),
-                    userID = userID)
+                                   filmTypeID=request.form.get('filmTypeID'),
+                                   filmSizeID=request.form.get('filmSizeID'),
+                                   userID=userID)
         if request.form.get('button') == 'decrement':
             if request.form.get('filmTypeID') != '' and request.form.get('filmSizeID') != '':
                 qry = text("""SELECT qty FROM FilmStock
@@ -63,27 +58,27 @@ def filmstock():
                     AND filmSizeID = :filmSizeID
                     AND userID = :userID""")
                 result = connection.execute(qry,
-                    filmTypeID=request.form.get('filmTypeID'),
-                    filmSizeID=request.form.get('filmSizeID'),
-                    userID = userID).fetchone()
+                                            filmTypeID=request.form.get('filmTypeID'),
+                                            filmSizeID=request.form.get('filmSizeID'),
+                                            userID=userID).fetchone()
                 if result.qty == 1:
                     qry = text("""DELETE FROM FilmStock
                         WHERE filmTypeID = :filmTypeID
                         AND filmSizeID = :filmSizeID
                         AND userID = :userID""")
                     connection.execute(qry,
-                        filmTypeID=request.form.get('filmTypeID'),
-                        filmSizeID=request.form.get('filmSizeID'),
-                        userID = userID)
+                                       filmTypeID=request.form.get('filmTypeID'),
+                                       filmSizeID=request.form.get('filmSizeID'),
+                                       userID=userID)
                 else:
                     qry = text("""UPDATE FilmStock SET qty = qty - 1
                         WHERE filmTypeID = :filmTypeID
                         AND filmSizeID = :filmSizeID
                         AND userID = :userID""")
                     connection.execute(qry,
-                        filmTypeID=request.form.get('filmTypeID'),
-                        filmSizeID=request.form.get('filmSizeID'),
-                        userID = userID)
+                                       filmTypeID=request.form.get('filmTypeID'),
+                                       filmSizeID=request.form.get('filmSizeID'),
+                                       userID=userID)
         if request.form.get('button') == 'add':
             qty = request.form.get('qty')
             if request.form.get('filmTypeID') != '':
@@ -93,10 +88,10 @@ def filmstock():
                         (filmTypeID, filmSizeID, userID, qty)
                         VALUES (:filmTypeID, :filmSizeID, :userID, :qty)""")
                     result = connection.execute(qry,
-                        filmTypeID=form.filmTypeID.data,
-                        filmSizeID=form.filmSizeID.data,
-                        qty=form.qty.data,
-                        userID = userID)
+                                                filmTypeID=form.filmTypeID.data,
+                                                filmSizeID=form.filmSizeID.data,
+                                                qty=form.qty.data,
+                                                userID=userID)
     qry = text("""SELECT FilmStock.filmTypeID AS filmTypeID,
         FilmStock.filmSizeID AS filmSizeID, FilmSizes.size AS size, qty,
         FilmBrands.brand AS brand, FilmTypes.name AS type, iso
@@ -108,7 +103,7 @@ def filmstock():
         AND userID = :userID
         AND qty != 0
         ORDER BY size, brand, type, iso""")
-    stock_35mm = connection.execute(qry, userID = userID).fetchall()
+    stock_35mm = connection.execute(qry, userID=userID).fetchall()
 
     qry = text("""SELECT FilmStock.filmTypeID AS filmTypeID,
         FilmStock.filmSizeID AS filmSizeID, FilmSizes.size AS size, qty,
@@ -121,7 +116,7 @@ def filmstock():
         AND userID = :userID
         AND qty != 0
         ORDER BY size, brand, type, iso""")
-    stock_mf = connection.execute(qry, userID = userID).fetchall()
+    stock_mf = connection.execute(qry, userID=userID).fetchall()
 
     qry = text("""SELECT FilmStock.filmTypeID AS filmTypeID,
         FilmStock.filmSizeID AS filmSizeID, FilmSizes.size AS size, qty,
@@ -134,7 +129,7 @@ def filmstock():
         AND userID = :userID
         AND qty != 0
         ORDER BY size, brand, type, iso""")
-    stock_sheets = connection.execute(qry, userID = userID).fetchall()
+    stock_sheets = connection.execute(qry, userID=userID).fetchall()
 
     qry = text("""SELECT FilmTypes.filmTypeID AS filmTypeID,
         FilmBrands.brand AS brand, FilmTypes.name AS type, iso
@@ -144,15 +139,16 @@ def filmstock():
 
     transaction.commit()
     return render_template('filmstock.html',
-                form=form,
-                stock_35mm=stock_35mm,
-                stock_mf=stock_mf,
-                stock_sheets=stock_sheets,
-                films=films)
+                           form=form,
+                           stock_35mm=stock_35mm,
+                           stock_mf=stock_mf,
+                           stock_sheets=stock_sheets,
+                           films=films)
 
-@app.route('/filmtypes',  methods = ['GET'])
+@app.route('/filmtypes', methods=['GET'])
 @login_required
-def filmtypes():
+def get_filmtypes():
+    """ Get a list of all the available films """
     connection = engine.connect()
     qry = text("""SELECT filmTypeID, brand, name, iso, kind
         FROM FilmTypes

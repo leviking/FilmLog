@@ -1,127 +1,123 @@
-from flask import Flask
-from flask import request, render_template, redirect, url_for, Response, session, abort, send_from_directory
-from sqlalchemy.sql import select, text, func
-import os, re
-
-from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
+""" Gear specific views (/gear) """
+from flask import request, render_template, redirect
+from flask_login import login_required, current_user
+from sqlalchemy.sql import text
 
 # Forms
 from flask_wtf import FlaskForm
-from wtforms import Form, StringField, DateField, SelectField, IntegerField, \
-    TextAreaField, DecimalField, SelectMultipleField, BooleanField
+from wtforms import StringField, SelectField, IntegerField, TextAreaField, \
+                    DecimalField
 from wtforms.validators import DataRequired, Optional, Length, NumberRange
-from wtforms import widgets
 
-from filmlog import config
-from filmlog import database
+# Filmlog
+from filmlog.config import app, engine
 from filmlog.functions import next_id, insert, delete, optional_choices, get_film_types
 from filmlog.classes import MultiCheckboxField
 
-app = config.app
-engine = config.engine
-
 def get_lenses(connection):
+    """ Get the all user's lenses """
     userID = current_user.get_id()
     qry = text("""SELECT lensID, name
         FROM Lenses
         WHERE userID = :userID""")
-    return connection.execute(qry,
-        userID = userID).fetchall()
+    return connection.execute(qry, userID=userID).fetchall()
 
 class CameraForm(FlaskForm):
+    """ Form for updating a user's camera """
     name = StringField('Name',
-        validators=[DataRequired(), Length(min=1, max=64)])
+                       validators=[DataRequired(), Length(min=1, max=64)])
     filmSize = SelectField('Film Size',
-        validators=[DataRequired()],
-        choices=[
-            ('35mm', '35mm'),
-            ('120', '120'),
-            ('220', '220'),
-            ('4x5', '4x5'),
-            ('8x10', '8x10')])
+                           validators=[DataRequired()],
+                           choices=[('35mm', '35mm'),
+                                    ('120', '120'),
+                                    ('220', '220'),
+                                    ('4x5', '4x5'),
+                                    ('8x10', '8x10')])
     status = SelectField('Status',
-        validators=[DataRequired()],
-        choices=[
-            ('Active', 'Active'),
-            ('Inactive', 'Inactive')])
+                         validators=[DataRequired()],
+                         choices=[('Active', 'Active'),
+                                  ('Inactive', 'Inactive')])
     lenses = MultiCheckboxField('Lenses',
-        validators=[Optional()])
+                                validators=[Optional()])
 
     def populate_select_fields(self, connection):
-        self.connection = connection
+        """ Helper function to populate select fields """
         self.lenses.choices = get_lenses(connection)
 
     def populate_lens_selections(self, lenses):
+        """ Helper function to checkbox lenses associated with camera """
         selected_lenses = []
-        for lens in lenses:
-            selected_lenses.append(lens.lensID)
+        for this_lens in lenses:
+            selected_lenses.append(this_lens.lensID)
         self.lenses.process_data(selected_lenses)
 
 class FilterForm(FlaskForm):
+    """ Form for updating user's lens filters """
     name = StringField('Name',
-        validators=[DataRequired(), Length(min=1, max=64)])
+                       validators=[DataRequired(), Length(min=1, max=64)])
     code = StringField('Code',
-        validators=[DataRequired(), Length(min=1, max=8)])
-    factor = DecimalField('Factor', places=1,
-        validators=[DataRequired()])
-    ev = DecimalField('EV', places=1,
-        validators=[DataRequired()])
+                       validators=[DataRequired(), Length(min=1, max=8)])
+    factor = DecimalField('Factor', places=1, validators=[DataRequired()])
+    ev = DecimalField('EV', places=1, validators=[DataRequired()])
 
 class CameraLensForm(FlaskForm):
+    """ Form for updating a user's lens """
     name = StringField('Name',
-        validators=[DataRequired(), Length(min=1, max=64)])
+                       validators=[DataRequired(), Length(min=1, max=64)])
     shutter = SelectField('Integrated Shutter',
-        validators=[Optional()],
-        choices=[
-            ('No', 'No'),
-            ('Yes', 'Yes')])
+                          validators=[Optional()],
+                          choices=[('No', 'No'),
+                                   ('Yes', 'Yes')])
 
 class LensShutterSpeedsForm(FlaskForm):
+    """ Form for putting in shutter speed tests for a lens """
     speed = IntegerField('Rated Speed',
-        validators=[DataRequired(), NumberRange(min=1, max=1000)])
+                         validators=[DataRequired(),
+                                     NumberRange(min=1, max=1000)])
     measuredSpeedMicroseconds = IntegerField('Measured Speed (microseconds)',
-        validators=[DataRequired(), NumberRange(min=1, max=64000000)])
+                                             validators=[DataRequired(),
+                                                         NumberRange(min=1,
+                                                                     max=64000000)])
 
 class HolderForm(FlaskForm):
+    """ Form for updating a user's film holder """
     name = StringField('Name',
-        validators=[DataRequired(), Length(min=1, max=64)])
+                       validators=[DataRequired(), Length(min=1, max=64)])
     size = SelectField('Size',
-        validators=[DataRequired()],
-        choices=[
-            ('4x5', '4x5'),
-            ('5x7', '5x7'),
-            ('8x10', '8x10'),
-            ('11x14', '11x14')])
+                       validators=[DataRequired()],
+                       choices=[('4x5', '4x5'),
+                                ('5x7', '5x7'),
+                                ('8x10', '8x10'),
+                                ('11x14', '11x14')])
     filmTypeID = SelectField('Film',
-        validators=[Optional()],
-        coerce=int)
-    iso = IntegerField('Shot ISO',
-            validators=[NumberRange(min=0,max=65535),
-                        Optional()])
+                             validators=[Optional()],
+                             coerce=int)
+    iso = IntegerField('Shot ISO', validators=[NumberRange(min=0, max=65535),
+                                               Optional()])
     compensation = IntegerField('Compensation',
-            validators=[NumberRange(min=-64,max=64),
-                        Optional()])
+                                validators=[NumberRange(min=-64, max=64),
+                                            Optional()])
     notes = TextAreaField('Notes',
-        validators=[Optional()],
-        filters = [lambda x: x or None])
+                          validators=[Optional()],
+                          filters=[lambda x: x or None])
 
     def populate_select_fields(self, connection):
-        self.connection = connection
+        """ Helper function to populate select fields """
         self.filmTypeID.choices = optional_choices("None", get_film_types(connection))
 
-@app.route('/gear',  methods = ['GET', 'POST'])
+@app.route('/gear', methods=['GET'])
 @login_required
 def gear():
+    """ Gear index page """
     connection = engine.connect()
     transaction = connection.begin()
-    userID = current_user.get_id()
-
     transaction.commit()
     return render_template('/gear/index.html')
 
-@app.route('/gear/filters',  methods = ['GET', 'POST'])
+@app.route('/gear/filters', methods=['GET', 'POST'])
 @login_required
-def filters():
+def user_filters():
+    """ Manage user's lens filters """
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
@@ -135,34 +131,35 @@ def filters():
                 (userID, filterID, name, code, factor, ev)
                 VALUES (:userID, :filterID, :name, :code, :factor, :ev)""")
             insert(connection, qry, "Filters",
-                userID = userID,
-                filterID = nextFilterID,
-                name = filter_form.name.data,
-                code = filter_form.code.data,
-                factor = filter_form.factor.data,
-                ev = filter_form.ev.data)
+                   userID=userID,
+                   filterID=nextFilterID,
+                   name=filter_form.name.data,
+                   code=filter_form.code.data,
+                   factor=filter_form.factor.data,
+                   ev=filter_form.ev.data)
 
         if request.form['button'] == 'deleteFilter':
             qry = text("""DELETE FROM Filters
                 WHERE userID = :userID
                 AND filterID = :filterID""")
             delete(connection, qry, "Filter",
-                userID = userID,
-                filterID = int(request.form['filterID']))
+                   userID=userID,
+                   filterID=int(request.form['filterID']))
 
     qry = text("""SELECT filterID, name, code, factor, ev
         FROM Filters
         WHERE userID = :userID ORDER BY name""")
-    filters = connection.execute(qry, userID = current_user.get_id()).fetchall()
+    filters = connection.execute(qry, userID=current_user.get_id()).fetchall()
 
     transaction.commit()
     return render_template('/gear/filters.html',
-        filter_form = filter_form,
-        filters=filters)
+                           filter_form=filter_form,
+                           filters=filters)
 
-@app.route('/gear/cameras',  methods = ['GET', 'POST'])
+@app.route('/gear/cameras', methods=['GET', 'POST'])
 @login_required
-def cameras():
+def user_cameras():
+    """ Manage a user's cameras """
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
@@ -177,10 +174,10 @@ def cameras():
             qry = text("""INSERT INTO Cameras
                 (cameraID, userID, name, filmSize) VALUES (:cameraID, :userID, :name, :filmSize)""")
             insert(connection, qry, "Camera",
-                cameraID = nextCameraID,
-                userID = int(current_user.get_id()),
-                name = camera_form.name.data,
-                filmSize = camera_form.filmSize.data)
+                   cameraID=nextCameraID,
+                   userID=int(current_user.get_id()),
+                   name=camera_form.name.data,
+                   filmSize=camera_form.filmSize.data)
 
         # Camera Lenses
         if request.form['button'] == 'addCameraLens':
@@ -189,39 +186,40 @@ def cameras():
                 (lensID, userID, name, shutter)
                 VALUES (:lensID, :userID, :name, :shutter)""")
             insert(connection, qry, "Lens",
-                lensID = nextLensID,
-                userID = userID,
-                name = camera_lens_form.name.data,
-                shutter = camera_lens_form.shutter.data)
+                   lensID=nextLensID,
+                   userID=userID,
+                   name=camera_lens_form.name.data,
+                   shutter=camera_lens_form.shutter.data)
 
         if request.form['button'] == 'deleteCameraLens':
             qry = text("""DELETE FROM Lenses
                 WHERE userID = :userID
                 AND lensID = :lensID""")
             delete(connection, qry, "Lens",
-                userID = userID,
-                lensID = int(request.form['lensID']))
+                   userID=userID,
+                   lensID=int(request.form['lensID']))
 
     qry = text("""SELECT cameraID, name, filmSize, status
         FROM Cameras
         WHERE userID = :userID ORDER BY filmSize, name""")
-    cameras = connection.execute(qry, userID = userID).fetchall()
+    cameras = connection.execute(qry, userID=userID).fetchall()
 
     qry = text("""SELECT lensID, name, shutter
         FROM Lenses
         WHERE userID = :userID ORDER BY name""")
-    cameraLenses = connection.execute(qry, userID = userID).fetchall()
+    cameraLenses = connection.execute(qry, userID=userID).fetchall()
 
     transaction.commit()
     return render_template('/gear/cameras.html',
-        camera_form = camera_form,
-        camera_lens_form = camera_lens_form,
-        cameras=cameras,
-        cameraLenses = cameraLenses)
+                           camera_form=camera_form,
+                           camera_lens_form=camera_lens_form,
+                           cameras=cameras,
+                           cameraLenses=cameraLenses)
 
-@app.route('/gear/camera/<int:cameraID>',  methods = ['GET', 'POST'])
+@app.route('/gear/camera/<int:cameraID>', methods=['GET', 'POST'])
 @login_required
-def camera(cameraID):
+def user_camera(cameraID):
+    """ Manage a specific camera """
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
@@ -236,40 +234,38 @@ def camera(cameraID):
                 WHERE userID = :userID
                 AND cameraID = :cameraID""")
             connection.execute(qry,
-                name = camera_form.name.data,
-                filmSize = camera_form.filmSize.data,
-                status = camera_form.status.data,
-                userID = userID,
-                cameraID = cameraID)
+                               name=camera_form.name.data,
+                               filmSize=camera_form.filmSize.data,
+                               status=camera_form.status.data,
+                               userID=userID,
+                               cameraID=cameraID)
 
             # Remove and repopulate lenses based on selection
             qry = text("""DELETE FROM CameraLenses
                 WHERE cameraID = :cameraID
                 AND userID = :userID""")
-            connection.execute(qry, cameraID = cameraID,
-                userID = userID)
+            connection.execute(qry, cameraID=cameraID, userID=userID)
 
             qry = text("""INSERT INTO CameraLenses
                 (userID, cameraID, lensID)
                 VALUES (:userID, :cameraID, :lensID)""")
             for lensID in request.form.getlist('lenses'):
                 connection.execute(qry,
-                    userID = userID,
-                    cameraID = cameraID,
-                    lensID = lensID)
+                                   userID=userID,
+                                   cameraID=cameraID,
+                                   lensID=lensID)
 
     qry = text("""SELECT cameraID, name, filmSize
         FROM Cameras
         WHERE userID = :userID
         AND cameraID = :cameraID""")
     camera = connection.execute(qry,
-        userID = userID,
-        cameraID = cameraID).fetchone()
+                                userID=userID,
+                                cameraID=cameraID).fetchone()
 
     qry = text("""SELECT lensID, name FROM Lenses
         WHERE userID = :userID""")
-    lenses = connection.execute(qry,
-        userID = userID).fetchall()
+    lenses = connection.execute(qry, userID=userID).fetchall()
 
     qry = text("""SELECT CameraLenses.lensID AS lensID, name FROM CameraLenses
         JOIN Lenses ON Lenses.lensID = CameraLenses.lensID
@@ -277,22 +273,23 @@ def camera(cameraID):
         WHERE CameraLenses.userID = :userID
         AND cameraID = :cameraID""")
     camera_lenses = connection.execute(qry,
-        userID = userID,
-        cameraID = cameraID).fetchall()
+                                       userID=userID,
+                                       cameraID=cameraID).fetchall()
 
     camera_form = CameraForm(data=camera)
     camera_form.populate_select_fields(connection)
     camera_form.populate_lens_selections(camera_lenses)
     transaction.commit()
     return render_template('/gear/camera.html',
-        camera_form = camera_form,
-        camera = camera,
-        camera_lenses = camera_lenses,
-        lenses = lenses)
+                           camera_form=camera_form,
+                           camera=camera,
+                           camera_lenses=camera_lenses,
+                           lenses=lenses)
 
-@app.route('/gear/lens/<int:lensID>',  methods = ['GET', 'POST'])
+@app.route('/gear/lens/<int:lensID>', methods=['GET', 'POST'])
 @login_required
-def lens(lensID):
+def user_lens(lensID):
+    """ Manage a specific lens """
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
@@ -304,28 +301,31 @@ def lens(lensID):
                 qry = text("""REPLACE INTO LensShutterSpeeds
                     (userID, lensID, speed, measuredSpeedMicroseconds)
                     VALUES (:userID, :lensID, :speed, :measuredSpeedMicroseconds)""")
+                # pylint: disable=line-too-long
+                # Haven't found a great way to format this without it being
+                # more ugly.
                 connection.execute(qry,
-                    speed = shutter_speed_form.speed.data,
-                    measuredSpeedMicroseconds = shutter_speed_form.measuredSpeedMicroseconds.data,
-                    userID = userID,
-                    lensID = lensID)
+                                   speed=shutter_speed_form.speed.data,
+                                   measuredSpeedMicroseconds=shutter_speed_form.measuredSpeedMicroseconds.data,
+                                   userID=userID,
+                                   lensID=lensID)
         if request.form['button'] == 'deleteSpeed':
             qry = text("""DELETE FROM LensShutterSpeeds
                 WHERE userID = :userID
                 AND lensID = :lensID
                 AND speed = :speed""")
             connection.execute(qry,
-                userID = userID,
-                lensID = lensID,
-                speed = shutter_speed_form.speed.data)
+                               userID=userID,
+                               lensID=lensID,
+                               speed=shutter_speed_form.speed.data)
 
     qry = text("""SELECT lensID, name, shutter
         FROM Lenses
         WHERE userID = :userID
         AND lensID = :lensID""")
     lens = connection.execute(qry,
-        userID = userID,
-        lensID = lensID).fetchone()
+                              userID=userID,
+                              lensID=lensID).fetchone()
 
     qry = text("""SELECT speed, measuredSpeed,
         idealSpeedMicroseconds, measuredSpeedMicroseconds,
@@ -334,9 +334,8 @@ def lens(lensID):
         WHERE userID = :userID
         AND lensID = :lensID""")
     shutter_speeds = connection.execute(qry,
-        userID = userID,
-        lensID = lensID).fetchall()
-
+                                        userID=userID,
+                                        lensID=lensID).fetchall()
     transaction.commit()
 
     if request.args.get('print'):
@@ -345,13 +344,14 @@ def lens(lensID):
         template = '/gear/lens.html'
 
     return render_template(template,
-        lens = lens,
-        shutter_speeds = shutter_speeds,
-        shutter_speed_form = shutter_speed_form)
+                           lens=lens,
+                           shutter_speeds=shutter_speeds,
+                           shutter_speed_form=shutter_speed_form)
 
-@app.route('/gear/holders',  methods = ['GET', 'POST'])
+@app.route('/gear/holders', methods=['GET', 'POST'])
 @login_required
-def holders():
+def user_holders():
+    """ Manage holders """
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
@@ -363,8 +363,8 @@ def holders():
                 SET loaded = NULL, exposed = NULL, unloaded = NOW()
                 WHERE userID = :userID AND holderID = :holderID""")
             connection.execute(qry,
-                userID = userID,
-                holderID = int(request.form['holderID']))
+                               userID=userID,
+                               holderID=int(request.form['holderID']))
 
         if request.form['button'] == 'Load':
             return redirect("/gear/holders/" + request.form['holderID'])
@@ -374,16 +374,16 @@ def holders():
                 SET loaded = NOW(), exposed = NULL, unloaded = NULL
                 WHERE userID = :userID AND holderID = :holderID""")
             connection.execute(qry,
-                userID = userID,
-                holderID = int(request.form['holderID']))
+                               userID=userID,
+                               holderID=int(request.form['holderID']))
 
         if request.form['button'] == 'Expose':
             qry = text("""UPDATE Holders
                 SET exposed = NOW()
                 WHERE userID = :userID AND holderID = :holderID""")
             connection.execute(qry,
-                userID = userID,
-                holderID = int(request.form['holderID']))
+                               userID=userID,
+                               holderID=int(request.form['holderID']))
 
         if request.form['button'] == 'addHolder':
             nextHolderID = next_id(connection, 'holderID', 'Holders')
@@ -391,11 +391,11 @@ def holders():
                 (userID, holderID, name, size, notes)
                 VALUES (:userID, :holderID, :name, :size, :notes)""")
             connection.execute(qry,
-                userID = userID,
-                holderID = nextHolderID,
-                name = form.name.data,
-                size = form.size.data,
-                notes = form.notes.data)
+                               userID=userID,
+                               holderID=nextHolderID,
+                               name=form.name.data,
+                               size=form.size.data,
+                               notes=form.notes.data)
 
     form.populate_select_fields(connection)
 
@@ -408,17 +408,14 @@ def holders():
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Holders.filmTypeID
         LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
         WHERE userID = :userID ORDER BY Holders.name""")
-    holders = connection.execute(qry,
-        userID = userID)
+    holders = connection.execute(qry, userID=userID)
     transaction.commit()
+    return render_template('/gear/holders.html', form=form, holders=holders)
 
-    return render_template('/gear/holders.html',
-        form = form,
-        holders = holders)
-
-@app.route('/gear/holders/<int:holderID>',  methods = ['GET', 'POST'])
+@app.route('/gear/holders/<int:holderID>', methods=['GET', 'POST'])
 @login_required
-def holder(holderID):
+def user_holder(holderID):
+    """ Manage a film holder """
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
@@ -432,14 +429,14 @@ def holder(holderID):
                 WHERE userID = :userID
                 AND holderID = :holderID""")
             connection.execute(qry,
-                name = form.name.data,
-                size = form.size.data,
-                filmTypeID = form.filmTypeID.data,
-                iso = form.iso.data,
-                compensation = form.compensation.data,
-                notes = form.notes.data,
-                userID = userID,
-                holderID = holderID)
+                               name=form.name.data,
+                               size=form.size.data,
+                               filmTypeID=form.filmTypeID.data,
+                               iso=form.iso.data,
+                               compensation=form.compensation.data,
+                               notes=form.notes.data,
+                               userID=userID,
+                               holderID=holderID)
         if request.form['button'] == 'loadHolder':
             qry = text("""UPDATE Holders
                 SET name = :name, size = :size, filmTypeID = :filmTypeID,
@@ -448,14 +445,14 @@ def holder(holderID):
                 WHERE userID = :userID
                 AND holderID = :holderID""")
             connection.execute(qry,
-                name = form.name.data,
-                size = form.size.data,
-                filmTypeID = form.filmTypeID.data,
-                iso = form.iso.data,
-                compensation = form.compensation.data,
-                notes = form.notes.data,
-                userID = userID,
-                holderID = holderID)
+                               name=form.name.data,
+                               size=form.size.data,
+                               filmTypeID=form.filmTypeID.data,
+                               iso=form.iso.data,
+                               compensation=form.compensation.data,
+                               notes=form.notes.data,
+                               userID=userID,
+                               holderID=holderID)
         transaction.commit()
         return redirect("/gear/holders")
 
@@ -472,7 +469,8 @@ def holder(holderID):
         AND holderID = :holderID""")
 
     holder = connection.execute(qry,
-        userID = userID, holderID = holderID).fetchone()
+                                userID=userID,
+                                holderID=holderID).fetchone()
 
     qry = text("""SELECT Exposures.filmID, title, exposureNumber,
         fileDate, Projects.projectID, binderID
@@ -485,11 +483,13 @@ def holder(holderID):
         AND holderID = :holderID""")
 
     exposures = connection.execute(qry,
-        userID = userID, holderID = holderID).fetchall()
-
+                                   userID=userID,
+                                   holderID=holderID).fetchall()
     form = HolderForm(data=holder)
     form.populate_select_fields(connection)
     transaction.commit()
 
     return render_template('/gear/holder.html',
-        form = form, holder = holder, exposures = exposures)
+                           form=form,
+                           holder=holder,
+                           exposures=exposures)

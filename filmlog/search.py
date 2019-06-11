@@ -1,19 +1,15 @@
-from flask import Flask
-from flask import request, render_template, redirect, url_for, abort
-from sqlalchemy.sql import select, text, func
-import os, re
+""" Search section (/search) """
+import re
+from flask import request, render_template
+from flask_login import login_required, current_user
+from sqlalchemy.sql import text
 
-from flask_login import LoginManager, login_required, current_user
+from filmlog.config import app, engine
 
-from filmlog import config
-from filmlog import database
-
-app = config.app
-engine = config.engine
-
-@app.route('/search',  methods = ['GET'])
+@app.route('/search', methods=['GET'])
 @login_required
-def search():
+def search_index():
+    """ Index page for search section """
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
@@ -28,9 +24,7 @@ def search():
         WHERE Projects.userID = :userID
         AND Projects.name LIKE ('%""" + search + """%')
         ORDER BY createdOn""")
-    projects = connection.execute(qry,
-        userID = userID,
-        search = search).fetchall()
+    projects = connection.execute(qry, userID=userID, search=search).fetchall()
 
     qry = text("""SELECT filmID, Films.projectID, binderID,
         title, fileNo, fileDate,
@@ -67,7 +61,7 @@ def search():
 
     transaction.commit()
     return render_template('search.html',
-        search = search,
-        projects = projects,
-        films = films,
-        exposures = exposures)
+                           search=search,
+                           projects=projects,
+                           films=films,
+                           exposures=exposures)

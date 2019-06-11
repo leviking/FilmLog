@@ -1,90 +1,96 @@
-from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
-from sqlalchemy.sql import select, text, func
-from sqlalchemy.exc import IntegrityError
-from filmlog import database, functions
-from flask import Blueprint, jsonify, request, make_response
-from flask_api import status
-from filmlog.api import api_blueprint, binders, projects, filmstock
+""" Main view for FilmLog application, where all other views come in """
+from flask_login import login_required
+from flask import request
 
-engine = database.engine
+# Filmlog
+from filmlog.api import api_blueprint, binders, projects, filmstock
+from filmlog.config import engine
 
 # http://jsonapi.org/format/
 
-@api_blueprint.route('/',   methods = ['GET'])
+@api_blueprint.route('/', methods=['GET'])
 def index():
+    """ Index page for API """
     return "Hello"
 
-@api_blueprint.route('/binders',  methods = ['GET', 'POST'])
+@api_blueprint.route('/binders', methods=['GET', 'POST'])
 @login_required
 def binders_all():
+    """ Get all binders """
     connection = engine.connect()
     transaction = connection.begin()
-    userID = current_user.get_id()
+    # userID = current_user.get_id()
     if request.method == 'GET':
-        status = binders.get_all(connection, transaction)
-    if request.method == 'POST':
-        status = binders.post(connection, transaction)
+        return_status = binders.get_all(connection)
+    elif request.method == 'POST':
+        return_status = binders.post(connection)
     transaction.commit()
-    return status
+    return return_status
 
-@api_blueprint.route('/binders/<int:binderID>',  methods = ['GET', 'PATCH', 'DELETE'])
+@api_blueprint.route('/binders/<int:binderID>', methods=['GET', 'PATCH', 'DELETE'])
 @login_required
 def binder_details(binderID):
+    """ Get binder details """
     connection = engine.connect()
     transaction = connection.begin()
     if request.method == 'GET':
-        status = binders.get(connection, transaction, binderID)
-    if request.method == 'PATCH':
-        status = binders.patch(connection, transaction, binderID)
-    if request.method == 'DELETE':
-        status = binders.delete(connection, transaction, binderID)
+        return_status = binders.get(connection, binderID)
+    elif request.method == 'PATCH':
+        return_status = binders.patch(connection, binderID)
+    elif request.method == 'DELETE':
+        return_status = binders.delete(connection, binderID)
     transaction.commit()
-    return status
+    return return_status
 
-@api_blueprint.route('/binders/<int:binderID>/projects',  methods = ['GET', 'POST'])
+@api_blueprint.route('/binders/<int:binderID>/projects', methods=['GET', 'POST'])
 @login_required
 def projects_all(binderID):
+    """ Get all projects under a binder """
     connection = engine.connect()
     transaction = connection.begin()
 
     if request.method == 'GET':
-        status = projects.get_all(connection, transaction, binderID)
+        return_status = projects.get_all(connection, binderID)
     if request.method == 'POST':
-        status = projects.post(connection, transaction, binderID)
+        return_status = projects.post(connection, binderID)
     transaction.commit()
-    return status
+    return return_status
 
-@api_blueprint.route('/binders/<int:binderID>/projects/<int:projectID>',  methods = ['GET'])
+@api_blueprint.route('/binders/<int:binderID>/projects/<int:projectID>',
+                     methods=['GET'])
 @login_required
 def project_details(binderID, projectID):
+    """ Get details of a project """
     connection = engine.connect()
     transaction = connection.begin()
 
     if request.method == 'GET':
-        status = projects.get(connection, transaction, binderID, projectID)
+        return_status = projects.get(connection, binderID, projectID)
     transaction.commit()
-    return status
+    return return_status
 
-@api_blueprint.route('/filmstock',  methods = ['GET'])
+@api_blueprint.route('/filmstock', methods=['GET'])
 @login_required
 def filmstock_all():
+    """ Get available filmstocks """
     connection = engine.connect()
     transaction = connection.begin()
 
     if request.method == 'GET':
-        status = filmstock.get_all(connection, transaction)
+        return_status = filmstock.get_all(connection)
     transaction.commit()
-    return status
+    return return_status
 
-@api_blueprint.route('/filmstock/<int:filmTypeID>/<int:filmSizeID>',  methods = ['GET', 'PATCH'])
+@api_blueprint.route('/filmstock/<int:filmTypeID>/<int:filmSizeID>', methods=['GET', 'PATCH'])
 @login_required
 def filmstock_details(filmTypeID, filmSizeID):
+    """ Get detailed filmstock information """
     connection = engine.connect()
     transaction = connection.begin()
 
     if request.method == 'GET':
-        status = filmstock.get(connection, transaction, filmTypeID, filmSizeID)
+        return_status = filmstock.get(connection, filmTypeID, filmSizeID)
     if request.method == 'PATCH':
-        status = filmstock.patch(connection, transaction, filmTypeID, filmSizeID)
+        return_status = filmstock.patch(connection, filmTypeID, filmSizeID)
     transaction.commit()
-    return status
+    return return_status

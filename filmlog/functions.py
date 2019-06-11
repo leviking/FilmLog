@@ -4,9 +4,8 @@ from flask_login import current_user
 from sqlalchemy.sql import text
 from sqlalchemy.exc import IntegrityError
 from wtforms.validators import ValidationError
-from filmlog import config, abort
-
-app = config.app
+from filmlog import abort
+from filmlog.config import app
 
 # Functions
 def result_to_dict(result_set):

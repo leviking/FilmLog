@@ -1,9 +1,10 @@
+""" Configuration and Setup for the Filmlog """
 import configparser
 import os
-import re
 
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
+
 from filmlog import database
 
 app = Flask('filmlog')

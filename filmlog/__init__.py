@@ -12,11 +12,7 @@ from flask_wtf.csrf import CSRFProtect
 from filmlog import config
 from filmlog import database
 from filmlog import views
-
-app = config.app
-engine = config.engine
-csrf = config.csrf
-user_files = config.user_files
+from filmlog.config import app, engine, csrf, user_files
 
 # Error Handling
 if not app.debug:

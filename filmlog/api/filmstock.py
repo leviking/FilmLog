@@ -1,15 +1,13 @@
-from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
-from flask import Blueprint, jsonify, request, make_response, url_for
-from sqlalchemy.sql import select, text, func
-from sqlalchemy.exc import IntegrityError
-from filmlog import database, functions
+""" Filmstock interactions for API """
+from flask import jsonify, request, make_response, url_for
+from flask_login import current_user
 from flask_api import status
-from filmlog.functions import next_id
-
-engine = database.engine
+from sqlalchemy.sql import text
+from sqlalchemy.exc import IntegrityError
 
 ## Film Stock
-def get_all(connection, transaction):
+def get_all(connection):
+    """ Get all films in stock """
     userID = current_user.get_id()
 
     qry = text("""SELECT FilmStock.filmTypeID AS filmTypeID,
@@ -21,7 +19,7 @@ def get_all(connection, transaction):
         JOIN FilmSizes ON FilmSizes.filmSizeID = FilmStock.filmSizeID
         WHERE userID = :userID
         ORDER BY size, brand, type, iso""")
-    stock = connection.execute(qry, userID = userID).fetchall()
+    stock = connection.execute(qry, userID=userID).fetchall()
 
     filmstock = {
         "data": []
@@ -43,14 +41,15 @@ def get_all(connection, transaction):
             },
             "links" : {
                 "self" : url_for("api.filmstock_details",
-                    filmTypeID = row['filmTypeID'],
-                    filmSizeID = row['filmSizeID'])
+                                 filmTypeID=row['filmTypeID'],
+                                 filmSizeID=row['filmSizeID'])
             }
         }
         filmstock["data"].append(item)
     return jsonify(filmstock), status.HTTP_200_OK
 
-def get(connection, transaction, filmTypeID, filmSizeID):
+def get(connection, filmTypeID, filmSizeID):
+    """ Get film from stock """
     userID = current_user.get_id()
 
     qry = text("""SELECT FilmStock.filmTypeID AS filmTypeID,
@@ -64,9 +63,9 @@ def get(connection, transaction, filmTypeID, filmSizeID):
         AND FilmStock.filmTypeID = :filmTypeID
         AND FilmStock.filmSizeID = :filmSizeID""")
     stock = connection.execute(qry,
-        userID = userID,
-        filmTypeID = filmTypeID,
-        filmSizeID = filmSizeID).fetchone()
+                               userID=userID,
+                               filmTypeID=filmTypeID,
+                               filmSizeID=filmSizeID).fetchone()
 
     filmstock = {
         "data" : {
@@ -85,14 +84,15 @@ def get(connection, transaction, filmTypeID, filmSizeID):
             },
             "links" : {
                 "self" : url_for("api.filmstock_details",
-                    filmTypeID = filmTypeID,
-                    filmSizeID = filmSizeID)
+                                 filmTypeID=filmTypeID,
+                                 filmSizeID=filmSizeID)
             }
         }
     }
     return jsonify(filmstock), status.HTTP_200_OK
 
-def patch(connection, transaction, filmTypeID, filmSizeID):
+def patch(connection, filmTypeID, filmSizeID):
+    """ Update film in stock """
     userID = current_user.get_id()
     json = request.get_json()
     qry = text("""UPDATE FilmStock SET qty = :qty
@@ -101,12 +101,12 @@ def patch(connection, transaction, filmTypeID, filmSizeID):
         AND filmSizeID = :filmSizeID""")
     try:
         connection.execute(qry,
-            qty = json['data']['attributes']['qty'],
-            userID = userID,
-            filmTypeID = filmTypeID,
-            filmSizeID = filmSizeID)
+                           qty=json['data']['attributes']['qty'],
+                           userID=userID,
+                           filmTypeID=filmTypeID,
+                           filmSizeID=filmSizeID)
     except IntegrityError:
-       return "FAILED", status.HTTP_409_CONFLICT
+        return "FAILED", status.HTTP_409_CONFLICT
     resp = make_response(jsonify(json))
     resp.headers['Location'] = "/filmstock/" + str(filmTypeID) + "/" + str(filmSizeID)
     return resp, status.HTTP_200_OK
