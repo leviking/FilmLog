@@ -1,4 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+
+#import sys
+#sys.path.insert(0, '/path/to/the/application')
+
 # If installing filmlog in a virtualenv and using Apache WSGI, use this
 # Be sure to chage the path below to the path of your virtual env
 activate_this = '/path/to/venv/bin/activate_this.py'
