@@ -77,9 +77,6 @@ def login():
                     WHERE username = :username""")
             user = connection.execute(qry, username=username).fetchone()
             if user:
-                print(user.password)
-                print(password)
-                print(password.encode('utf-8'))
                 if check_password_hash(user.password.decode(), password):
                     login_user(User(user.userID), remember=True)
                     qry = text("""UPDATE Users SET lastLogin = NOW()
