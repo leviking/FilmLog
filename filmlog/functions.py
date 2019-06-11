@@ -93,7 +93,7 @@ def optional_choices(name, choices):
 
 def zero_to_none(value):
     """ Helper function to set 0 or '0' (the string) to None or null. """
-    if value == 0 or value == '0':
+    if value in (0, '0'):
         return None
     return value
 

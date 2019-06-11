@@ -1,13 +1,12 @@
 """ Main body of filmlog web (non API) for handling the app routing.
     Sections (e.g. /gear) will come from other files to break things appart
     in a useful way without having to go deep into blueprints. """
-
+import re
+import datetime
 from flask import Flask
 from flask import request, render_template, redirect, url_for, Response, \
     session, abort, flash, send_from_directory
 from sqlalchemy.sql import select, text, func
-import os, re, datetime
-
 from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
 
 # Forms
@@ -42,22 +41,24 @@ def encode_shutter(shutter):
         for the database. """
     if re.search(r'^1\/', shutter):
         return re.sub(r'^1\/', r'', shutter)
-    elif re.search(r'"', shutter):
+    if re.search(r'"', shutter):
         return int(re.sub(r'"', r'', shutter)) * -1
-    elif shutter == 'B' or shutter == 'Bulb':
+    if shutter in ('B', 'Bulb'):
         return 0
-    elif shutter != '':
+    if shutter != '':
         return shutter
 
 @app.template_filter('format_shutter')
 def format_shutter(shutter):
     """ Helper function to encode the shutter value from the database
         into a human readable format. """
+    if not shutter:
+        return None
     if shutter > 0:
         return "1/" + str(shutter)
-    elif shutter == 0:
+    if shutter == 0:
         return "B"
-    elif shutter:
+    if shutter:
         if abs(shutter) > 60:
             return str(datetime.timedelta(seconds=abs(shutter)))
         return str(abs(shutter)) + "\""
@@ -173,6 +174,7 @@ class FilmForm(FlaskForm):
         self.cameraID.choices = get_cameras(connection)
 
 class ExposureForm(FlaskForm):
+    """ For User's Exposures """
     exposureNumber = StringField('Exposure #',
                                  validators=[DataRequired()])
     shutter = StringField('Shutter',
@@ -415,7 +417,8 @@ def project(binderID, projectID):
                            films=films)
 
 # Film Exposures
-@app.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>',  methods = ['POST', 'GET'])
+@app.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>',
+           methods=['POST', 'GET'])
 @login_required
 def film(binderID, projectID, filmID):
     """ Provide details about the given user's film, including the exposures.
@@ -439,9 +442,9 @@ def film(binderID, projectID, filmID):
 
         if request.form['button'] == 'editExposure':
             return redirect('/binders/' + str(binderID)
-                + '/projects/' + str(projectID)
-                + '/films/' + str(filmID)
-                + '/exposure/' + request.form['exposureNumber'])
+                            + '/projects/' + str(projectID)
+                            + '/films/' + str(filmID)
+                            + '/exposure/' + request.form['exposureNumber'])
 
         if request.form['button'] == 'editFilm':
             form = FilmForm()
@@ -464,32 +467,32 @@ def film(binderID, projectID, filmID):
                     AND filmID = :filmID
                     AND userID = :userID""")
                 result = connection.execute(qry,
-                    userID = userID,
-                    filmID = filmID,
-                    projectID = projectID,
-                    cameraID = form.cameraID.data,
-                    title = form.title.data,
-                    fileNo = form.fileNo.data,
-                    fileDate = form.fileDate.data,
-                    filmTypeID = zero_to_none(form.filmTypeID.data),
-                    filmSizeID = form.filmSizeID.data,
-                    iso = zero_to_none(form.shotISO.data),
-                    loaded = form.loaded.data,
-                    unloaded = form.unloaded.data,
-                    developed = form.developed.data,
-                    development = form.development.data,
-                    notes = form.notes.data)
+                                            userID=userID,
+                                            filmID=filmID,
+                                            projectID=projectID,
+                                            cameraID=form.cameraID.data,
+                                            title=form.title.data,
+                                            fileNo=form.fileNo.data,
+                                            fileDate=form.fileDate.data,
+                                            filmTypeID=zero_to_none(form.filmTypeID.data),
+                                            filmSizeID=form.filmSizeID.data,
+                                            iso=zero_to_none(form.shotISO.data),
+                                            loaded=form.loaded.data,
+                                            unloaded=form.unloaded.data,
+                                            developed=form.developed.data,
+                                            development=form.development.data,
+                                            notes=form.notes.data)
                 transaction.commit()
                 return redirect('/binders/' + str(binderID)
-                    + '/projects/' + str(projectID)
-                    + '/films/' + str(filmID))
+                                + '/projects/' + str(projectID)
+                                + '/films/' + str(filmID))
             else:
                 film = get_film_details(connection, binderID, projectID, filmID)
                 app.logger.debug("FilmTypeID: %s", film.filmTypeID)
                 return render_template('film/edit-film.html',
-                    form=form,
-                    binderID=binderID,
-                    film=film)
+                                       form=form,
+                                       binderID=binderID,
+                                       film=film)
 
     film = get_film_details(connection, binderID, projectID, filmID)
     if film is None:
@@ -501,8 +504,8 @@ def film(binderID, projectID, filmID):
         WHERE userID = :userID
         AND filmID = :filmID""")
     extras_result = connection.execute(qry,
-        userID = userID,
-        filmID = filmID).fetchone()
+                                       userID=userID,
+                                       filmID=filmID).fetchone()
     cameraID = extras_result[0]
     filmFormat = extras_result[1]
 
@@ -532,9 +535,10 @@ def film(binderID, projectID, filmID):
             WHERE filmID = :filmID
             AND exposureNumber = :exposureNumber
             AND ExposureFilters.userID = :userID""")
-        filtersResult = connection.execute(qry, filmID=filmID,
-            userID = userID,
-            exposureNumber = exposure['exposureNumber']).fetchall()
+        filtersResult = connection.execute(qry,
+                                           filmID=filmID,
+                                           userID=userID,
+                                           exposureNumber=exposure['exposureNumber']).fetchall()
         exposureFilters = result_to_dict(filtersResult)
         exposure['filters'] = exposureFilters
 
@@ -562,9 +566,9 @@ def film(binderID, projectID, filmID):
         form.populate_select_fields(connection)
         transaction.commit()
         return render_template('film/edit-film.html',
-            form=form,
-            binderID=binderID,
-            film=film)
+                               form=form,
+                               binderID=binderID,
+                               film=film)
     else:
         print_view = False
         app.logger.debug("filmSizeType: %s", film.filmSizeType)
@@ -573,9 +577,9 @@ def film(binderID, projectID, filmID):
         if film.filmSizeType == 'Medium':
             template = 'film/120.html'
         if film.size == '4x5':
-            template = 'film/lf.html';
+            template = 'film/lf.html'
         if film.size == '8x10':
-            template = 'film/lf.html';
+            template = 'film/lf.html'
 
     form = ExposureForm()
     form.populate_select_fields(connection, film.cameraID)
@@ -583,17 +587,24 @@ def film(binderID, projectID, filmID):
     form.set_exposure_number(exposureNumber)
     transaction.commit()
     return render_template(template,
-        form=form,
-        binderID=binderID, projectID=projectID, filmID=filmID,
-        film=film, exposures=exposures, exposureNumber=exposureNumber,
-        filmFormat = filmFormat,
-        print_view=print_view,
-        view='exposures')
+                           form=form,
+                           binderID=binderID,
+                           projectID=projectID,
+                           filmID=filmID,
+                           film=film,
+                           exposures=exposures,
+                           exposureNumber=exposureNumber,
+                           filmFormat=filmFormat,
+                           print_view=print_view,
+                           view='exposures')
 
 # Edit Exposure
-@app.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>/exposure/<int:exposureNumber>',  methods = ['POST', 'GET'])
+@app.route('/binders/<int:binderID>/projects/<int:projectID>/films/' +
+           '<int:filmID>/exposure/<int:exposureNumber>',
+           methods=['POST', 'GET'])
 @login_required
 def expsoure(binderID, projectID, filmID, exposureNumber):
+    """ Detailed exposure information """
     connection = engine.connect()
     transaction = connection.begin()
     userID = current_user.get_id()
@@ -609,9 +620,9 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                 AND filmID = :filmID
                 AND userID = :userID""")
             filmInfo = connection.execute(qry,
-                projectID = projectID,
-                filmID = filmID,
-                userID = userID).fetchone()
+                                          projectID=projectID,
+                                          filmID=filmID,
+                                          userID=userID).fetchone()
             filmTypeID = filmInfo.filmTypeID
             filmSizeID = filmInfo.filmSizeID
 
@@ -620,7 +631,7 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                 WHERE filmSizeID = :filmSizeID
                 AND format = 'Sheet'""")
             sheet_film = connection.execute(qry,
-                filmSizeID = filmSizeID).fetchone()
+                                            filmSizeID=filmSizeID).fetchone()
 
             # If exposure number has a dash, it means
             # we are adding a range of exposures
@@ -638,34 +649,35 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                     :shutter, :aperture, :filmTypeID, :shotISO, :metering,
                     :flash, :subject, :development, :notes)""")
                 insert(connection, qry, "Exposure",
-                    userID = userID,
-                    filmID = filmID,
-                    exposureNumber = exposure,
-                    lensID = zero_to_none(form.lensID.data),
-                    holderID = zero_to_none(form.holderID.data),
-                    shutter = encode_shutter(form.shutter.data),
-                    aperture = form.aperture.data,
-                    filmTypeID = zero_to_none(form.filmTypeID.data),
-                    shotISO = zero_to_none(form.shotISO.data),
-                    metering = zero_to_none(form.metering.data),
-                    flash = form.flash.data,
-                    subject = form.subject.data,
-                    development = form.development.data,
-                    notes = form.notes.data)
+                       userID=userID,
+                       filmID=filmID,
+                       exposureNumber=exposure,
+                       lensID=zero_to_none(form.lensID.data),
+                       holderID=zero_to_none(form.holderID.data),
+                       shutter=encode_shutter(form.shutter.data),
+                       aperture=form.aperture.data,
+                       filmTypeID=zero_to_none(form.filmTypeID.data),
+                       shotISO=zero_to_none(form.shotISO.data),
+                       metering=zero_to_none(form.metering.data),
+                       flash=form.flash.data,
+                       subject=form.subject.data,
+                       development=form.development.data,
+                       notes=form.notes.data)
 
                 qry = text("""INSERT INTO ExposureFilters
                 (userID, filmID, exposureNumber, filterID)
                 VALUES (:userID, :filmID, :exposureNumber, :filterID)""")
                 for filterID in form.filters.data:
                     insert(connection, qry, "Filter",
-                    userID = userID,
-                    filmID = filmID,
-                    exposureNumber = exposure,
-                    filterID = filterID)
+                           userID=userID,
+                           filmID=filmID,
+                           exposureNumber=exposure,
+                           filterID=filterID)
 
                 if sheet_film:
                     auto_decrement_film_stock(connection,
-                        filmTypeID, filmSizeID)
+                                              filmTypeID,
+                                              filmSizeID)
 
         if request.form['button'] == 'updateExposure':
             qry = text("""UPDATE Exposures
@@ -685,44 +697,45 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
                 AND exposureNumber = :exposureNumberOld
                 AND userID = :userID""")
             connection.execute(qry,
-                userID = userID,
-                filmID = filmID,
-                exposureNumberNew = form.exposureNumber.data,
-                exposureNumberOld = exposureNumber,
-                lensID = zero_to_none(form.lensID.data),
-                holderID = zero_to_none(form.holderID.data),
-                shutter = encode_shutter(form.shutter.data),
-                aperture = form.aperture.data,
-                filmTypeID = zero_to_none(form.filmTypeID.data),
-                filmSizeID = filmSizeID,
-                shotISO = zero_to_none(form.shotISO.data),
-                metering = zero_to_none(form.metering.data),
-                flash = form.flash.data,
-                subject = form.subject.data,
-                development = form.development.data,
-                notes = form.notes.data)
+                               userID=userID,
+                               filmID=filmID,
+                               exposureNumberNew=form.exposureNumber.data,
+                               exposureNumberOld=exposureNumber,
+                               lensID=zero_to_none(form.lensID.data),
+                               holderID=zero_to_none(form.holderID.data),
+                               shutter=encode_shutter(form.shutter.data),
+                               aperture=form.aperture.data,
+                               filmTypeID=zero_to_none(form.filmTypeID.data),
+                               filmSizeID=filmSizeID,
+                               shotISO=zero_to_none(form.shotISO.data),
+                               metering=zero_to_none(form.metering.data),
+                               flash=form.flash.data,
+                               subject=form.subject.data,
+                               development=form.development.data,
+                               notes=form.notes.data)
 
             qry = text("""DELETE FROM ExposureFilters
                 WHERE filmID = :filmID
                 AND exposureNumber = :exposureNumber
                 AND userID = :userID""")
-            connection.execute(qry, filmID = filmID,
-                userID = userID,
-                exposureNumber = request.form['exposureNumber'])
+            connection.execute(qry,
+                               filmID=filmID,
+                               userID=userID,
+                               exposureNumber=request.form['exposureNumber'])
 
             qry = text("""INSERT INTO ExposureFilters
                 (userID, filmID, exposureNumber, filterID)
                 VALUES (:userID, :filmID, :exposureNumber, :filterID)""")
             for filterID in request.form.getlist('filters'):
                 insert(connection, qry, "Filter",
-                    userID = userID,
-                    filmID = filmID,
-                    exposureNumber = request.form['exposureNumber'],
-                    filterID = filterID)
+                       userID=userID,
+                       filmID=filmID,
+                       exposureNumber=request.form['exposureNumber'],
+                       filterID=filterID)
         transaction.commit()
         return redirect('/binders/' + str(binderID)
-            + '/projects/' + str(projectID)
-            + '/films/' + str(filmID))
+                        + '/projects/' + str(projectID)
+                        + '/films/' + str(filmID))
 
     qry = text("""SELECT exposureNumber, shutter, aperture,
         lensID, flash, notes, metering, subject, development, filmTypeID,
@@ -732,9 +745,9 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
         AND exposureNumber = :exposureNumber
         AND userID = :userID""")
     exposure_result = connection.execute(qry,
-        filmID=filmID,
-        exposureNumber=exposureNumber,
-        userID = userID).fetchall()
+                                         filmID=filmID,
+                                         exposureNumber=exposureNumber,
+                                         userID=userID).fetchall()
     row = result_to_dict(exposure_result)
     exposure = row[0]
     exposure['shutter'] = format_shutter(exposure['shutter'])
@@ -745,8 +758,8 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
         WHERE userID = :userID
         AND filmID = :filmID""")
     extras_result = connection.execute(qry,
-        userID = userID,
-        filmID = filmID).fetchone()
+                                       userID=userID,
+                                       filmID=filmID).fetchone()
     cameraID = extras_result[0]
     filmFormat = extras_result[1]
 
@@ -755,9 +768,10 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
         WHERE filmID = :filmID
         AND exposureNumber = :exposureNumber
         AND ExposureFilters.userID = :userID""")
-    filtersResult = connection.execute(qry, filmID=filmID,
-        exposureNumber = exposureNumber,
-        userID = userID).fetchall()
+    filtersResult = connection.execute(qry,
+                                       filmID=filmID,
+                                       exposureNumber=exposureNumber,
+                                       userID=userID).fetchall()
     transaction.commit()
 
     form = ExposureForm()
@@ -766,11 +780,11 @@ def expsoure(binderID, projectID, filmID, exposureNumber):
     form.populate_filter_selections(filtersResult)
 
     return render_template('film/edit-exposure.html',
-        form=form,
-        userID=userID,
-        binderID=binderID,
-        projectID=projectID,
-        filmID=filmID,
-        filmFormat=filmFormat,
-        exposureNumber=exposureNumber,
-        film=film)
+                           form=form,
+                           userID=userID,
+                           binderID=binderID,
+                           projectID=projectID,
+                           filmID=filmID,
+                           filmFormat=filmFormat,
+                           exposureNumber=exposureNumber,
+                           film=film)
