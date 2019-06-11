@@ -3,7 +3,7 @@ services:
 
 variables:
     MYSQL_DATABASE: filmlogdev
-    MYSQL_PASSWORD: filmlogdevtestrunnerpassword
+    MYSQL_ROOT_PASSWORD: filmlogdevtestrunnerpassword
 
 before_script:
     - apt-get update -y
@@ -18,4 +18,4 @@ lint:
     script: "tests/lint.sh"
 
 import_database:
-    script: "tests/import_database.sh"
+    script: "tests/import_database.sh $MYSQL_DATABASE mysql root $MYSQL_ROOT_ASSWORD"
