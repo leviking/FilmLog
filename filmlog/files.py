@@ -46,10 +46,10 @@ def upload_file(request, connection, transaction, fileID):
     userID = current_user.get_id()
     if 'file' not in request.files:
         flash('File missing')
-    file = request.files['file']
-    if file.filename == '':
+    file_upload = request.files['file']
+    if file_upload.filename == '':
         flash('File missing')
-    if file and is_file_allowed(file.filename):
+    if file_upload and is_file_allowed(file_upload.filename):
         # We rename the file so this may not be required
         # filename = secure_filename(file.filename)
         try:
@@ -58,7 +58,7 @@ def upload_file(request, connection, transaction, fileID):
                                      str(fileID))
             if not os.path.exists(directory):
                 os.makedirs(directory)
-            file.save(os.path.join(directory + "/full.jpg"))
+            file_upload.save(os.path.join(directory + "/full.jpg"))
             generate_thumbnail(fileID)
             qry = text("""INSERT INTO Files (fileID, userID)
                 VALUES (:fileID, :userID)""")
