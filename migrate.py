@@ -31,7 +31,7 @@ for row in result:
 
 # Find all the migration files (those ending in .sql)
 for f in listdir(migration_directory):
-    if isfile(migration_directory + f):    
+    if isfile(migration_directory + f):
         if splitext(f)[1] == '.sql':
             migration_files.append(splitext(f)[0])
 
@@ -46,15 +46,15 @@ for migration in sorted(to_migrate):
     try:
         result = connection.execute(qry)
     except Exception:
-        print "Migration failed for %s" % migration
+        print("Migration failed for %s" % migration)
         f.close()
         break
     try:
         qry = text("""INSERT INTO Migrations (name) VALUES (:name)""")
         connection.execute(qry, name = migration)
     except Exception:
-        print "Migration passed but failed to update Migrations table"
+        print("Migration passed but failed to update Migrations table")
         f.close()
         break
-    print "Migration %s passed" % migration
+    print("Migration %s passed" % migration)
     f.close()
