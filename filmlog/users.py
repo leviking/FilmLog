@@ -28,7 +28,7 @@ class User(UserMixin):
         self.id = userID
 
     def get_id(self):
-        return unicode(self.id)
+        return str(self.id)
 
     def get(userID):
         return self.id
@@ -37,7 +37,7 @@ class User(UserMixin):
         self.password = generate_password_hash(password_cleartest)
 
     def check_password(self, password):
-        return check_password_hash(self.password, password)
+        return check_password_hash(self.password.encode('utf-8'), password.encode('utf-8'))
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[validators.input_required()])
@@ -77,7 +77,10 @@ def login():
                     WHERE username = :username""")
             user = connection.execute(qry, username=username).fetchone()
             if user:
-                if check_password_hash(user.password, password):
+                print(user.password)
+                print(password)
+                print(password.encode('utf-8'))
+                if check_password_hash(user.password.decode(), password):
                     login_user(User(user.userID), remember=True)
                     qry = text("""UPDATE Users SET lastLogin = NOW()
                         WHERE userID = :userID""")

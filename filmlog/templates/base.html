@@ -1,5 +1,5 @@
 {% macro form_errors(form) -%}
-  {% for field, errors in form.errors.iteritems() %}
+  {% for field, errors in form.errors.items() %}
     <div class="alert alert-danger">
         {{ form[field].label }}: {{ ', '.join(errors) }}
     </div>
