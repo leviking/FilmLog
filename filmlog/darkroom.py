@@ -17,17 +17,22 @@ from filmlog.config import app, engine
 from filmlog.functions import optional_choices, zero_to_none, insert, next_id
 
 ## Functions
-def get_paper_filters(connection):
-    """ Helper function to grab paper filters """
-    qry = text("""SELECT paperFilterID, name FROM PaperFilters""")
-    return connection.execute(qry).fetchall()
-
 def get_papers(connection):
     """ Helper function to get available papers """
     qry = text("""SELECT paperID,
         CONCAT(PaperBrands.name, " ", Papers.name) AS name
         FROM Papers
         JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID""")
+    return connection.execute(qry).fetchall()
+
+def get_paper_filters(connection):
+    """ Helper function to grab paper filters """
+    qry = text("""SELECT paperFilterID, name FROM PaperFilters""")
+    return connection.execute(qry).fetchall()
+
+def get_paper_developers(connection):
+    """ Helper function to grab paper developers """
+    qry = text("""SELECT paperDeveloperID, CONCAT(name, ', 1:', dilution) AS name FROM PaperDevelopers""")
     return connection.execute(qry).fetchall()
 
 def get_enlarger_lenses(connection):
@@ -143,6 +148,9 @@ class PrintForm(FlaskForm):
     paperID = SelectField('Paper',
                           validators=[Optional()],
                           coerce=int)
+    paperDeveloperID = SelectField('Developer',
+                                   validators=[Optional()],
+                                   coerce=int)
     paperFilterID = SelectField('Filters',
                                 validators=[Optional()],
                                 coerce=int)
@@ -180,6 +188,7 @@ class PrintForm(FlaskForm):
     def populate_select_fields(self, connection, filmID):
         """ Helper function to populate select drop downs """
         self.paperID.choices = optional_choices("None", get_papers(connection))
+        self.paperDeveloperID.choices = optional_choices("None", get_paper_developers(connection))
         self.paperFilterID.choices = optional_choices("None", get_paper_filters(connection))
         self.enlargerLensID.choices = optional_choices("None", get_enlarger_lenses(connection))
         self.enlargerID.choices = optional_choices("None", get_enlargers(connection))
@@ -347,6 +356,7 @@ def user_prints(binderID, projectID, filmID):
         if request.form['button'] == 'addPrint':
             if form.validate_on_submit():
                 nextPrintID = functions.next_id(connection, 'printID', 'Prints')
+                app.logger.debug("Next Print ID: %s" % nextPrintID)
                 # If user included a file, let's upload it. Otherwise skip it.
                 if form.file.data:
                     nextFileID = functions.next_id(connection, 'fileID', 'Files')
@@ -355,9 +365,9 @@ def user_prints(binderID, projectID, filmID):
                     nextFileID = None
 
                 qry = text("""INSERT INTO Prints
-                    (printID, filmID, exposureNumber, userID, paperID, paperFilterID,
+                    (printID, paperDeveloperID, filmID, exposureNumber, userID, paperID, paperFilterID,
                     enlargerLensID, enlargerID, fileID, aperture, ndFilter, headHeight, exposureTime, printType, size, notes)
-                    VALUES (:printID, :filmID, :exposureNumber, :userID, :paperID,
+                    VALUES (:printID, :paperDeveloperID, :filmID, :exposureNumber, :userID, :paperID,
                     :paperFilterID, :enlargerLensID, :enlargerID, :fileID, :aperture, :ndFilter, :headHeight, :exposureTime,
                     :printType, :size, :notes)""")
                 insert(connection, qry, "Print",
@@ -365,6 +375,7 @@ def user_prints(binderID, projectID, filmID):
                        filmID=filmID,
                        userID=userID,
                        fileID=nextFileID,
+                       paperDeveloperID=zero_to_none(form.paperDeveloperID.data),
                        exposureNumber=form.exposureNumber.data,
                        paperID=zero_to_none(form.paperID.data),
                        paperFilterID=zero_to_none(form.paperFilterID.data),
@@ -379,7 +390,10 @@ def user_prints(binderID, projectID, filmID):
                        notes=form.notes.data)
     film = functions.get_film_details(connection, binderID, projectID, filmID)
 
-    qry = text("""SELECT printID, exposureNumber, Papers.name AS paperName,
+    qry = text("""SELECT printID, exposureNumber,
+        PaperDevelopers.name AS paperDeveloperName,
+        PaperDevelopers.dilution AS paperDeveloperDilution,
+        Papers.name AS paperName,
         PaperBrands.name AS paperBrand, PaperFilters.name AS paperFilterName,
         printType, size, aperture, ndFilter, headHeight, Prints.notes, fileID,
         EnlargerLenses.name AS lens,
@@ -389,6 +403,7 @@ def user_prints(binderID, projectID, filmID):
         LEFT OUTER JOIN Papers ON Papers.paperID = Prints.paperID
         LEFT OUTER JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID
         LEFT OUTER JOIN PaperFilters ON PaperFilters.paperFilterID = Prints.paperFilterID
+        LEFT OUTER JOIN PaperDevelopers ON PaperDevelopers.paperDeveloperID = Prints.paperDeveloperID
         LEFT OUTER JOIN EnlargerLenses ON EnlargerLenses.enlargerLensID = Prints.enlargerLensID
             AND EnlargerLenses.userID = Prints.userID
         LEFT OUTER JOIN Enlargers ON Enlargers.enlargerID = Prints.enlargerID
@@ -482,6 +497,8 @@ def print_exposure(binderID, projectID, filmID, printID):
 
     film = functions.get_film_details(connection, binderID, projectID, filmID)
     qry = text("""SELECT printID, exposureNumber, Papers.name AS paperName,
+        PaperDevelopers.name AS paperDeveloperName,
+        PaperDevelopers.dilution AS paperDeveloperDilution,
         Papers.paperID, PaperFilters.paperFilterID, PaperFilters.name AS paperFilterName,
         EnlargerLenses.enlargerLensID, EnlargerLenses.name AS enlargerLensName,
         Enlargers.enlargerID, Enlargers.name AS enlargerName,
@@ -489,6 +506,7 @@ def print_exposure(binderID, projectID, filmID, printID):
         SECONDS_TO_DURATION(exposureTime) AS exposureTime
         FROM Prints
         LEFT OUTER JOIN Papers ON Papers.paperID = Prints.paperID
+        LEFT OUTER JOIN PaperDevelopers ON PaperDevelopers.paperDeveloperID = Prints.paperDeveloperID
         LEFT OUTER JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID
         LEFT OUTER JOIN PaperFilters ON PaperFilters.paperFilterID = Prints.paperFilterID
         LEFT OUTER JOIN EnlargerLenses ON EnlargerLenses.enlargerLensID = Prints.enlargerLensID

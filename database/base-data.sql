@@ -122,3 +122,6 @@ INSERT INTO FilmSizes VALUES (7, '4x5', 'Large', 'Sheet');
 INSERT INTO FilmSizes VALUES (8, '5x7', 'Large', 'Sheet');
 INSERT INTO FilmSizes VALUES (9, '8x10', 'Large', 'Sheet');
 INSERT INTO FilmSizes VALUES (10,'11x14', 'Ultra-Large', 'Sheet');
+
+INSERT INTO PaperDevelopers VALUES (1, 'Ilford Multigrade', '9');
+INSERT INTO PaperDevelopers VALUES (2, 'Ilford Multigrade', '14');

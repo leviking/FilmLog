@@ -7,17 +7,10 @@
   <div class="card">
     <table class="table table-striped-by-two table-bordered" id="exposures">
       <tr>
-        <th>Number</th>
+        <th>Exposure</th>
         <th>Type</th>
         <th>Size</th>
         <th>Paper</th>
-        <th>Contrast Filter</th>
-        <th>Enlarger</th>
-        <th>Lens</th>
-        <th>Aperture</th>
-        <th>ND Filter</th>
-        <th>Head Height</th>
-        <th>Exposure Time</th>
         <th></th>
       </tr>
       {% for print in prints %}
@@ -30,19 +23,11 @@
           <td>{{ print.printType }}</td>
           <td>{{ print.size }}</td>
           <td>{{ print.paperbrand }} {{ print.paperName }}</td>
-          <td>{{ print.paperFilterName }}</td>
-          <td>{{ print.enlarger }}</td>
-          <td>{{ print.lens }}</td>
-          <td>{{ print.aperture }}</td>
-          <td>{{ print.ndFilter }}</td>
           <td>
-            {% if print.headHeight %}
-              {{ print.headHeight }}
-            {% else %}
-              Unknown
+            {% if print.paperDeveloperName %}
+              {{ print.paperDeveloperName }} 1:{{ print.paperDeveloperDilution }}</td>
             {% endif %}
           </td>
-          <td>{{ print.exposureTime }}</td>
 
           <td class="text-right">
             <form role="form" class="form-horizontal"
@@ -60,12 +45,7 @@
           </td>
         </tr>
         <tr>
-          {% if print.notes %}
-            <td colspan="6"><pre>{{ print.notes }}</pre></td>
-          {% else %}
-            <td colspan="6">&nbsp;</td>
-          {% endif %}
-          <td colspan="6">
+          <td colspan="3">
             {% if print.fileID %}
               <a href="/files/full/{{ print.fileID }}">
                 <img class="img-fluid mx-auto d-block" src="/files/thumb/{{ print.fileID }}" />
@@ -74,9 +54,14 @@
               <p>No Image</p>
             {% endif %}
           </td>
+          {% if print.notes %}
+            <td colspan="3"><pre>{{ print.notes }}</pre></td>
+          {% else %}
+            <td colspan="3">&nbsp;</td>
+          {% endif %}
         </tr>
       {% else %}
-        <tr><td colspan="10">No Prints Made</td</tr>
+        <tr><td colspan="6">No Prints Made</td</tr>
       {% endfor %}
     </table>
 </div>

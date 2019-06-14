@@ -10,6 +10,9 @@
   {% if print_details.paperName %}
     <tr><th>Paper</th><td>{{ print_details.paperName }}</td></tr>
   {% endif %}
+  {% if print_details.paperDeveloperName %}
+    <tr><th>Developer</th><td>{{ print_details.paperDeveloperName }} 1:{{ print_details.paperDeveloperDilution }}</td></tr>
+  {% endif %}
   {% if print_details.paperFilterName %}
     <tr><th>Contrast Filter</th><td>{{ print_details.paperFilterName }}</td></tr>
   {% endif %}
@@ -36,8 +39,14 @@
 <pre>{{ print_details.notes }}</pre>
 {% endif %}
 
-<h3>Images</h3>
-<pre>Images Go Here</pre>
+<h3>Image</h3>
+{% if print_details.fileID %}
+  <a href="/files/full/{{ print_details.fileID }}">
+    <img class="img-fluid mx-auto d-block" src="/files/thumb/{{ print_details.fileID }}" />
+  </a>
+{% else %}
+  <p>No Image</p>
+{% endif %}
 
 
 <div class="card">

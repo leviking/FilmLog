@@ -244,8 +244,15 @@ CREATE TABLE ExposureFilters(
 -- Darkroom
 CREATE TABLE PaperBrands(
     paperBrandID TINYINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
-    name varchar(32) NOT NULL,
+    name VARCHAR(32) NOT NULL,
     UNIQUE name_iq (name)
+) ENGINE='InnoDB';
+
+CREATE TABLE PaperDevelopers(
+    paperDeveloperID TINYINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
+    name VARCHAR(32) NOT NULL,
+    dilution TINYINT UNSIGNED NOT NULL,
+    UNIQUE  name_dilution (name, dilution)
 ) ENGINE='InnoDB';
 
 CREATE TABLE Papers(
@@ -313,6 +320,7 @@ CREATE TABLE Prints (
     exposureNumber TINYINT UNSIGNED NOT NULL,
     userID INT UNSIGNED NOT NULL,
     paperID TINYINT UNSIGNED DEFAULT NULL,
+    paperDeveloperID TINYINT UNSIGNED DEFAULT NULL,
     paperFilterID TINYINT UNSIGNED DEFAULT NULL,
     enlargerLensID TINYINT UNSIGNED DEFAULT NULL,
     enlargerID TINYINT UNSIGNED DEFAULT NULL,
@@ -334,7 +342,8 @@ CREATE TABLE Prints (
     CONSTRAINT Prints_Exposures_fk FOREIGN KEY (userID, filmID, exposureNumber) REFERENCES Exposures (userID, filmID, exposureNumber),
     CONSTRAINT Prints_Files_fk FOREIGN KEY (userID, fileID) REFERENCES Files (userID, fileID) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT Prints_EnlargerLenses_fk FOREIGN KEY (userID, enlargerLensID) REFERENCES EnlargerLenses (userID, enlargerLensID) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT Prints_Enlargers_fk FOREIGN KEY (userID, enlargerID) REFERENCES Enlargers (userID, enlargerID)
+    CONSTRAINT Prints_Enlargers_fk FOREIGN KEY (userID, enlargerID) REFERENCES Enlargers (userID, enlargerID),
+    CONSTRAINT Prints_PaperDevelopers_fk FOREIGN KEY (paperDeveloperID) REFERENCES PaperDevelopers (paperDeveloperID)
 ) ENGINE='InnoDB';
 
 CREATE TABLE MaxBlackTests(
