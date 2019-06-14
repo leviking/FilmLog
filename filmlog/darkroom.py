@@ -32,7 +32,8 @@ def get_paper_filters(connection):
 
 def get_paper_developers(connection):
     """ Helper function to grab paper developers """
-    qry = text("""SELECT paperDeveloperID, CONCAT(name, ', 1:', dilution) AS name FROM PaperDevelopers""")
+    qry = text("""SELECT paperDeveloperID, CONCAT(name, ', 1:', dilution) AS
+        name FROM PaperDevelopers""")
     return connection.execute(qry).fetchall()
 
 def get_enlarger_lenses(connection):
