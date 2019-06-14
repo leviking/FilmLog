@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 from os import listdir
 from os.path import isfile, join, abspath, dirname, splitext
-import ConfigParser
+import configparser
+
 
 from filmlog import app
 
@@ -10,7 +11,7 @@ from sqlalchemy.sql import text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 config.read(join(abspath(dirname(__file__)), './config.ini'))
 
 migration_directory = 'database/migrations/'
