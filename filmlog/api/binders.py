@@ -22,14 +22,9 @@ def get_all(connection):
         binder = {
             "type" : "binders",
             "id" : str(row['binderID']),
-            "attributes" : {
-                "name" : row['name'],
-                "project_count" : row['projectCount'],
-                "created_on" : row['createdOn']
-            },
-            "links" : {
-                "self" : url_for("api.binder_details", binderID=row['binderID'])
-            }
+            "name" : row['name'],
+            "project_count" : row['projectCount'],
+            "created_on" : row['createdOn']
         }
         binders["data"].append(binder)
     return jsonify(binders), status.HTTP_200_OK

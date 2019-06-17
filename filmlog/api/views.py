@@ -3,7 +3,7 @@ from flask_login import login_required
 from flask import request
 
 # Filmlog
-from filmlog.api import api_blueprint, binders, projects, filmstock
+from filmlog.api import api_blueprint, binders, projects, filmstock, holders
 from filmlog.config import engine
 
 # http://jsonapi.org/format/
@@ -92,5 +92,31 @@ def filmstock_details(filmTypeID, filmSizeID):
         return_status = filmstock.get(connection, filmTypeID, filmSizeID)
     if request.method == 'PATCH':
         return_status = filmstock.patch(connection, filmTypeID, filmSizeID)
+    transaction.commit()
+    return return_status
+
+# Holders
+@api_blueprint.route('/holders', methods=['GET'])
+@login_required
+def holders_all():
+    """ Get all user's holders filmstock information """
+    connection = engine.connect()
+    transaction = connection.begin()
+
+    if request.method == 'GET':
+        return_status = holders.get_all(connection)
+    transaction.commit()
+    return return_status
+
+@api_blueprint.route('/holders/<int:holderID>', methods=['GET', 'PATCH'])
+@login_required
+def holder_details(holderID):
+    """ Get detailed holder information """
+    connection = engine.connect()
+    transaction = connection.begin()
+    #if request.method == 'GET':
+    #    return_status = filmstock.get(connection, filmTypeID, filmSizeID)
+    if request.method == 'PATCH':
+        return_status = holders.patch(connection, holderID)
     transaction.commit()
     return return_status

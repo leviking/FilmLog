@@ -1,58 +1,110 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+
+// Set the holder's state via an API call then call
+// function to update HTML
+function setHolderState(holderID, action){
+  var state = '';
+  console.log('setHolderState ' + holderID + ' : ' + action);
+  var data =
+  {
+      "data" :
+      {
+        "id": holderID,
+        "action" : action
+      }
+  }
+
+  switch (action)
+  {
+    case 'Unload':
+      state = 'Empty';
+      break;
+    case 'Reload':
+      state = 'Loaded';
+      break;
+    case 'Expose':
+      state = 'Exposed';
+      break;
+  }
+
+  jQuery.ajax({
+    type: "PATCH",
+    url: "/api/v1/holders/" + holderID,
+    data: JSON.stringify(data),
+    contentType: "application/json",
+    dataType: "json",
+    success: updateHolderState(holderID, state)
+  });
+}
+
+// Update the holder's state in the UI
+function updateHolderState(holderID, state)
+{
+  $('#stateForHolderID' + holderID).html(state);
+  updateHolderButtons(holderID, state);
+}
+
+// Update the buttons of a holder in the UI
+function updateHolderButtons(holderID, state)
+{
+  load_location = "'/gear/holders/" + holderID + "'";
+  buttons = ' '
+  if(state == 'Loaded')
+    buttons += '<button class="btn btn-dark" name="button" value="Expose" \
+                onclick="setHolderState(' + holderID + ', \'Expose\')">Expose</button> ';
+  if(state == 'Loaded' || state == 'Exposed')
+    buttons += '<button class="btn btn-secondary" name="button" value="Unload" \
+                onclick="setHolderState(' + holderID + ', \'Unload\')">Unload</button> ';
+  if(state == 'Empty')
+    buttons += '<button class="btn btn-danger" name="button" value="Load" \
+               onclick="location.href=' + load_location + '">Load</button> \
+               <button class="btn btn-warning" name="button" value="Reload" \
+               onclick="setHolderState(' + holderID + ', \'Reload\')">Reload</button> ';
+
+  $('#buttonsForHolderID' + holderID).html(buttons);
+}
+
+// Make a call to pull a list of all the user's holders
+jQuery.ajax({
+    type: "GET",
+    url: "/api/v1/holders",
+    contentType: "application/json",
+    dataType: "json",
+    success: function(data)
+    {
+      jQuery(data.data).each(function(i, holder){
+        var buttons = '';
+        $('#holdersTableBody').append($('<tr id="rowHolderID' + holder.id + '">'));
+        $('#holdersTableBody').append($('<td><a href="/gear/holders/' + holder.id + '">' + holder.name + '</a></td>'));
+        $('#holdersTableBody').append($('<td>' + holder.size + '</td>'));
+        $('#holdersTableBody').append($('<td>' + holder.film + '</td>'));
+        $('#holdersTableBody').append($('<td id="stateForHolderID' + holder.id + '">' + holder.state + '</td>'));
+        $('#holdersTableBody').append($('<td id="buttonsForHolderID' + holder.id + '"></td></tr>'));
+        updateHolderButtons(holder.id, holder.state);
+      });
+    }
+});
+
+{% endblock %}
+
 {% block content %}
 <div class="row">
   {% include "gear/sidebar.html" %}
   <div class="col-10">
     <h1 class="page-header">Film Holders</h1>
-    <table class="table table-striped table-bordered" id="holders">
-      <tr>
+    <table class="table table-striped table-bordered" id="holdersTable">
+      <thead>
           <th>Name</th>
           <th>Size</th>
           <th>Film</th>
           <th>State</th>
           <th>Command</th>
-      </tr>
-      {% for holder in holders %}
-        <tr>
-          <td><a href="/gear/holders/{{ holder.holderID }}">{{ holder.name }}</a></td>
-          <td>{{ holder.size }}</td>
-          <td>
-            {% if holder.filmTypeID %}
-            {{ holder.filmBrand }} {{ holder.filmType }} {{ holder.filmISO }}
-            {% endif %}
-          </td>
-          {% if holder.state == 'Empty' %}
-            <td class="holderState holderUnloaded">
-          {% elif holder.state ==  'Loaded' %}
-            <td class="holderState holderLoaded">
-          {% elif holder.state == 'Exposed' %}
-            <td class="holderState holderExposed">
-          {% endif %}
-            {{ holder.state }}
-          </td>
-          <td>
-            <form role="form" class="form-horizontal"
-              action="/gear/holders"
-              method="POST">
-              {{ form.csrf_token }}
-              {% if holder.state == 'Empty' %}
-                <button class="btn btn-danger" name="button" action="submit" value="Load">Load</button>
-                <button class="btn btn-warning" name="button" action="submit" value="Reload">Reload</button>
-              {% endif %}
-              {% if holder.state == 'Loaded' %}
-                <button class="btn btn-dark" name="button" action="submit" value="Expose">Expose</button>
-              {% endif %}
-              {% if holder.state == 'Loaded' or holder.state == 'Exposed' %}
-                <button class="btn btn-secondary" name="button" action="submit" value="Unload">Unload</button>
-              {% endif %}
-              <input type="hidden" name="holderID" value="{{ holder.holderID }}" >
-            </form>
-          </td>
-        </tr>
-      {% else %}
-        <tr><td colspan="4">No Holders Found</td></tr>
-      {% endfor %}
+      </thead>
+      <tbody id="holdersTableBody"></tbody>
+
+
     </table>
 
     <div class="card">
