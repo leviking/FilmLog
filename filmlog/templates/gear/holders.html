@@ -42,14 +42,32 @@ function setHolderState(holderID, action){
 // Update the holder's state in the UI
 function updateHolderState(holderID, state)
 {
+  var newClass = '';
+  switch (state)
+  {
+    case 'Empty':
+      newClass = 'holderEmpty';
+      break;
+    case 'Loaded':
+      newClass = 'holderLoaded';
+      break;
+    case 'Exposed':
+      newClass = 'holderExposed';
+      break;
+  }
+
+  $('#stateForHolderID' + holderID).removeClass();
+  $('#stateForHolderID' + holderID).addClass('holderState');
+  $('#stateForHolderID' + holderID).addClass(newClass);
   $('#stateForHolderID' + holderID).html(state);
+
   updateHolderButtons(holderID, state);
 }
 
 // Update the buttons of a holder in the UI
 function updateHolderButtons(holderID, state)
 {
-  load_location = "'/gear/holders/" + holderID + "'";
+  loadLocation = "'/gear/holders/" + holderID + "'";
   buttons = ' '
   if(state == 'Loaded')
     buttons += '<button class="btn btn-dark" name="button" value="Expose" \
@@ -59,7 +77,7 @@ function updateHolderButtons(holderID, state)
                 onclick="setHolderState(' + holderID + ', \'Unload\')">Unload</button> ';
   if(state == 'Empty')
     buttons += '<button class="btn btn-danger" name="button" value="Load" \
-               onclick="location.href=' + load_location + '">Load</button> \
+               onclick="location.href=' + loadLocation + '">Load</button> \
                <button class="btn btn-warning" name="button" value="Reload" \
                onclick="setHolderState(' + holderID + ', \'Reload\')">Reload</button> ';
 
@@ -82,7 +100,7 @@ jQuery.ajax({
         $('#holdersTableBody').append($('<td>' + holder.film + '</td>'));
         $('#holdersTableBody').append($('<td id="stateForHolderID' + holder.id + '">' + holder.state + '</td>'));
         $('#holdersTableBody').append($('<td id="buttonsForHolderID' + holder.id + '"></td></tr>'));
-        updateHolderButtons(holder.id, holder.state);
+        updateHolderState(holder.id, holder.state);
       });
     }
 });
