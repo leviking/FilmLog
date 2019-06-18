@@ -81,7 +81,8 @@ def filmstock_all():
     transaction.commit()
     return return_status
 
-@api_blueprint.route('/filmstock/<int:filmTypeID>/<int:filmSizeID>', methods=['GET', 'PATCH'])
+@api_blueprint.route('/filmstock/<int:filmTypeID>:<int:filmSizeID>',
+                     methods=['GET', 'PATCH', 'DELETE'])
 @login_required
 def filmstock_details(filmTypeID, filmSizeID):
     """ Get detailed filmstock information """
@@ -92,6 +93,9 @@ def filmstock_details(filmTypeID, filmSizeID):
         return_status = filmstock.get(connection, filmTypeID, filmSizeID)
     if request.method == 'PATCH':
         return_status = filmstock.patch(connection, filmTypeID, filmSizeID)
+    if request.method == 'DELETE':
+        print("DELETE")
+        return_status = filmstock.delete(connection, filmTypeID, filmSizeID)
     transaction.commit()
     return return_status
 

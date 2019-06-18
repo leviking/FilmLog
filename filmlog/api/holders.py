@@ -30,7 +30,6 @@ def get_all(connection):
         else:
             film = None
         item = {
-            "type" : "holders",
             "id" : str(row['holderID']),
             "name" : row['name'],
             "size" : row['size'],

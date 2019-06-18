@@ -1,5 +1,5 @@
 """ Filmstock interactions for API """
-from flask import jsonify, request, make_response, url_for
+from flask import jsonify, request, make_response
 from flask_login import current_user
 from flask_api import status
 from sqlalchemy.sql import text
@@ -26,7 +26,6 @@ def get_all(connection):
     }
     for row in stock:
         item = {
-            "type" : "filmstock",
             "id" : str(row['filmTypeID']) + ':' + str(row['filmSizeID']),
             "brand" : row['brand'],
             "type" : row['type'],
@@ -62,7 +61,6 @@ def get(connection, filmTypeID, filmSizeID):
 
     filmstock = {
         "data" : {
-            "type" : "filmstock",
             "id" : str(filmTypeID) + ':' + str(filmSizeID),
             "brand" : stock['brand'],
             "type" : stock['type'],
@@ -98,3 +96,16 @@ def patch(connection, filmTypeID, filmSizeID):
     resp = make_response(jsonify(json))
     resp.headers['Location'] = "/filmstock/" + str(filmTypeID) + "/" + str(filmSizeID)
     return resp, status.HTTP_200_OK
+
+def delete(connection, filmTypeID, filmSizeID):
+    """ Delete a film stock entirely """
+    userID = current_user.get_id()
+    qry = text("""DELETE FROM FilmStock
+        WHERE userID = :userID
+        AND filmTypeID = :filmTypeID
+        AND filmSizeID = :filmSizeID""")
+    connection.execute(qry,
+                       userID=userID,
+                       filmTypeID=filmTypeID,
+                       filmSizeID=filmSizeID)
+    return "OK", status.HTTP_200_OK
