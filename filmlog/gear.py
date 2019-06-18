@@ -358,33 +358,6 @@ def user_holders():
     form = HolderForm()
 
     if request.method == 'POST':
-        if request.form['button'] == 'Unload':
-            qry = text("""UPDATE Holders
-                SET loaded = NULL, exposed = NULL, unloaded = NOW()
-                WHERE userID = :userID AND holderID = :holderID""")
-            connection.execute(qry,
-                               userID=userID,
-                               holderID=int(request.form['holderID']))
-
-        if request.form['button'] == 'Load':
-            return redirect("/gear/holders/" + request.form['holderID'])
-
-        if request.form['button'] == 'Reload':
-            qry = text("""UPDATE Holders
-                SET loaded = NOW(), exposed = NULL, unloaded = NULL
-                WHERE userID = :userID AND holderID = :holderID""")
-            connection.execute(qry,
-                               userID=userID,
-                               holderID=int(request.form['holderID']))
-
-        if request.form['button'] == 'Expose':
-            qry = text("""UPDATE Holders
-                SET exposed = NOW()
-                WHERE userID = :userID AND holderID = :holderID""")
-            connection.execute(qry,
-                               userID=userID,
-                               holderID=int(request.form['holderID']))
-
         if request.form['button'] == 'addHolder':
             nextHolderID = next_id(connection, 'holderID', 'Holders')
             qry = text("""INSERT INTO Holders
@@ -396,21 +369,9 @@ def user_holders():
                                name=form.name.data,
                                size=form.size.data,
                                notes=form.notes.data)
-
     form.populate_select_fields(connection)
-
-    qry = text("""SELECT holderID, Holders.name, size,
-        IF(exposed, "Exposed",
-            IF(loaded, "Loaded", "Empty")) AS state,
-        Holders.filmTypeID, Holders.iso, brand AS filmBrand, FilmTypes.name AS filmType,
-        FilmTypes.iso AS filmISO, compensation, notes
-        FROM Holders
-        LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Holders.filmTypeID
-        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
-        WHERE userID = :userID ORDER BY Holders.name""")
-    holders = connection.execute(qry, userID=userID)
     transaction.commit()
-    return render_template('/gear/holders.html', form=form, holders=holders)
+    return render_template('/gear/holders.html', form=form)
 
 @app.route('/gear/holders/<int:holderID>', methods=['GET', 'POST'])
 @login_required

@@ -92,6 +92,8 @@ jQuery.ajax({
     success: function(data)
     {
       jQuery(data.data).each(function(i, holder){
+        if (holder.film == null)
+          holder.film = '';
         var row = '<tr id="rowHolderID' + holder.id + '">';
         row += '<td><a href="/gear/holders/' + holder.id + '">' + holder.name + '</a></td>';
         row += '<td>' + holder.size + '</td>';
