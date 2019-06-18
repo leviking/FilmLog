@@ -28,21 +28,14 @@ def get_all(connection):
         item = {
             "type" : "filmstock",
             "id" : str(row['filmTypeID']) + ':' + str(row['filmSizeID']),
-            "attributes" : {
-                "brand" : row['brand'],
-                "type" : row['type'],
-                "iso" : row['iso'],
-                "size" : row['size'],
-                "qty" : row['qty'],
-                "composite_id" : {
-                    "filmtype_id" : str(row['filmTypeID']),
-                    "filmsize_id": str(row['filmSizeID'])
-                }
-            },
-            "links" : {
-                "self" : url_for("api.filmstock_details",
-                                 filmTypeID=row['filmTypeID'],
-                                 filmSizeID=row['filmSizeID'])
+            "brand" : row['brand'],
+            "type" : row['type'],
+            "iso" : row['iso'],
+            "size" : row['size'],
+            "qty" : row['qty'],
+            "composite_id" : {
+                "filmtype_id" : str(row['filmTypeID']),
+                "filmsize_id": str(row['filmSizeID'])
             }
         }
         filmstock["data"].append(item)
@@ -71,21 +64,14 @@ def get(connection, filmTypeID, filmSizeID):
         "data" : {
             "type" : "filmstock",
             "id" : str(filmTypeID) + ':' + str(filmSizeID),
-            "attributes" : {
-                "brand" : stock['brand'],
-                "type" : stock['type'],
-                "iso" : stock['iso'],
-                "size" : stock['size'],
-                "qty" : stock['qty'],
-                "composite_id" : {
-                    "filmtype_id" : str(filmTypeID),
-                    "filmsize_id": str(filmSizeID)
-                }
-            },
-            "links" : {
-                "self" : url_for("api.filmstock_details",
-                                 filmTypeID=filmTypeID,
-                                 filmSizeID=filmSizeID)
+            "brand" : stock['brand'],
+            "type" : stock['type'],
+            "iso" : stock['iso'],
+            "size" : stock['size'],
+            "qty" : stock['qty'],
+            "composite_id" : {
+                "filmtype_id" : str(filmTypeID),
+                "filmsize_id": str(filmSizeID)
             }
         }
     }
@@ -95,18 +81,20 @@ def patch(connection, filmTypeID, filmSizeID):
     """ Update film in stock """
     userID = current_user.get_id()
     json = request.get_json()
-    qry = text("""UPDATE FilmStock SET qty = :qty
-        WHERE userID = :userID
-        AND filmTypeID = :filmTypeID
-        AND filmSizeID = :filmSizeID""")
-    try:
-        connection.execute(qry,
-                           qty=json['data']['attributes']['qty'],
-                           userID=userID,
-                           filmTypeID=filmTypeID,
-                           filmSizeID=filmSizeID)
-    except IntegrityError:
-        return "FAILED", status.HTTP_409_CONFLICT
+    if json['action']:
+        if json['action'] == 'SetQTY':
+            qry = text("""UPDATE FilmStock SET qty = :qty
+                WHERE userID = :userID
+                AND filmTypeID = :filmTypeID
+                AND filmSizeID = :filmSizeID""")
+            try:
+                connection.execute(qry,
+                                   qty=json['data']['qty'],
+                                   userID=userID,
+                                   filmTypeID=filmTypeID,
+                                   filmSizeID=filmSizeID)
+            except IntegrityError:
+                return "FAILED", status.HTTP_409_CONFLICT
     resp = make_response(jsonify(json))
     resp.headers['Location'] = "/filmstock/" + str(filmTypeID) + "/" + str(filmSizeID)
     return resp, status.HTTP_200_OK

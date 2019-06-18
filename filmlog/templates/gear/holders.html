@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block scripts %}
-
 // Set the holder's state via an API call then call
 // function to update HTML
 function setHolderState(holderID, action){
@@ -11,9 +10,9 @@ function setHolderState(holderID, action){
   {
       "data" :
       {
-        "id": holderID,
-        "action" : action
-      }
+        "id": holderID
+      },
+      "action" : action
   }
 
   switch (action)
@@ -93,13 +92,13 @@ jQuery.ajax({
     success: function(data)
     {
       jQuery(data.data).each(function(i, holder){
-        var buttons = '';
-        $('#holdersTableBody').append($('<tr id="rowHolderID' + holder.id + '">'));
-        $('#holdersTableBody').append($('<td><a href="/gear/holders/' + holder.id + '">' + holder.name + '</a></td>'));
-        $('#holdersTableBody').append($('<td>' + holder.size + '</td>'));
-        $('#holdersTableBody').append($('<td>' + holder.film + '</td>'));
-        $('#holdersTableBody').append($('<td id="stateForHolderID' + holder.id + '">' + holder.state + '</td>'));
-        $('#holdersTableBody').append($('<td id="buttonsForHolderID' + holder.id + '"></td></tr>'));
+        var row = '<tr id="rowHolderID' + holder.id + '">';
+        row += '<td><a href="/gear/holders/' + holder.id + '">' + holder.name + '</a></td>';
+        row += '<td>' + holder.size + '</td>';
+        row += '<td>' + holder.film + '</td>';
+        row += '<td id="stateForHolderID' + holder.id + '">' + holder.state + '</td>';
+        row += '<td id="buttonsForHolderID' + holder.id + '"></td></tr>';
+        $('#holdersTableBody').append($(row));
         updateHolderState(holder.id, holder.state);
       });
     }
@@ -113,7 +112,7 @@ jQuery.ajax({
   <div class="col-10">
     <h1 class="page-header">Film Holders</h1>
     <table class="table table-striped table-bordered" id="holdersTable">
-      <thead>
+      <thead class="thead-light">
           <th>Name</th>
           <th>Size</th>
           <th>Film</th>
@@ -121,8 +120,6 @@ jQuery.ajax({
           <th>Command</th>
       </thead>
       <tbody id="holdersTableBody"></tbody>
-
-
     </table>
 
     <div class="card">

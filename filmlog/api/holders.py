@@ -46,15 +46,15 @@ def patch(connection, holderID):
     json = request.get_json()
 
     # Set holder states
-    if json['data']['action']:
-        if json['data']['action'] == 'Expose':
+    if json['action']:
+        if json['action'] == 'Expose':
             qry = text("""UPDATE Holders SET exposed = NOW()
                 WHERE userID = :userID AND holderID = :holderID""")
             try:
                 connection.execute(qry, userID=userID, holderID=holderID)
             except IntegrityError:
                 return "FAILED", status.HTTP_409_CONFLICT
-        if json['data']['action'] == 'Unload':
+        if json['action'] == 'Unload':
             qry = text("""UPDATE Holders
                 SET loaded = NULL, exposed = NULL, unloaded = NOW()
                 WHERE userID = :userID AND holderID = :holderID""")
@@ -62,7 +62,7 @@ def patch(connection, holderID):
                 connection.execute(qry, userID=userID, holderID=holderID)
             except IntegrityError:
                 return "FAILED", status.HTTP_409_CONFLICT
-        if json['data']['action'] == 'Reload':
+        if json['action'] == 'Reload':
             qry = text("""UPDATE Holders
                 SET loaded = NOW(), exposed = NULL, unloaded = NULL
                 WHERE userID = :userID AND holderID = :holderID""")

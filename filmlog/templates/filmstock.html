@@ -1,56 +1,76 @@
 {% extends "base.html" %}
 
-{% macro list_film(size, stock) %}
-  {% if stock|length > 0 %}
-    <h2>{{ size }}</h2>
-    <table class="table table-striped table-bordered" id="film_{{ size }}">
-          <tr>
-              <th>Film</th>
-              <th>ISO</th>
-              <th>Size</th>
-              {% if type == 'Miniature' or type == 'Small' or type == 'Medium' %}
-                <th>Rolls</th>
-              {% else %}
-                <th>Sheets</th>
-              {% endif %}
-              <th></th>
-          </tr>
-    {% for film in stock %}
-      <tr
-        {% if film.qty < 0 %}
-        class="filmStockNegative"
-        {% endif %}
-        {% if film.qty == 0 %}
-        class="filmStockZero"
-        {% endif %}
-      >
-        <td>{{ film.brand }} {{ film.type }}</td>
-        <td>{{ film.iso }}</td>
-        <td>{{ film.size }}</td>
-        <td>{{ film.qty }}</td>
-        <td class="text-right">
-          <form role="form" class="form-horizontal"
-            action="/filmstock"
-            method="POST">
-            {{ form.csrf_token }}
-            <button name="button" value="increment" action="submit" class="btn btn-sm btn-primary">Increment</button>
-            <button name="button" value="decrement" action="submit" class="btn btn-sm btn-danger">Decrement</button>
-            <input type="hidden" name="filmTypeID" value="{{ film.filmTypeID }}" >
-            <input type="hidden" name="filmSizeID" value="{{ film.filmSizeID }}" >
-          </form>
-        </td>
-      </tr>
-    {% endfor %}
-  </table>
-  {% endif %}
-{% endmacro %}
+{% block scripts %}
+// Make a call to pull a list of all the user's holders
+jQuery.ajax({
+    type: "GET",
+    url: "/api/v1/filmstock",
+    contentType: "application/json",
+    dataType: "json",
+    success: buildStocks
+});
+
+// Build out the film stocks to produce tables
+function buildStocks(data)
+{
+  var film35mm = [];
+  var filmMediumFormat = [];
+  var filmSheets = [];
+  var size;
+
+  // Split out film into groups by size
+  jQuery(data.data).each(function(i, stock){
+    size = stock.size;
+    if (size.startsWith("35mm"))
+      film35mm.push(stock);
+    else if (size == '120' || size == '220')
+      filmMediumFormat.push(stock);
+    else if (size == '4x5')
+      filmSheets.push(stock);
+  });
+
+  buildFilmStockTable('35mm', 'film35mm', film35mm);
+  buildFilmStockTable('Medium Format', 'filmMediumFormat', filmMediumFormat);
+  buildFilmStockTable('Sheets', 'filmSheets', filmSheets);
+}
+
+function buildFilmStockTable(title, div, stock)
+{
+  var filmType;
+  var tableID = "table" + div;
+  var tableBodyID = "tableBody" + div;
+
+  if(title == 'Sheets')
+    filmType = 'Sheets';
+  else
+    filmType = 'Rolls';
+
+  $('#' + div).append($('<h3>' + title + '</h3>'));
+  $('#' + div).append($('<table class="table table-striped table-bordered" id="' + tableID + '"></table>'));
+  $('#' + tableID).append($('<thead class="thead-light"><th>Film</th><th>ISO</th><th>Size</th><th>' + filmType + '</th></thead>'));
+  $('#' + tableID).append($('<tbody id="' + tableBodyID + '"></tbody>'));
+
+  jQuery(stock).each(function(i, item){
+    var row = '<tr>';
+      row += '<td>' + item.brand + ' ' + item.type + '</td>';
+      row += '<td>' + item.iso + '</td>';
+      row += '<td>' + item.size + '</td>';
+      row += '<td>' + item.qty + '</td>';
+      row += '</tr>';
+    $('#' + tableBodyID).append($(row));
+  });
+
+}
+
+
+{% endblock %}
 
 {% block content %}
   <h1 class="page-header">Film Stock</h1>
-    {{ list_film('35mm', stock_35mm) }}
-    {{ list_film('Medium Format', stock_mf) }}
-    {{ list_film('Sheet Film', stock_sheets) }}
-  
+  <div id="film35mm"></div>
+  <div id="filmMediumFormat"></div>
+  <div id="filmSheets"></div>
+
   <div class="card">
     <div class="card-header">Add Filmstock</div>
     <div class="card-body">
