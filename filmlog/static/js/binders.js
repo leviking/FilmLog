@@ -20,7 +20,12 @@ function addBinder() {
     data: JSON.stringify(binder),
     contentType: 'application/json',
     dataType: 'json',
-    success(data) { displayBinderRow(data.data); },
+    success(data) {
+      /* If we prviously had no binders, remove the no binders message */
+      if($('#bindersTableBody:contains(No Binders)'))
+        $('#bindersTableBody').html('');
+      displayBinderRow(data.data);
+    },
     statusCode: { 409() { alert('Binder already exists'); } },
   });
 }
@@ -36,6 +41,8 @@ function deleteBinder(binderID) {
     success() {
       const tr = `#rowBinderID${binderID}`;
       $(tr).remove();
+      if($('#bindersTableBody').length == 0);
+        $('#bindersTableBody').html('<tr><td colspan="4">No Binders Have Been Created Yet</td></tr>');
     },
     statusCode: { 403() { alert('Cannot delete binder with projects in it.'); } },
   });
@@ -48,7 +55,10 @@ jQuery.ajax({
   contentType: 'application/json',
   dataType: 'json',
   success(data) {
-    jQuery(data.data).each((i, binder) => { displayBinderRow(binder); });
+    if(data.data.length > 0)
+      jQuery(data.data).each((i, binder) => { displayBinderRow(binder); });
+    else
+      $('#bindersTableBody').html('<tr><td colspan="4">No Binders Have Been Created Yet</td></tr>');
   },
 });
 
