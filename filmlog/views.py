@@ -131,11 +131,6 @@ def auto_decrement_film_stock(connection, filmTypeID, filmSizeID):
                            filmSizeID=filmSizeID)
 
 ## Form Objects
-class BinderForm(FlaskForm):
-    """ Form for Binders. """
-    name = StringField('Name',
-                       validators=[DataRequired(), Length(min=1, max=64)])
-
 class ProjectForm(FlaskForm):
     """ Form for Projects. """
     name = StringField('Name',
@@ -259,30 +254,11 @@ def index():
     return render_template('public/index.html')
 
 # Binder List
-@app.route('/binders', methods=['POST', 'GET'])
+@app.route('/binders', methods=['GET'])
 @login_required
 def user_binders():
     """ List all the user's binders. """
-    connection = engine.connect()
-    transaction = connection.begin()
-    userID = current_user.get_id()
-    form = BinderForm()
-
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            nextBinderID = next_id(connection, 'binderID', 'Binders')
-            qry = text("""INSERT INTO Binders
-                (binderID, userID, name) VALUES (:binderID, :userID, :name)""")
-            insert(connection, qry,
-                   "Binder",
-                   binderID=nextBinderID,
-                   userID=userID,
-                   name=form.name.data)
-    qry = text("""SELECT binderID, name, projectCount, createdOn
-        FROM Binders WHERE userID = :userID""")
-    binders = connection.execute(qry, userID=userID).fetchall()
-    transaction.commit()
-    return render_template('binders.html', form=form, binders=binders)
+    return render_template('binders.html')
 
 # Project List
 @app.route('/binders/<int:binderID>/projects', methods=['POST', 'GET'])

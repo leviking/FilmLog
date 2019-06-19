@@ -27,7 +27,8 @@ def binders_all():
     transaction.commit()
     return return_status
 
-@api_blueprint.route('/binders/<int:binderID>', methods=['GET', 'PATCH', 'DELETE'])
+@api_blueprint.route('/binders/<int:binderID>',
+                     methods=['GET', 'POST', 'PATCH', 'DELETE'])
 @login_required
 def binder_details(binderID):
     """ Get binder details """
@@ -35,6 +36,8 @@ def binder_details(binderID):
     transaction = connection.begin()
     if request.method == 'GET':
         return_status = binders.get(connection, binderID)
+    elif request.method == 'POST':
+        return_status = binders.post(connection, binderID)
     elif request.method == 'PATCH':
         return_status = binders.patch(connection, binderID)
     elif request.method == 'DELETE':

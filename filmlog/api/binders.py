@@ -1,5 +1,6 @@
 """ Binder interactions for API """
-from flask import jsonify, request, make_response, url_for
+import datetime
+from flask import jsonify, request, make_response
 from flask_login import current_user
 from flask_api import status
 from sqlalchemy.sql import text
@@ -20,7 +21,6 @@ def get_all(connection):
     }
     for row in binders_query:
         binder = {
-            "type" : "binders",
             "id" : str(row['binderID']),
             "name" : row['name'],
             "project_count" : row['projectCount'],
@@ -40,17 +40,13 @@ def post(connection):
         connection.execute(qry,
                            binderID=nextBinderID,
                            userID=userID,
-                           name=json['data']['attributes']['name'])
+                           name=json['data']['name'])
     except IntegrityError:
         return "FAILED", status.HTTP_409_CONFLICT
-    location_url = url_for('api.binder_details', binderID=nextBinderID)
     json['data']['id'] = str(nextBinderID)
-    json['data']['attributes']['project_count'] = str(0)
-    json['data']['links'] = {
-        "self" : location_url
-    }
+    json['data']['project_count'] = str(0)
+    json['data']['created_on'] = datetime.datetime.now()
     resp = make_response(jsonify(json))
-    resp.headers['Location'] = location_url
     return resp, status.HTTP_201_CREATED
 
 ## Binder (Singular)
@@ -62,51 +58,15 @@ def get(connection, binderID):
     binder_query = connection.execute(qry,
                                       userID=userID,
                                       binderID=binderID).fetchone()
-    qry = text("""SELECT projectID, name, filmCount, createdOn FROM Projects
-        WHERE binderID = :binderID
-        AND userID = :userID
-        ORDER BY createdOn""")
-    projects_query = connection.execute(qry,
-                                        userID=userID,
-                                        binderID=binderID).fetchall()
-
     binder = {
         "data" : {
             "type" : "binders",
             "id" : str(binderID),
-            "attributes" : {
-                "name" : binder_query['name'],
-                "project_count" : binder_query['projectCount'],
-                "created_on" : binder_query['createdOn']
-            },
-            "links" : {
-                "self" : url_for("api.binder_details", binderID=binderID)
-            },
-            "relationships": {
-                "project": {
-                    "data" : []
-                    }
-                }
-            }
+            "name" : binder_query['name'],
+            "project_count" : binder_query['projectCount'],
+            "created_on" : binder_query['createdOn']
         }
-
-    for row in projects_query:
-        project = {
-            "type" : "project",
-            "id" : str(binderID) + ":" + str(row['projectID']),
-            "attributes" : {
-                "name" : row['name'],
-                "film_count" : row['filmCount'],
-                "created_on" : row['createdOn']
-            },
-            "links" : {
-                "self" : url_for('api.project_details',
-                                 binderID=binderID,
-                                 projectID=row['projectID'])
-            }
-        }
-        binder["data"]["relationships"]["project"]["data"].append(project)
-
+    }
     return jsonify(binder), status.HTTP_200_OK
 
 def patch(connection, binderID):
@@ -117,7 +77,7 @@ def patch(connection, binderID):
         WHERE userID = :userID AND binderID = :binderID""")
     try:
         connection.execute(qry,
-                           name=json['data']['attributes']['name'],
+                           name=json['data']['name'],
                            userID=userID,
                            binderID=binderID)
     except IntegrityError:
