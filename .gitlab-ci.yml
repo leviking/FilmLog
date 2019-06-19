@@ -9,7 +9,7 @@ variables:
 
 before_script:
     - apt-get update -y
-    - apt-get install -y python-pip python-dev build-essential mariadb-client libmariadbclient-dev-compat virtualenv nodejs
+    - apt-get install -y python-pip python-dev build-essential mariadb-client libmariadbclient-dev-compat virtualenv nodejs npm
     - virtualenv venv
     - source venv/bin/activate
     - pip install -r requirements.txt
