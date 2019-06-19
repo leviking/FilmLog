@@ -9,6 +9,38 @@ function displayBinderRow(binder) {
   $('#bindersTableBody').append($(row));
 }
 
+/* Manipulation functions */
+function addBinder() {
+  const name = $('#binderName').val();
+  const binder = { data: { name } };
+
+  jQuery.ajax({
+    type: 'POST',
+    url: '/api/v1/binders',
+    data: JSON.stringify(binder),
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) { displayBinderRow(data.data); },
+    statusCode: { 409() { alert('Binder already exists'); } },
+  });
+}
+
+// This function is used on the HTML side
+// eslint-disable-next-line no-unused-vars
+function deleteBinder(binderID) {
+  jQuery.ajax({
+    type: 'DELETE',
+    url: `/api/v1/binders/${binderID}`,
+    contentType: 'application/json',
+    dataType: 'json',
+    success() {
+      const tr = `#rowBinderID${binderID}`;
+      $(tr).remove();
+    },
+    statusCode: { 403() { alert('Cannot delete binder with projects in it.'); } },
+  });
+}
+
 /* Ajax and Events */
 jQuery.ajax({
   type: 'GET',
@@ -17,58 +49,12 @@ jQuery.ajax({
   dataType: 'json',
   success(data) {
     jQuery(data.data).each((i, binder) => { displayBinderRow(binder); });
-  }
+  },
 });
 
 // Add Binder on form submission
-$("form").on("submit", function (e)
-{
+$('form').on('submit', (e) => {
   e.preventDefault();
   addBinder();
-  $("#binderForm")[0].reset();
+  $('#binderForm')[0].reset();
 });
-
-/* Manipulation functions */
-function addBinder()
-{
-  var name = $('#binderName').val();
-  var binder =
-  {
-    "data" :
-    {
-      "name": name,
-    }
-  }
-
-  jQuery.ajax({
-    type: "POST",
-    url: "/api/v1/binders",
-    data: JSON.stringify(binder),
-    contentType: "application/json",
-    dataType: "json",
-    success: function(data) { displayBinderRow(data.data); },
-    statusCode:
-    {
-      409: function() { alert( 'Binder already exists' ); },
-    }
-  });
-}
-
-function deleteBinder(binderID)
-{
-  jQuery.ajax({
-    type: "DELETE",
-    url: "/api/v1/binders/" + binderID,
-    contentType: "application/json",
-    dataType: "json",
-    success: function(data)
-    {
-      var tr = '#rowBinderID' + binderID;
-      $(tr).remove();
-    },
-    statusCode:
-    {
-      403: function() { alert( 'Cannot delete binder with projects in it.' ); }
-    }
-  });
-}
