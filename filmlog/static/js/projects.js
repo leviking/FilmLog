@@ -18,13 +18,9 @@ jQuery.ajax({
   url: "/api/v1/binders/" + binderID + "/projects",
   contentType: "application/json",
   dataType: "json",
-  success: function(data)
-  {
-    jQuery(data.data).each(function(i, project){
-      console.log(project);
-      displayProjectRow(project);
-    });
-  }
+  success(data) {
+    jQuery(data.data).each((i, project) => { displayProjectRow(project); });
+  },
 });
 
 // Add Project on form submission
@@ -53,10 +49,12 @@ function addProject()
     data: JSON.stringify(project),
     contentType: "application/json",
     dataType: "json",
-    success: function(data) { displayProjectRow(data.data); },
+    success: function(data) {
+      displayProjectRow(data.data);
+    },
     statusCode:
     {
-      409: function() { alert( 'Binder already exists' ); },
+      409: function() { alert( 'Project already exists' ); },
     }
   });
 }
@@ -68,10 +66,8 @@ function deleteProject(projectID)
     url: "/api/v1/binders/" + binderID + "/projects/" + projectID,
     contentType: "application/json",
     dataType: "json",
-    success: function(data)
-    {
-      var tr = '#rowProjectID' + projectID;
-      console.log(tr);
+    success() {
+      const tr = `#rowProjectID${projectID}`;
       $(tr).remove();
     },
     statusCode:
