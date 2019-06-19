@@ -11,7 +11,7 @@
     <thead class="thead-light">
       <tr>
           <th>Name</th>
-          <th>Rolls / Sheets</th>
+          <th>Films</th>
           <th>Created On</th>
           <th></th>
       </tr>
@@ -20,21 +20,18 @@
   </table>
 
   <div class="card">
-    <div class="card-header">Add Project</div>
+    <div class="card-header"><strong>Add Project</strong></div>
     <div class="card-body">
-      {% include 'form_errors.html' %}
-      <form role="form" class="form-horizontal"
-        action="/binders/{{ binder.binderID }}/projects"
-        method="POST">
-        {{ form.csrf_token }}
+      <form method="post" action="#" id="projectForm">
         <div class="form-group">
-          <div class="col-sm-6">
-            {{ form.name.label }}
-            {{ form.name(size=48) }}
+          <div class="col-6">
+            <label for="binderName">Name</label>
+            <input type="text" class="form-control" id="projectName"
+                   maxlength="64" placeholder="My Cool Project">
           </div>
         </div>
         <div class="button-bar">
-          <button class="btn btn-success" action="submit">Save</button>
+          <button class="btn btn-success" type="submit">Save</button>
         </div>
       </form>
     </div>

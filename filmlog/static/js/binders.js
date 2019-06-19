@@ -13,6 +13,7 @@ jQuery.ajax({
   }
 });
 
+// Add Binder on form submission
 $("form").on("submit", function (e)
 {
   e.preventDefault();
@@ -21,25 +22,6 @@ $("form").on("submit", function (e)
 });
 
 /* Manipulation functions */
-function deleteBinder(binderID)
-{
-  jQuery.ajax({
-    type: "DELETE",
-    url: "/api/v1/binders/" + binderID,
-    contentType: "application/json",
-    dataType: "json",
-    success: function(data)
-    {
-      var tr = '#rowBinderID' + binderID;
-      $(tr).remove();
-    },
-    statusCode:
-    {
-      403: function() { alert( 'Cannot delete binder with projects in it.' ); }
-    }
-  });
-}
-
 function addBinder()
 {
   var name = $('#binderName').val();
@@ -63,7 +45,25 @@ function addBinder()
       409: function() { alert( 'Binder already exists' ); },
     }
   });
+}
 
+function deleteBinder(binderID)
+{
+  jQuery.ajax({
+    type: "DELETE",
+    url: "/api/v1/binders/" + binderID,
+    contentType: "application/json",
+    dataType: "json",
+    success: function(data)
+    {
+      var tr = '#rowBinderID' + binderID;
+      $(tr).remove();
+    },
+    statusCode:
+    {
+      403: function() { alert( 'Cannot delete binder with projects in it.' ); }
+    }
+  });
 }
 
 // Helper function to create binder rows in table

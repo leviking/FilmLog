@@ -27,7 +27,40 @@ jQuery.ajax({
   }
 });
 
+// Add Project on form submission
+$("form").on("submit", function (e)
+{
+  e.preventDefault();
+  addProject();
+  $("#projectForm")[0].reset();
+});
+
 /* Manipulation functions */
+function addProject()
+{
+  var name = $('#projectName').val();
+  var project =
+  {
+    "data" :
+    {
+      "name": name,
+    }
+  }
+
+  jQuery.ajax({
+    type: "POST",
+    url: "/api/v1/binders/" + binderID + "/projects",
+    data: JSON.stringify(project),
+    contentType: "application/json",
+    dataType: "json",
+    success: function(data) { displayProjectRow(data.data); },
+    statusCode:
+    {
+      409: function() { alert( 'Binder already exists' ); },
+    }
+  });
+}
+
 function deleteProject(projectID)
 {
   jQuery.ajax({

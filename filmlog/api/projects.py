@@ -1,5 +1,5 @@
 """ Project interactions for API """
-
+import datetime
 from flask import jsonify, request, make_response
 from flask_api import status
 from flask_login import current_user
@@ -73,11 +73,12 @@ def post(connection, binderID):
                            projectID=nextProjectID,
                            binderID=binderID,
                            userID=userID,
-                           name=json['data']['attributes']['name'])
+                           name=json['data']['name'])
     except IntegrityError:
         return "FAILED", status.HTTP_409_CONFLICT
-    json['id'] = str(binderID) + ":" + str(nextProjectID)
+    json['data']['id'] = str(nextProjectID)
     json['data']['film_count'] = str(0)
+    json['data']['created_on'] = datetime.datetime.now()
     resp = make_response(jsonify(json))
     return resp, status.HTTP_201_CREATED
 
