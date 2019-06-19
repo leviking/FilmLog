@@ -1,0 +1,31 @@
+{
+  "name": "filmlog",
+  "version": "1.0.0",
+  "description": "Mostly here for the linting",
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "tests"
+  },
+  "dependencies": {
+    "eslint": "^5.16.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/m00dawg/FilmLog.git"
+  },
+  "author": "Tim Soderstrom",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://gitlab.com/m00dawg/FilmLog/issues"
+  },
+  "homepage": "https://gitlab.com/m00dawg/FilmLog#README"
+}
