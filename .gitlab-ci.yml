@@ -7,6 +7,11 @@ variables:
     MYSQL_DATABASE: filmlogdev
     MYSQL_ROOT_PASSWORD: filmlogdevtestrunnerpassword
 
+cache:
+    paths:
+        - node_modules/
+        - venv/
+
 before_script:
     - apt-get update -y
     - apt-get install -y python-pip python-dev build-essential mariadb-client libmariadbclient-dev-compat virtualenv nodejs npm
