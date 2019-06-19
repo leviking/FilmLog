@@ -1,6 +1,6 @@
 """ Project interactions for API """
 
-from flask import jsonify, request, make_response, url_for
+from flask import jsonify, request, make_response
 from flask_api import status
 from flask_login import current_user
 from sqlalchemy.sql import text
@@ -24,21 +24,13 @@ def get_all(connection, binderID):
     }
     for row in projects_query:
         project = {
-            "type" : "projects",
-            "id" : str(binderID) + ":" + str(row['projectID']),
-            "attributes" : {
-                "name" : row['name'],
-                "film_count" : row['filmCount'],
-                "created_on" : row['createdOn'],
-                "composite_id" : {
-                    "binder_id" : str(binderID),
-                    "project_id": str(row['projectID']),
-                }
-            },
-            "links" : {
-                "self" : url_for("api.project_details",
-                                 binderID=binderID,
-                                 projectID=row['projectID'])
+            "id" : str(row['projectID']),
+            "name" : row['name'],
+            "film_count" : row['filmCount'],
+            "created_on" : row['createdOn'],
+            "composite_id" : {
+                "binder_id" : str(binderID),
+                "project_id": str(row['projectID']),
             }
         }
         projects['data'].append(project)
@@ -59,21 +51,11 @@ def get(connection, binderID, projectID):
     projects = {
         "data": {
             "type" : "projects",
-            "id" : str(binderID) + ":" + str(projectID),
-            "attributes" : {
-                "name" : projects_query['name'],
-                "film_count" : projects_query['filmCount'],
-                "created_on" : projects_query['createdOn'],
-                "composite_id" : {
-                    "binder_id" : str(binderID),
-                    "project_id": str(projectID),
-                }
-            },
-            "links" : {
-                "self" : url_for("api.project_details",
-                                 binderID=binderID,
-                                 projectID=projectID)
-            }
+            "id" : projectID,
+            "binderID" : binderID,
+            "name" : projects_query['name'],
+            "film_count" : projects_query['filmCount'],
+            "created_on" : projects_query['createdOn'],
         }
     }
     return jsonify(projects), status.HTTP_200_OK
@@ -94,14 +76,23 @@ def post(connection, binderID):
                            name=json['data']['attributes']['name'])
     except IntegrityError:
         return "FAILED", status.HTTP_409_CONFLICT
-    location_url = url_for('api.project_details',
-                           binderID=binderID,
-                           projectID=nextProjectID)
-    json['data']['id'] = str(binderID) + ":" + str(nextProjectID)
-    json['data']['attributes']['film_count'] = str(0)
-    json['data']['links'] = {
-        "self" : location_url
-    }
+    json['id'] = str(binderID) + ":" + str(nextProjectID)
+    json['data']['film_count'] = str(0)
     resp = make_response(jsonify(json))
-    resp.headers['Location'] = location_url
     return resp, status.HTTP_201_CREATED
+
+def delete(connection, binderID, projectID):
+    """ Delete a project """
+    userID = current_user.get_id()
+    qry = text("""DELETE FROM Projects
+        WHERE userID = :userID
+        AND binderID = :binderID
+        AND projectID = :projectID""")
+    try:
+        connection.execute(qry,
+                           userID=userID,
+                           binderID=binderID,
+                           projectID=projectID)
+    except IntegrityError:
+        return "FAILED", status.HTTP_403_FORBIDDEN
+    return "OK", status.HTTP_204_NO_CONTENT

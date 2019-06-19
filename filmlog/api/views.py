@@ -19,7 +19,6 @@ def binders_all():
     """ Get all binders """
     connection = engine.connect()
     transaction = connection.begin()
-    # userID = current_user.get_id()
     if request.method == 'GET':
         return_status = binders.get_all(connection)
     elif request.method == 'POST':
@@ -28,7 +27,7 @@ def binders_all():
     return return_status
 
 @api_blueprint.route('/binders/<int:binderID>',
-                     methods=['GET', 'POST', 'PATCH', 'DELETE'])
+                     methods=['GET', 'PATCH', 'DELETE'])
 @login_required
 def binder_details(binderID):
     """ Get binder details """
@@ -36,8 +35,6 @@ def binder_details(binderID):
     transaction = connection.begin()
     if request.method == 'GET':
         return_status = binders.get(connection, binderID)
-    elif request.method == 'POST':
-        return_status = binders.post(connection, binderID)
     elif request.method == 'PATCH':
         return_status = binders.patch(connection, binderID)
     elif request.method == 'DELETE':
@@ -54,13 +51,13 @@ def projects_all(binderID):
 
     if request.method == 'GET':
         return_status = projects.get_all(connection, binderID)
-    if request.method == 'POST':
+    elif request.method == 'POST':
         return_status = projects.post(connection, binderID)
     transaction.commit()
     return return_status
 
 @api_blueprint.route('/binders/<int:binderID>/projects/<int:projectID>',
-                     methods=['GET'])
+                     methods=['GET', 'DELETE'])
 @login_required
 def project_details(binderID, projectID):
     """ Get details of a project """
@@ -69,6 +66,8 @@ def project_details(binderID, projectID):
 
     if request.method == 'GET':
         return_status = projects.get(connection, binderID, projectID)
+    elif request.method == 'DELETE':
+        return_status = projects.delete(connection, binderID, projectID)
     transaction.commit()
     return return_status
 
@@ -97,7 +96,6 @@ def filmstock_details(filmTypeID, filmSizeID):
     if request.method == 'PATCH':
         return_status = filmstock.patch(connection, filmTypeID, filmSizeID)
     if request.method == 'DELETE':
-        print("DELETE")
         return_status = filmstock.delete(connection, filmTypeID, filmSizeID)
     transaction.commit()
     return return_status
