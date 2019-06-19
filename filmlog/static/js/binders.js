@@ -1,15 +1,22 @@
+// Helper function to create binder rows in table
+function displayBinderRow(binder) {
+  let row = `<tr id="rowBinderID${binder.id}">`;
+  row += `<td><a href="/binders/${binder.id}/projects">${binder.name}</a></td>`;
+  row += `<td>${binder.project_count}</td>`;
+  row += `<td>${binder.created_on}</td>`;
+  row += `<td><button class="btn btn-danger" name="button" value="Delete" \
+             onclick="deleteBinder(${binder.id})">Delete</button></td>`;
+  $('#bindersTableBody').append($(row));
+}
+
 /* Ajax and Events */
-// Make a call to pull a list of all the user's binders
 jQuery.ajax({
-  type: "GET",
-  url: "/api/v1/binders",
-  contentType: "application/json",
-  dataType: "json",
-  success: function(data)
-  {
-    jQuery(data.data).each(function(i, binder){
-      displayBinderRow(binder);
-    });
+  type: 'GET',
+  url: '/api/v1/binders',
+  contentType: 'application/json',
+  dataType: 'json',
+  success(data) {
+    jQuery(data.data).each((i, binder) => { displayBinderRow(binder); });
   }
 });
 
@@ -64,16 +71,4 @@ function deleteBinder(binderID)
       403: function() { alert( 'Cannot delete binder with projects in it.' ); }
     }
   });
-}
-
-// Helper function to create binder rows in table
-function displayBinderRow(binder)
-{
-  var row = '<tr id="rowBinderID' + binder.id + '">';
-  row += '<td><a href="/binders/' + binder.id + '/projects">' + binder.name + '</a></td>';
-  row += '<td>' + binder.project_count + '</td>';
-  row += '<td>' + binder.created_on + '</td>';
-  row += '<td><button class="btn btn-danger" name="button" value="Delete" \
-             onclick="deleteBinder(' + binder.id + ')">Delete</button></td>';
-  $('#bindersTableBody').append($(row));
 }
