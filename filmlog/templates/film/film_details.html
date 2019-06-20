@@ -17,8 +17,8 @@
   <div class="card-header border-0">Overview</div>
   <div class="card-body">
     <div class="row border-bottom py-2">
-      <div class="col-sm-2"><strong>Camera</strong></div>
-      <div class="col-sm-2">{{ film.camera }}</div>
+      <div class="col-md-2"><strong>Camera</strong></div>
+      <div class="col-md-2">{{ film.camera }}</div>
       <div class="col-md-2"><strong>File Date</strong></div>
       <div class="col-md-2">{{ film.fileDate|to_date }}</div>
       <div class="col-md-2"><strong>File No</strong></div>
@@ -43,8 +43,8 @@
     {% endif %}
 
     <div class="row border-bottom py-2">
-      <div class="col-sm-2"><strong>Loaded</strong></div>
-      <div class="col-sm-2">{{ film.loaded|to_date }}</div>
+      <div class="col-md-2"><strong>Loaded</strong></div>
+      <div class="col-md-2">{{ film.loaded|to_date }}</div>
       <div class="col-md-2"><strong>Unloaded</strong></div>
       <div class="col-md-2">{{ film.unloaded|to_date }}</div>
       <div class="col-md-2"><strong>Development</strong></div>
@@ -53,14 +53,15 @@
 
     {% if film.development %}
     <div class="row border-bottom py-2">
-      <div class="col-sm-2"><strong>Development</strong></div>
-      <div class="col-sm-10">{{ film.development }}</div>
+      <div class="col-md-2"><strong>Development</strong></div>
+      <div class="col-md-10">{{ film.development }}</div>
     </div>
     {% endif %}
   </div>
 </div>
 <br />
 <br />
+
 <div>
   {% if not print_view %}
     <ul class="nav nav-tabs">

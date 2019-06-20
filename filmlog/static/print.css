@@ -52,6 +52,20 @@ body, span, div, table, tr, tbody, tfoot, td, hr {
 
 /* Taken from https://gist.github.com/donnierayjones/6fd9802d992b2d8d6cfd */
 @media print {
+
+  .col-md-1 {width:8%;  float:left;}
+  .col-md-2 {width:16%; float:left;}
+  .col-md-3 {width:25%; float:left;}
+  .col-md-4 {width:33%; float:left;}
+  .col-md-5 {width:42%; float:left;}
+  .col-md-6 {width:50%; float:left;}
+  .col-md-7 {width:58%; float:left;}
+  .col-md-8 {width:66%; float:left;}
+  .col-md-9 {width:75%; float:left;}
+  .col-md-10{width:83%; float:left;}
+  .col-md-11{width:92%; float:left;}
+  .col-md-12{width:100%; float:left;}
+
   .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12 {
     float: left;
   }
