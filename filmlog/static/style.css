@@ -7,6 +7,26 @@ pre{
   word-wrap: break-word;
 }
 
+a{
+  color: #333399;
+}
+
+a:hover{
+  color: #2244ff;
+}
+
+/*
+a:active{
+  color: #ff0000;
+}
+*/
+
+.card-header{
+  border: 0px;
+  font-size: 1.25em;
+  font-weight: bold;
+}
+
 .notes{
   overflow-x: auto;
   white-space: pre-wrap;

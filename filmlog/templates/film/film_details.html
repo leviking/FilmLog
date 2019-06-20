@@ -13,47 +13,60 @@
   </h1>
 </div>
 
-  <div class="card">
-    <div class="card-header"><strong>Overview</strong></div>
-    <table class="table">
-      <tr>
-        <th>Camera</th><td>{{ film.camera }}</td>
-        <th>File Date</th><td>{{ film.fileDate|to_date }}</td>
-        <th>File No</th><td>{{ film.fileNo }}</td>
-      </tr>
-      {% if film.filmName %}
-        <tr>
-          <th>Film</th>
-          <td>
-            {% if film.filmName %}
-              {{ film.brand }} {{ film.filmName }}
-            {% else %}
-              Unknown
-            {% endif %}
-          </td>
-          <th>Size</th><td> {{ film.size }}</td>
-          <th>ISO</th><td>{{ film.filmISO }}, shot at {{ film.shotISO }}</td>
-        </tr>
-      {% endif %}
-      <tr>
-        <th>Loaded</th><td>{{ film.loaded|to_date }}</td>
-        <th>Unloaded</th><td>{{ film.unloaded|to_date }}</td>
-        <th>Developed</th><td>{{ film.developed|to_date }}</td>
-      </tr>
-      {% if film.development %}
-        <tr>
-          <th>Development</th><td colspan="5">{{ film.development }}</td>
-        </tr>
-      {% endif %}
-    </table>
-  </div>
-  <br />
-  <div>
-    {% if not print_view %}
-      <ul class="nav nav-tabs">
-        <li class="nav-item"><a class="nav-link {% if view =='exposures' %} active {% endif %} " href="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}">Exposures</a></li>
-        <li class="nav-item"><a class="nav-link {% if view == 'prints' %} active {% endif %}" href="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}/prints">Darkroom Prints</a></li>
-        <li class="nav-item"><a class="nav-link {% if view == 'contactsheet' %} active {% endif %}" href="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}/contactsheet">Contact Sheet</a></li>
-      </ul>
+<div class="card border-0">
+  <div class="card-header border-0">Overview</div>
+  <div class="card-body">
+    <div class="row border-bottom py-2">
+      <div class="col-sm-2"><strong>Camera</strong></div>
+      <div class="col-sm-2">{{ film.camera }}</div>
+      <div class="col-md-2"><strong>File Date</strong></div>
+      <div class="col-md-2">{{ film.fileDate|to_date }}</div>
+      <div class="col-md-2"><strong>File No</strong></div>
+      <div class="col-md-2">{{ film.fileNo }}</div>
+    </div>
+
+    {% if film.filmName %}
+      <div class="row border-bottom py-2">
+        <div class="col-md-2"><strong>Film</strong></div>
+        <div class="col-md-2">
+          {% if film.filmName %}
+            {{ film.brand }} {{ film.filmName }}
+          {% else %}
+            Unknown
+          {% endif %}
+        </div>
+        <div class="col-md-2"><strong>Size</strong></div>
+        <div class="col-md-2">{{ film.size }}</div>
+        <div class="col-md-2"><strong>ISO</strong></div>
+        <div class="col-md-2">{{ film.filmISO }}, shot at {{ film.shotISO }}</div>
+      </div>
+    {% endif %}
+
+    <div class="row border-bottom py-2">
+      <div class="col-sm-2"><strong>Loaded</strong></div>
+      <div class="col-sm-2">{{ film.loaded|to_date }}</div>
+      <div class="col-md-2"><strong>Unloaded</strong></div>
+      <div class="col-md-2">{{ film.unloaded|to_date }}</div>
+      <div class="col-md-2"><strong>Development</strong></div>
+      <div class="col-md-2">{{ film.developed|to_date }}</div>
+    </div>
+
+    {% if film.development %}
+    <div class="row border-bottom py-2">
+      <div class="col-sm-2"><strong>Development</strong></div>
+      <div class="col-sm-10">{{ film.development }}</div>
+    </div>
     {% endif %}
   </div>
+</div>
+<br />
+<br />
+<div>
+  {% if not print_view %}
+    <ul class="nav nav-tabs">
+      <li class="nav-item"><a class="nav-link {% if view =='exposures' %} active {% endif %} " href="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}">Exposures</a></li>
+      <li class="nav-item"><a class="nav-link {% if view == 'prints' %} active {% endif %}" href="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}/prints">Darkroom Prints</a></li>
+      <li class="nav-item"><a class="nav-link {% if view == 'contactsheet' %} active {% endif %}" href="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}/contactsheet">Contact Sheet</a></li>
+    </ul>
+  {% endif %}
+</div>

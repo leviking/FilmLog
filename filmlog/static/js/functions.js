@@ -14,3 +14,9 @@ function showAlert(strong, message, color) {
   $('#alert').delay(2000).fadeOut(2000);
   $('#alert').show();
 }
+
+function formatDate(date)
+{
+  const newDate = new Date(date);
+  return $.datepicker.formatDate('yy-mm-dd', newDate);
+}

@@ -1,9 +1,11 @@
 // Helper function to create binder rows in table
 function displayBinderRow(binder) {
+  const created_on = formatDate(binder.created_on);
+
   let row = `<tr id="rowBinderID${binder.id}">`;
   row += `<td><a href="/binders/${binder.id}/projects">${binder.name}</a></td>`;
   row += `<td>${binder.project_count}</td>`;
-  row += `<td>${binder.created_on}</td>`;
+  row += `<td>${created_on}</td>`;
   row += `<td><button class="btn btn-danger" name="button" value="Delete" \
              onclick="deleteBinder(${binder.id})">Delete</button></td>`;
   $('#bindersTableBody').append($(row));
