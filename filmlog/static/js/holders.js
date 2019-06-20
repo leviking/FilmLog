@@ -4,7 +4,7 @@ function updateHolderButtons(holderID, state) {
   let buttons = ' ';
   if (state === 'Loaded') {
     buttons += `<button class="btn btn-dark" name="button" value="Expose" \
-                onclick="setHolderState('${holderID}', 'Expose')">Expose</button>`;
+                onclick="setHolderState('${holderID}', 'Expose')">Expose</button> `;
   }
   if (state === 'Loaded' || state === 'Exposed') {
     buttons += `<button class="btn btn-secondary" name="button" value="Unload" \
