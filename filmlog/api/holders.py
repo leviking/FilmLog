@@ -5,6 +5,8 @@ from flask_api import status
 from sqlalchemy.sql import text
 from sqlalchemy.exc import IntegrityError
 
+from filmlog.functions import next_id
+
 ## Holders Stock
 def get_all(connection):
     """ Get all user's holders """
@@ -38,6 +40,26 @@ def get_all(connection):
         }
         holders_json["data"].append(item)
     return jsonify(holders_json), status.HTTP_200_OK
+
+def post(connection):
+    """ Add holder """
+    userID = current_user.get_id()
+    json = request.get_json()
+    nextHolderID = next_id(connection, 'holderID', 'Holders')
+    qry = text("""INSERT INTO Holders (userID, holderID, name, size, notes)
+        VALUES (:userID, :holderID, :name, :size, :notes)""")
+    try:
+        connection.execute(qry,
+                           userID=userID,
+                           holderID=nextHolderID,
+                           name=json['data']['name'],
+                           size=json['data']['size'],
+                           notes=json['data']['notes'])
+    except IntegrityError:
+        return "FAILED", status.HTTP_409_CONFLICT
+    json['data']['id'] = str(nextHolderID)
+    resp = make_response(jsonify(json))
+    return resp, status.HTTP_201_CREATED
 
 def patch(connection, holderID):
     """ Update holder """

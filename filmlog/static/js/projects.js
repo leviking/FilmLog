@@ -20,6 +20,11 @@ function addProject() {
   const name = $('#projectName').val();
   const project = { data: { name } };
 
+  if (!$('#projectName').val()) {
+    showAlert('Cannot Add Project', 'It needs a name.', 'danger');
+    return;
+  }
+
   jQuery.ajax({
     type: 'POST',
     url: `/api/v1/binders/${binderID}/projects`,
@@ -29,6 +34,7 @@ function addProject() {
     success(data) { displayProjectRow(data.data); },
     statusCode: { 409() { showAlert('Cannot Add Project', 'It already exists.', 'warning'); } },
   });
+  $('#projectForm')[0].reset();
 }
 
 // This function is used on the HTML side
@@ -72,5 +78,4 @@ jQuery.ajax({
 $('form').on('submit', (e) => {
   e.preventDefault();
   addProject();
-  $('#projectForm')[0].reset();
 });

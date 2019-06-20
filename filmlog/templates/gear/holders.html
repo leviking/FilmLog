@@ -25,27 +25,29 @@
     <div class="card">
       <div class="card-header">Add Film Holder</div>
       <div class="card-body">
-        {{ form_errors(form) }}
-        <form role="form" class="form-horizontal"
-          action="/gear/holders"
-          method="POST">
-          {{ form.csrf_token }}
+        <form method="post" action="#" id="holderForm">
           <div class="form-group">
             <div class="col-sm-6">
-              {{ form.name.label }}
-              {{ form.name(class="form-control") }}
+              <label for="holderName">Name</label>
+              <input type="text" class="form-control" id="holderName"
+                     maxlength="64" placeholder="Holder 1" />
             </div>
             <div class="col-sm-6">
-              {{ form.size.label }}
-              {{ form.size(class="form-control") }}
+              <label for="holderSize">Size</label>
+              <select name="size" class="form-control" id="holderSize">
+                <option value="4x5">4x5</option>
+                <option value="5x7">5x7</option>
+                <option value="8x10">8x10</option>
+                <option value="11x14">11x14</option>
+              </select>
             </div>
             <div class="col-sm-12">
-              {{ form.notes.label }}
-              {{ form.notes(class="form-control") }}
+              <label for="holderNotes">Notes</label>
+              <textarea class="form-control" id="holderNotes" rows="4" columns="40"></textarea>
             </div>
           </div>
           <div class="button-bar">
-            <button class="btn btn-success" name="button" value="addHolder" action="submit">Add</button>
+            <button class="btn btn-success" type="submit">Add</button>
           </div>
         </form>
       </div>

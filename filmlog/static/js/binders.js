@@ -14,6 +14,11 @@ function addBinder() {
   const name = $('#binderName').val();
   const binder = { data: { name } };
 
+  if (!$('#binderName').val()) {
+    showAlert('Cannot Add Binder', 'It needs a name.', 'danger');
+    return;
+  }
+
   jQuery.ajax({
     type: 'POST',
     url: '/api/v1/binders',
@@ -22,6 +27,7 @@ function addBinder() {
     dataType: 'json',
     success(data) {
       displayBinderRow(data.data);
+      $('#binderForm')[0].reset();
     },
     statusCode: { 409() { showAlert('Cannot Add Binder', 'It already exists', 'danger'); } },
   });
@@ -59,5 +65,4 @@ jQuery.ajax({
 $('form').on('submit', (e) => {
   e.preventDefault();
   addBinder();
-  $('#binderForm')[0].reset();
 });

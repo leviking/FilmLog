@@ -81,21 +81,66 @@ function setHolderState(holderID, action) {
 }
 
 // Make a call to pull a list of all the user's holders
-jQuery.ajax({
-  type: 'GET',
-  url: '/api/v1/holders',
-  contentType: 'application/json',
-  dataType: 'json',
-  success(data) {
-    jQuery(data.data).each((i, holder) => {
-      let row = `<tr id="rowHolderID${holder.id}">`;
-      row += `<td><a href="/gear/holders/${holder.id}">${holder.name}</a></td>`;
-      row += `<td>${holder.size}</td>`;
-      row += `<td>${holder.film}</td>`;
-      row += `<td id="stateForHolderID${holder.id}">${holder.state}</td>`;
-      row += `<td id="buttonsForHolderID${holder.id}"></td></tr>`;
-      $('#holdersTableBody').append($(row));
-      updateHolderState(holder.id, holder.state);
-    });
-  },
+function getHolders() {
+  $('#holdersTableBody').empty();
+  jQuery.ajax({
+    type: 'GET',
+    url: '/api/v1/holders',
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      jQuery(data.data).each((i, holder) => {
+        let film = '';
+        if (holder.film) {
+          ({ film } = holder);
+        }
+        let row = `<tr id="rowHolderID${holder.id}">`;
+        row += `<td><a href="/gear/holders/${holder.id}">${holder.name}</a></td>`;
+        row += `<td>${holder.size}</td>`;
+        row += `<td>${film}</td>`;
+        row += `<td id="stateForHolderID${holder.id}">${holder.state}</td>`;
+        row += `<td id="buttonsForHolderID${holder.id}"></td></tr>`;
+        $('#holdersTableBody').append($(row));
+        updateHolderState(holder.id, holder.state);
+      });
+    },
+  });
+}
+
+function addHolder() {
+  const holder = {
+    data: {
+      name: $('#holderName').val(),
+      size: $('#holderSize').val(),
+      notes: $('#holderNotes').val(),
+    },
+  };
+
+  // Form validation
+  if (!$('#holderName').val()) {
+    showAlert('Cannot Add Holder', 'It needs a name', 'danger');
+    return;
+  }
+
+  jQuery.ajax({
+    type: 'POST',
+    url: '/api/v1/holders',
+    data: JSON.stringify(holder),
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      // We re-generate the table so it sorts properly
+      getHolders(data.data);
+      $('#holderForm')[0].reset();
+    },
+    statusCode: { 409() { showAlert('Cannot Add Holder', 'It already exists', 'danger'); } },
+  });
+}
+
+$(document).ready(() => { getHolders(); });
+
+// Add Holder on form submission
+$('form').on('submit', (e) => {
+  e.preventDefault();
+  addHolder();
 });

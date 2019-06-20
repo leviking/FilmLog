@@ -101,7 +101,7 @@ def filmstock_details(filmTypeID, filmSizeID):
     return return_status
 
 # Holders
-@api_blueprint.route('/holders', methods=['GET'])
+@api_blueprint.route('/holders', methods=['GET', 'POST'])
 @login_required
 def holders_all():
     """ Get all user's holders filmstock information """
@@ -110,6 +110,8 @@ def holders_all():
 
     if request.method == 'GET':
         return_status = holders.get_all(connection)
+    if request.method == 'POST':
+        return_status = holders.post(connection)
     transaction.commit()
     return return_status
 
