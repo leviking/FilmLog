@@ -13,7 +13,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="/static/bootstrap/4.1.0/css/bootstrap.min.css" rel="stylesheet" media="all">
+<link href="/static/include/bootstrap/4.1.0/css/bootstrap.min.css" rel="stylesheet" media="all">
 <link href="/static/style.css" rel="stylesheet" media="all">
 </head>
 
@@ -87,7 +87,6 @@
   {% block container %}
     <div class="col-md-10 main">
       <div id="content">
-          <span id="alertBox"></span>
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             <br />
@@ -110,13 +109,15 @@
   {% endblock %}
 </div>
 
+<div id="alert"></div>
 
 </body>
 {% endblock %}
 
-<script src="/static/jquery-3.3.1.min.js"></script>
-<script src="/static/popper.min.js"></script>
-<script src="/static/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="/static/include/jquery-3.3.1.min.js"></script>
+<script src="/static/include/popper.min.js"></script>
+<script src="/static/include/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="/static/js/functions.js"></script>
 
 {% block scripts %}
 {% endblock %}

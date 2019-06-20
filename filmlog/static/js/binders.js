@@ -23,7 +23,7 @@ function addBinder() {
     success(data) {
       displayBinderRow(data.data);
     },
-    statusCode: { 409() { alert('Binder already exists'); } },
+    statusCode: { 409() { showAlert('Cannot Add Binder', 'It already exists', 'danger'); } },
   });
 }
 
@@ -39,7 +39,8 @@ function deleteBinder(binderID) {
       const tr = `#rowBinderID${binderID}`;
       $(tr).remove();
     },
-    statusCode: { 403() { alert('Cannot delete binder with projects in it.'); } },
+    // eslint-disable-next-line no-unused-vars
+    statusCode: { 403() { showAlert('Cannot Remove Binder', 'Binder has projects in it.', 'warning'); } },
   });
 }
 

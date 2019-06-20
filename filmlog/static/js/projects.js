@@ -27,7 +27,7 @@ function addProject() {
     contentType: 'application/json',
     dataType: 'json',
     success(data) { displayProjectRow(data.data); },
-    statusCode: { 409() { alert('Project already exists'); } },
+    statusCode: { 409() { showAlert('Cannot Add Project', 'It already exists.', 'warning'); } },
   });
 }
 
@@ -43,7 +43,7 @@ function deleteProject(projectID) {
       const tr = `#rowProjectID${projectID}`;
       $(tr).remove();
     },
-    statusCode: { 403() { alert('Cannot delete project with films in it.'); } },
+    statusCode: { 403() { showAlert('Cannot Delete Project', 'It has films in it.', 'danger'); } },
   });
 }
 
