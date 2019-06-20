@@ -9,4 +9,8 @@ globals:
 parserOptions:
   ecmaVersion: 2018
   sourceType: module
-rules: {}
+rules: {
+    "no-restricted-globals": ["error", "event", "fdescribe"],
+    # I really don't like that style
+    # "nonblock-statement-body-position": "off"
+}

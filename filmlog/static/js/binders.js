@@ -22,7 +22,6 @@ function addBinder() {
     dataType: 'json',
     success(data) {
       displayBinderRow(data.data);
-      console.log($('#bindersTableBody tr').length);
     },
     statusCode: { 409() { alert('Binder already exists'); } },
   });
@@ -52,7 +51,6 @@ jQuery.ajax({
   dataType: 'json',
   success(data) {
     jQuery(data.data).each((i, binder) => { displayBinderRow(binder); });
-
   },
 });
 

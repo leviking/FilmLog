@@ -87,6 +87,7 @@
   {% block container %}
     <div class="col-md-10 main">
       <div id="content">
+          <span id="alertBox"></span>
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             <br />
