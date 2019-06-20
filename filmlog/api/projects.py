@@ -29,8 +29,8 @@ def get_all(connection, binderID):
             "film_count" : row['filmCount'],
             "created_on" : row['createdOn'],
             "composite_id" : {
-                "binder_id" : str(binderID),
-                "project_id": str(row['projectID']),
+                "binder_id" : binderID,
+                "project_id": row['projectID'],
             }
         }
         projects['data'].append(project)

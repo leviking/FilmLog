@@ -15,8 +15,7 @@ function showAlert(strong, message, color) {
   $('#alert').show();
 }
 
-function formatDate(date)
-{
+function formatDate(date) {
   const newDate = new Date(date);
   return $.datepicker.formatDate('yy-mm-dd', newDate);
 }

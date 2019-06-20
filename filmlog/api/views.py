@@ -3,7 +3,8 @@ from flask_login import login_required
 from flask import request
 
 # Filmlog
-from filmlog.api import api_blueprint, binders, projects, filmstock, holders
+from filmlog.api import api_blueprint, binders, projects, filmstock, holders, \
+                        films
 from filmlog.config import engine
 
 # http://jsonapi.org/format/
@@ -68,6 +69,32 @@ def project_details(binderID, projectID):
         return_status = projects.get(connection, binderID, projectID)
     elif request.method == 'DELETE':
         return_status = projects.delete(connection, binderID, projectID)
+    transaction.commit()
+    return return_status
+
+@api_blueprint.route('/binders/<int:binderID>/projects/<int:projectID>/films',
+                     methods=['GET', 'DELETE'])
+@login_required
+def films_all(binderID, projectID):
+    """ Get details of a project """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = films.get_all(connection, binderID, projectID)
+    transaction.commit()
+    return return_status
+
+@api_blueprint.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>',
+                     methods=['GET', 'DELETE'])
+@login_required
+def film_details(binderID, projectID, filmID):
+    """ Get details of a film """
+    connection = engine.connect()
+    transaction = connection.begin()
+    #if request.method == 'GET':
+    #    return_status = films.get_all(connection, binderID, projectID)
+    if request.method == 'DELETE':
+        return_status = films.delete(connection, filmID)
     transaction.commit()
     return return_status
 

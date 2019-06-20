@@ -5,17 +5,16 @@ const binderID = currentURL.split('/')[4];
 /* Helper Functions */
 // Helper function to create project rows in table
 function displayProjectRow(project) {
-  const created_on = formatDate(project.created_on);
+  const createdOn = formatDate(project.created_on);
 
   let row = `<tr id="rowProjectID${project.id}">`;
   row += `<td><a href="/binders/${binderID}/projects/${project.id}">${project.name}</a></td>`;
   row += `<td>${project.film_count}</td>`;
-  row += `<td>${created_on}</td>`;
+  row += `<td>${createdOn}</td>`;
   row += `<td><button class="btn btn-danger" name="button" value="Delete" \
              onclick="deleteProject(${project.id})">Delete</button></td>`;
   $('#projectsTableBody').append($(row));
 }
-
 
 /* Manipulation functions */
 function addProject() {
