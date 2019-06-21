@@ -81,7 +81,7 @@ function addFilm() {
       getFilms(data.data);
       $('#filmForm')[0].reset();
     },
-    statusCode: { 409() { showAlert('Cannot Add Film', 'It already exists', 'danger'); } },
+    statusCode: { 409() { showAlert('Cannot Add Film', 'It already exists', 'warning'); } },
   });
 }
 

@@ -7,6 +7,29 @@ from sqlalchemy.exc import IntegrityError
 
 from filmlog.functions import next_id, zero_to_none
 
+## Helper Functions
+def auto_decrement_film_stock(connection, filmTypeID, filmSizeID):
+    """ Blindly Decrement Film Stock. If the film does not exist, the UPDATE
+        won't do anything. This is currently by design since if a user isn't
+        tracking a particular film, no sense in cluttering up the Film Stock.
+        We only want to decrement films that are being tracked. """
+    userID = current_user.get_id()
+    qry = text("""SELECT 1 FROM UserPreferences
+        WHERE userID = :userID
+        AND autoUpdateFilmStock = 'Yes'""")
+    result = connection.execute(qry,
+                                userID=userID).fetchone()
+    if result:
+        qry = text("""UPDATE FilmStock SET qty = qty - 1
+            WHERE userID = :userID
+            AND filmTypeID = :filmTypeID
+            AND filmSizeID = :filmSizeID""")
+        connection.execute(qry,
+                           userID=userID,
+                           filmTypeID=filmTypeID,
+                           filmSizeID=filmSizeID)
+
+
 ## Films
 def get_all(connection, binderID, projectID):
     """ Get all films """
@@ -52,20 +75,23 @@ def post(connection, projectID):
     json = request.get_json()
     nextFilmID = next_id(connection, 'filmID', 'Films')
 
+    filmTypeID = zero_to_none(json['data']['filmTypeID'])
+    filmSizeID = json['data']['filmSizeID']
+
     qry = text("""INSERT INTO Films (userID, filmID, projectID, cameraID,
         filmTypeID, filmSizeID, iso, fileDate, loaded,
         unloaded, developed, fileNo, title, development, notes)
         VALUES (:userID, :filmID, :projectID, :cameraID,
             :filmTypeID, :filmSizeID, :iso, :fileDate, :loaded,
-            :unloaded, :developed, :fileNo, :title, :development, :notes)""")
+            :unloaded, :developed, UPPER(:fileNo), :title, :development, :notes)""")
     try:
         connection.execute(qry,
                            userID=userID,
                            filmID=nextFilmID,
                            projectID=projectID,
                            cameraID=zero_to_none(json['data']['cameraID']),
-                           filmTypeID=zero_to_none(json['data']['filmTypeID']),
-                           filmSizeID=json['data']['filmSizeID'],
+                           filmTypeID=filmTypeID,
+                           filmSizeID=filmSizeID,
                            iso=json['data']['shotISO'],
                            fileDate=json['data']['fileDate'],
                            loaded=json['data']['loaded'],
@@ -77,6 +103,18 @@ def post(connection, projectID):
                            notes=json['data']['notes'])
     except IntegrityError:
         return "FAILED", status.HTTP_409_CONFLICT
+
+    # Decrement the logged film from the film stock if the film
+    # type was provided and it is a roll film.
+    # If it's sheet film, we decrement only when need sheets
+    # are added.
+    qry = text("""SELECT 1 FROM FilmSizes
+        WHERE filmSizeID = :filmSizeID
+        AND format = 'Roll'""")
+    film_format = connection.execute(qry, filmSizeID=filmSizeID).fetchone()
+    if film_format and filmTypeID:
+        auto_decrement_film_stock(connection, filmTypeID, filmSizeID)
+
     json['data']['id'] = str(nextFilmID)
     resp = make_response(jsonify(json))
     return resp, status.HTTP_201_CREATED

@@ -15,7 +15,7 @@ from wtforms.validators import DataRequired, Optional, Length, NumberRange
 
 # Filmlog
 from filmlog import config
-from filmlog.functions import next_id, result_to_dict, get_film_details, \
+from filmlog.functions import result_to_dict, get_film_details, \
     optional_choices, zero_to_none, get_film_types, get_film_sizes, \
     insert
 from filmlog.classes import MultiCheckboxField
@@ -261,140 +261,22 @@ def user_binders():
     return render_template('binders.html')
 
 # Project List
-@app.route('/binders/<int:binderID>/projects', methods=['POST', 'GET'])
+@app.route('/binders/<int:binderID>/projects', methods=['GET'])
 @login_required
+# pylint: disable=unused-argument
+# Sort of required for pathing otherwise it throws errors
 def user_projects(binderID):
     """ List out the projects from the binder (for the logged in user). """
-    connection = engine.connect()
-    transaction = connection.begin()
-    userID = current_user.get_id()
-    form = ProjectForm()
-
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            nextProjectID = next_id(connection, 'projectID', 'Projects')
-            qry = text("""INSERT INTO Projects
-                (projectID, binderID, userID, name)
-                VALUES (:projectID, :binderID, :userID, :name)""")
-            insert(connection, qry, "Project",
-                   projectID=nextProjectID,
-                   binderID=binderID,
-                   userID=userID,
-                   name=form.name.data)
-
-    qry = text("""SELECT binderID, name, projectCount, createdOn
-        FROM Binders WHERE userID = :userID
-        AND binderID = :binderID""")
-    binder = connection.execute(qry,
-                                binderID=binderID,
-                                userID=userID).fetchone()
-
-    qry = text("""SELECT projectID, name, filmCount, createdOn FROM Projects
-        WHERE binderID = :binderID
-        AND userID = :userID
-        ORDER BY createdOn""")
-    projects = connection.execute(qry,
-                                  binderID=binderID,
-                                  userID=userID).fetchall()
-    transaction.commit()
-    return render_template('projects.html',
-                           form=form,
-                           binder=binder,
-                           binderID=binderID,
-                           projects=projects)
+    return render_template('projects.html')
 
 # Project Films List
 @app.route('/binders/<int:binderID>/projects/<int:projectID>', methods=['POST', 'GET'])
 @login_required
+# pylint: disable=unused-argument
+# Sort of required for pathing otherwise it throws errors
 def user_project(binderID, projectID):
-    """ List the films in the user's project. Films here means rolls or sheets.
-        In the case of sheets, the "film" is a bit of an arbitrary grouping.
-        For 4x5 it can be aligned with 4 sheets per film, as this fits with
-        the size of a PrintFile, though this is up to the user ultimately. """
-    connection = engine.connect()
-    transaction = connection.begin()
-    userID = current_user.get_id()
-    form = FilmForm()
-    form.populate_select_fields(connection)
-
-    qry = text("""SELECT projectID, Projects.name AS name
-        FROM Projects
-        JOIN Binders ON Binders.binderID = Projects.binderID
-            AND Binders.userID = Projects.userID
-        WHERE projectID = :projectID
-        AND Projects.binderID = :binderID
-        AND Projects.userID = :userID""")
-    project = connection.execute(qry,
-                                 projectID=projectID,
-                                 binderID=binderID,
-                                 userID=userID).fetchone()
-    if project is None:
-        abort(404)
-
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            filmTypeID = zero_to_none(form.filmTypeID.data)
-            filmSizeID = form.filmSizeID.data
-
-            nextFilmID = next_id(connection, 'filmID', 'Films')
-            qry = text("""INSERT INTO Films
-                (userID, filmID, projectID, cameraID, title, fileNo, fileDate,
-                filmTypeID, filmSizeID, iso, loaded, unloaded, developed,
-                development, notes)
-                VALUES (:userID, :filmID, :projectID, :cameraID, :title,
-                        UPPER(:fileNo), :fileDate, :filmTypeID, :filmSizeID,
-                        :iso, :loaded, :unloaded,
-                        :developed, :development, :notes)""")
-            insert(connection, qry, "Film",
-                   userID=userID,
-                   filmID=nextFilmID,
-                   projectID=projectID,
-                   cameraID=form.cameraID.data,
-                   title=form.title.data,
-                   fileNo=form.fileNo.data,
-                   fileDate=form.fileDate.data,
-                   filmTypeID=filmTypeID,
-                   filmSizeID=filmSizeID,
-                   iso=zero_to_none(form.shotISO.data),
-                   loaded=form.loaded.data,
-                   unloaded=form.unloaded.data,
-                   developed=form.developed.data,
-                   development=form.development.data,
-                   notes=form.notes.data)
-
-            # Decrement the logged film from the film stock if the film
-            # type was provided and it is a roll film.
-            # If it's sheet film, we decrement only when need sheets
-            # are added.
-            qry = text("""SELECT 1 FROM FilmSizes
-                WHERE filmSizeID = :filmSizeID
-                AND format = 'Roll'""")
-            film_format = connection.execute(qry, filmSizeID=form.filmSizeID.data).fetchone()
-            if film_format and filmTypeID:
-                auto_decrement_film_stock(connection, filmTypeID, filmSizeID)
-
-    qry = text("""SELECT filmID, title, fileNo, fileDate,
-        Films.iso AS iso, brand, FilmTypes.name AS filmName,
-        FilmSizes.size AS size, exposures,
-        Cameras.name AS camera
-        FROM Films
-        LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
-        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
-        JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
-        JOIN Cameras ON Cameras.cameraID = Films.cameraID
-            AND Cameras.userID = Films.userID
-        WHERE projectID = :projectID AND Films.userID = :userID ORDER BY fileDate""")
-    films = connection.execute(qry,
-                               projectID=projectID,
-                               userID=userID).fetchall()
-    transaction.commit()
-
-    return render_template('project.html',
-                           form=form,
-                           binderID=binderID,
-                           projectID=projectID,
-                           project=project,
-                           films=films)
+    """ List out the films within the project for the logged in user """
+    return render_template('project.html')
 
 # Film Exposures
 @app.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>',
