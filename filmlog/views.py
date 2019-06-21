@@ -131,11 +131,6 @@ def auto_decrement_film_stock(connection, filmTypeID, filmSizeID):
                            filmSizeID=filmSizeID)
 
 ## Form Objects
-class ProjectForm(FlaskForm):
-    """ Form for Projects. """
-    name = StringField('Name',
-                       validators=[DataRequired(), Length(min=1, max=64)])
-
 class FilmForm(FlaskForm):
     """ Form for user films. """
     title = StringField('Title',
@@ -170,6 +165,7 @@ class FilmForm(FlaskForm):
         self.filmTypeID.choices = optional_choices("None", get_film_types(connection))
         self.filmSizeID.choices = get_film_sizes(connection)
         self.cameraID.choices = get_cameras(connection)
+
 
 class ExposureForm(FlaskForm):
     """ For User's Exposures """

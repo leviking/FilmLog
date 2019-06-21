@@ -28,7 +28,6 @@ function displayFilmRow(film) {
   $('#filmsTableBody').append($(row));
 }
 
-
 /* Manipulation functions */
 function getFilmOptions(films) {
   jQuery(films).each((i, film) => {
@@ -50,7 +49,6 @@ function getFilms() {
     },
   });
 }
-
 
 function addFilm() {
   const film = {
