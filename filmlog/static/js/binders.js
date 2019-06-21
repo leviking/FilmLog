@@ -64,7 +64,7 @@ jQuery.ajax({
 });
 
 // Add Binder on form submission
-$('form').on('submit', (e) => {
+$('#binderForm').on('submit', (e) => {
   e.preventDefault();
   addBinder();
 });

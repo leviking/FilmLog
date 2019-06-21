@@ -27,11 +27,68 @@
   <div class="card">
     <div class="card-header"><strong>Add Roll/Film</strong></div>
     <div class="card-body">
-      {% include 'form_errors.html' %}
-      <form role="form" class="form-horizontal"
-        action="/binders/{{ binderID }}/projects/{{ project.projectID }}"
-        method="POST">
-        {% include 'film/edit-film-form.html' %}
+      <form method="post" action="#" id="filmForm">
+        <div class="form-group row">
+          <div class="col-sm-4">
+            <label for="filmTitle">Title</label>
+            <input type="text" class="form-control" id="title"
+                   maxlength="64" placeholder="My Film Roll" required />
+          </div>
+          <div class="col-sm-4">
+            <label for="filmFileNo">File No.</label>
+            <input type="text" class="form-control" id="fileNo"
+                   maxlength="32" placeholder="BW1" required />
+          </div>
+          <div class="col-sm-4">
+            <label for="filmFileDate">File Date</label>
+            <input type="text" class="form-control" size="30" id="fileDate" />
+            <small id="fileDateHelp" class="form-text text-muted">Leave blank to use today</small>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-3">
+            <label for="filmSizeID">Film Size</label>
+            <select name="size" class="form-control" id="filmSizeID"></select>
+          </div>
+          <div class="col-sm-3">
+            <label for="filmTypeID">Film</label>
+            <select name="type" class="form-control" id="filmTypeID"></select>
+          </div>
+          <div class="col-sm-3">
+            <label for="shotISO">ISO</label>
+            <input type="text" class="form-control" maxlength="10" id="shotISO" placeholder="400" />
+          </div>
+          <div class="col-sm-3">
+            <label for="cameraID">Camera</label>
+            <select name="camera" class="form-control" id="cameraID"></select>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-4">
+            <label for="filmLoadedDate">Loaded</label>
+            <input type="text" class="form-control" maxlength="10" id="loaded" />
+          </div>
+          <div class="col-sm-4">
+            <label for="filmUnloadedDate">Unloaded</label>
+            <input type="text" class="form-control" maxlength="10" id="unloaded" />
+          </div>
+          <div class="col-sm-4">
+            <label for="filmDevelopedDate">Developed</label>
+            <input type="text" class="form-control" maxlength="10" id="developed" />
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-12">
+            <label for="development">Development</label>
+            <input type="text" class="form-control" maxlength="255" id="development" placeholder="ID-11 at 20C for 12 minutes" />
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-12">
+              <label for="notes">Notes</label>
+              <textarea class="form-control" id="notes" rows="4" columns="40"></textarea>
+          </div>
+        </div>
         <div class="button-bar">
           <button class="btn btn-success" action="submit">Save</button>
         </div>

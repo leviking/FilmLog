@@ -76,7 +76,7 @@ jQuery.ajax({
 });
 
 // Add Project on form submission
-$('form').on('submit', (e) => {
+$('#projectForm').on('submit', (e) => {
   e.preventDefault();
   addProject();
 });

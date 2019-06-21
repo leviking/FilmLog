@@ -28,6 +28,63 @@ function displayFilmRow(film) {
   $('#filmsTableBody').append($(row));
 }
 
+
+/* Manipulation functions */
+function getFilmOptions(films) {
+  jQuery(films).each((i, film) => {
+    $('#filmSizeID').append($(`<option value="${film.id}">${film.size}</option>`));
+  });
+}
+
+function getFilms() {
+  $('#filmsTableBody').empty();
+
+  // Make a call for the films under the current project
+  jQuery.ajax({
+    type: 'GET',
+    url: `/api/v1/binders/${binderID}/projects/${projectID}/films`,
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      jQuery(data.data).each((i, film) => { displayFilmRow(film); });
+    },
+  });
+}
+
+
+function addFilm() {
+  const film = {
+    data: {
+      title: $('#title').val(),
+      fileNo: $('#fileNo').val(),
+      fileDate: $('#fileDate').val(),
+      filmSizeID: $('#filmSizeID').val(),
+      filmTypeID: $('#filmTypeID').val(),
+      shotISO: $('#shotISO').val(),
+      cameraID: $('#cameraID').val(),
+      loaded: $('#loaded').val(),
+      unloaded: $('#unloaded').val(),
+      developed: $('#developed').val(),
+      development: $('#development').val(),
+      notes: $('#notes').val(),
+    },
+  };
+
+  jQuery.ajax({
+    type: 'POST',
+    url: `/api/v1/binders/${binderID}/projects/${projectID}/films`,
+    data: JSON.stringify(film),
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      // We re-generate the table so it sorts properly
+      getFilms(data.data);
+      $('#filmForm')[0].reset();
+    },
+    statusCode: { 409() { showAlert('Cannot Add Film', 'It already exists', 'danger'); } },
+  });
+}
+
 // This function is used on the HTML side
 // eslint-disable-next-line no-unused-vars
 function deleteFilm(filmID) {
@@ -44,25 +101,72 @@ function deleteFilm(filmID) {
   });
 }
 
-/* Ajax and Events */
-// Make a call to pull a the current binder the projects reside under
-jQuery.ajax({
-  type: 'GET',
-  url: `/api/v1/binders/${binderID}/projects/${projectID}`,
-  contentType: 'application/json',
-  dataType: 'json',
-  success(data) {
-    $('#projectName').html(data.data.name);
-  },
+
+$(document).ready(() => {
+  /* Fancy Calendar */
+  $('#fileDate').datepicker({ dateFormat: 'yy-mm-dd' });
+  $('#loaded').datepicker({ dateFormat: 'yy-mm-dd' });
+  $('#unloaded').datepicker({ dateFormat: 'yy-mm-dd' });
+  $('#developed').datepicker({ dateFormat: 'yy-mm-dd' });
+
+  /* Get some things */
+  // Make a call to pull a the current project the films reside under
+  jQuery.ajax({
+    type: 'GET',
+    url: `/api/v1/binders/${binderID}/projects/${projectID}`,
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      $('#projectName').html(data.data.name);
+    },
+  });
+
+  // Make a call to pull the film sizes
+  jQuery.ajax({
+    type: 'GET',
+    url: '/api/v1/filmsizes',
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      getFilmOptions(data.data);
+    },
+  });
+
+  // Make a call to pull the film sizes
+  jQuery.ajax({
+    type: 'GET',
+    url: '/api/v1/films',
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      $('#filmTypeID').append($('<option value="0">None</option>'));
+      jQuery(data.data).each((i, film) => {
+        $('#filmTypeID').append($(`<option value="${film.id}">${film.brand} ${film.name} ${film.iso}</option>`));
+      });
+    },
+  });
+
+  // Make a call to pull the user's active cameras
+  jQuery.ajax({
+    type: 'GET',
+    url: '/api/v1/cameras?status=Active',
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      $('#cameraID').append($('<option value="0">None</option>'));
+      jQuery(data.data).each((i, camera) => {
+        $('#cameraID').append($(`<option value="${camera.id}">${camera.name}</option>`));
+      });
+    },
+  });
+
+  getFilms();
 });
 
-// Make a call for the projcts under the current binder
-jQuery.ajax({
-  type: 'GET',
-  url: `/api/v1/binders/${binderID}/projects/${projectID}/films`,
-  contentType: 'application/json',
-  dataType: 'json',
-  success(data) {
-    jQuery(data.data).each((i, film) => { displayFilmRow(film); });
-  },
+/* Ajax and Events */
+
+// Add Film on form submission
+$('#filmForm').on('submit', (e) => {
+  e.preventDefault();
+  addFilm();
 });

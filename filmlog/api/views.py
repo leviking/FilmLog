@@ -4,7 +4,7 @@ from flask import request
 
 # Filmlog
 from filmlog.api import api_blueprint, binders, projects, filmstock, holders, \
-                        films
+                        films, cameras
 from filmlog.config import engine
 
 # http://jsonapi.org/format/
@@ -14,6 +14,47 @@ def index():
     """ Index page for API """
     return "Hello"
 
+# General Public Endpoints
+@api_blueprint.route('/filmsizes', methods=['GET'])
+@login_required
+def film_sizes():
+    """ Get global film size information """
+    connection = engine.connect()
+    transaction = connection.begin()
+
+    if request.method == 'GET':
+        return_status = films.get_film_sizes(connection)
+    transaction.commit()
+    return return_status
+
+# Cameras
+@api_blueprint.route('/cameras', methods=['GET'])
+@login_required
+def cameras_active():
+    """ Get cameras information """
+    connection = engine.connect()
+    transaction = connection.begin()
+
+    if request.method == 'GET':
+        return_status = cameras.get_all(connection)
+
+    transaction.commit()
+    return return_status
+
+# Films
+@api_blueprint.route('/films', methods=['GET'])
+@login_required
+def films_list():
+    """ Get global films """
+    connection = engine.connect()
+    transaction = connection.begin()
+
+    if request.method == 'GET':
+        return_status = films.get_film_list(connection)
+    transaction.commit()
+    return return_status
+
+# Binders
 @api_blueprint.route('/binders', methods=['GET', 'POST'])
 @login_required
 def binders_all():
@@ -72,8 +113,9 @@ def project_details(binderID, projectID):
     transaction.commit()
     return return_status
 
+## Films
 @api_blueprint.route('/binders/<int:binderID>/projects/<int:projectID>/films',
-                     methods=['GET', 'DELETE'])
+                     methods=['GET', 'POST'])
 @login_required
 def films_all(binderID, projectID):
     """ Get details of a project """
@@ -81,12 +123,16 @@ def films_all(binderID, projectID):
     transaction = connection.begin()
     if request.method == 'GET':
         return_status = films.get_all(connection, binderID, projectID)
+    if request.method == 'POST':
+        return_status = films.post(connection, projectID)
     transaction.commit()
     return return_status
 
 @api_blueprint.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>',
                      methods=['GET', 'DELETE'])
 @login_required
+# pylint: disable=unused-argument
+# Sort of required for pathing otherwise it throws errors
 def film_details(binderID, projectID, filmID):
     """ Get details of a film """
     connection = engine.connect()
@@ -127,7 +173,7 @@ def filmstock_details(filmTypeID, filmSizeID):
     transaction.commit()
     return return_status
 
-# Holders
+## Holders
 @api_blueprint.route('/holders', methods=['GET', 'POST'])
 @login_required
 def holders_all():
