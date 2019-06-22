@@ -290,10 +290,12 @@ def index():
 
 @app.route('/contribute', methods=['GET'])
 def contribute():
+    """ Static page for contributions """
     return render_template('/public/contribute.html')
 
 @app.route('/thankyou', methods=['GET'])
 def thankyou():
+    """ Thank you page (return page from donations) """
     return render_template('/public/thankyou.html')
 
 # Binder List
