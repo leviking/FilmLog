@@ -292,6 +292,9 @@ def index():
 def contribute():
     return render_template('/public/contribute.html')
 
+@app.route('/thankyou', methods=['GET'])
+def thankyou():
+    return render_template('/public/thankyou.html')
 
 # Binder List
 @app.route('/binders', methods=['GET'])

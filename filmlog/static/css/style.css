@@ -120,6 +120,10 @@ a:hover{
   background-color: #f9f9f9;
 }
 
+.contribute{
+  width: 90%;
+}
+
 /* Special div to make alignment work for printing, particularly large format
    sheets where the information for each exposure is varied resulting in a
    varied height. */
