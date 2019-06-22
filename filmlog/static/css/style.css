@@ -13,7 +13,6 @@ a{
 }
 
 a:hover{
-  /* color: #1e212e; */
   color: #2a429d;
 }
 
@@ -121,7 +120,7 @@ a:hover{
 }
 
 .contribute{
-  width: 90%;
+  width: 250px;
 }
 
 /* Special div to make alignment work for printing, particularly large format
