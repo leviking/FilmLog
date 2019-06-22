@@ -154,7 +154,7 @@ a:hover{
 }
 
 /* Mobile */
-@media (max-width: 576px) {
+@media (max-width: 768px) {
   td{
     font-size: 0.75em;
   }
