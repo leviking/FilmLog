@@ -1,3 +1,2 @@
 #!/bin/bash
-git pull
-sudo apachectl graceful
+git pull && ./migrate.sh && sudo apachectl graceful
