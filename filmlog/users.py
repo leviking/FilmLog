@@ -53,7 +53,7 @@ class RegistrationForm(FlaskForm):
     """ New user registration form """
     username = StringField('Username', validators=[validators.input_required(),
                                                    Length(min=1, max=64)])
-    email = StringField('Email', validators=[validators.Optional(),
+    email = StringField('Email', validators=[validators.input_required(),
                                              Length(min=1, max=256)])
 
     # pylint: disable=line-too-long

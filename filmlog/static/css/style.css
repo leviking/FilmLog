@@ -1,3 +1,7 @@
+body{
+
+}
+
 pre{
   overflow-x: auto;
   white-space: pre-wrap;
@@ -9,10 +13,12 @@ pre{
 
 a{
   color: #3c4053;
+  font-weight: bold;
 }
 
 a:hover{
-  color: #1e212e;
+  /* color: #1e212e; */
+  color: #2a429d;
 }
 
 .navbar{
@@ -151,11 +157,7 @@ a:hover{
 
 /* Mobile */
 @media (max-width: 768px) {
-  td{
-    font-size: 0.75em;
-  }
-
-  .btn{
+  html{
     font-size: 0.75em;
   }
 }
