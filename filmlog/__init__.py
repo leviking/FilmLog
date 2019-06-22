@@ -48,8 +48,7 @@ def section_mapping():
         ('/gear', 'Gear'),
         ('/developing', 'Developing'),
         ('/filmstock', 'Film Stock'),
-        ('/filmtypes', 'Available Films'),
-        ('/stats', 'Stats')
+        ('/filmtypes', 'Available Films')
     )
     return dict(section_map=section_map)
 

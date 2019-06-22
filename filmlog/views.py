@@ -24,7 +24,7 @@ from filmlog.classes import MultiCheckboxField
 # Could be a better way to do this, but these are used to section out parts
 # of the app into logical groupings (e.g. darkroom is for /darkroom)
 # Blueprints may be the answer here.
-from filmlog import users, filmstock, darkroom, files, stats, gear, docs, \
+from filmlog import users, filmstock, darkroom, files, gear, docs, \
     search, developing
 
 ## Blueprints
@@ -243,9 +243,48 @@ def index():
         qry = text("""SELECT COUNT(*) AS cnt FROM Binders
             WHERE userID = :userID""")
         binder_count = connection.execute(qry, userID=userID).fetchone()
+
+
+        qry = text("""SELECT Cameras.name, COUNT(Films.cameraID) AS count
+            FROM Cameras
+            JOIN Films ON Films.cameraID = Cameras.cameraID
+            AND Films.userID = Cameras.userID
+            WHERE Cameras.userID=:userID
+            GROUP BY Films.cameraID
+            ORDER BY COUNT(Films.cameraID) DESC""")
+        cameras = connection.execute(qry, userID=userID)
+
+        qry = text("""SELECT
+            FilmBrands.brand AS brand, FilmTypes.name AS type, FilmTypes.iso AS iso,
+            COUNT(Films.filmTypeID) AS count
+            FROM Films
+            JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
+            JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+            AND userID = :userID
+            GROUP BY Films.filmTypeID
+            ORDER BY COUNT(Films.filmTypeID) DESC""")
+        favoriteRolls = connection.execute(qry, userID=userID)
+
+        qry = text("""SELECT
+            FilmBrands.brand AS brand, FilmTypes.name AS type, FilmTypes.iso AS iso,
+            COUNT(Exposures.filmTypeID) AS count
+            FROM Exposures
+            JOIN Films on Films.filmID = Exposures.filmID
+                AND Films.userID = Exposures.userID
+            JOIN FilmTypes ON FilmTypes.filmTypeID = Exposures.filmTypeID
+            JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+            AND Exposures.userID = :userID
+            GROUP BY Exposures.filmTypeID
+            ORDER BY COUNT(Exposures.filmTypeID) DESC""")
+        favoriteSheets = connection.execute(qry, userID=userID)
+
         transaction.commit()
-        return render_template('overview.html',
-                               binder_count=binder_count.cnt)
+        return render_template('/overview.html',
+                               binder_count=binder_count.cnt,
+                               cameras=cameras,
+                               favoriteRolls=favoriteRolls,
+                               favoriteSheets=favoriteSheets)
+
     transaction.rollback()
     return render_template('public/index.html')
 
