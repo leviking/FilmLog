@@ -21,95 +21,89 @@
 {% block body %}
 <body>
 {% block navbar %}
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item"><a class="nav-link
-            {% if '/' == request.path %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item"><a class="nav-link
+        {% if '/' == request.path %}
+          active
+        {% endif %}"
+        href="/">Home</a></li>
+      {% if current_user.is_authenticated %}
+
+        <li class="nav-item"><a class="nav-link
+            {% if '/binders' in request.path
+            and '/projects' not in request.path %}
               active
             {% endif %}"
-            href="/">Home</a></li>
-          {% if current_user.is_authenticated %}
-
+            href="/binders">Binders</a></li>
+        {% if binderID %}
+          <li class="nav-item"><a class="nav-link
+            {% if '/projects' in request.path
+              and '/films' not in request.path %}
+              active
+            {% endif %}"
+            href="/binders/{{ binderID }}/projects">Projects</a></li>
+          {% if projectID %}
             <li class="nav-item"><a class="nav-link
-                {% if '/binders' in request.path
-                and '/projects' not in request.path %}
-                  active
-                {% endif %}"
-                href="/binders">Binders</a></li>
-            {% if binderID %}
-              <li class="nav-item"><a class="nav-link
-                {% if '/projects' in request.path
-                  and '/films' not in request.path %}
-                  active
-                {% endif %}"
-                href="/binders/{{ binderID }}/projects">Projects</a></li>
-              {% if projectID %}
-                <li class="nav-item"><a class="nav-link
-                  {% if '/films' in request.path %}
-                    active
-                  {% endif %}"
-                  href="/binders/{{ binderID }}/projects/{{ projectID }}">Films</a></li>
-              {% endif %}
-            {% endif %}
-
-            {% for url,name in section_map %}
-              <li class="nav-item">
-                {% if url in request.path %}
-                  <a class="nav-link active" href="{{ url }}">{{ name }}</a>
-                {% else %}
-                  <a class="nav-link" href="{{ url }}">{{ name }}</a>
-                {% endif %}
-              </li>
-            {% endfor %}
-            <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
-          {% else %}
-            <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
-            <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+              {% if '/films' in request.path %}
+                active
+              {% endif %}"
+              href="/binders/{{ binderID }}/projects/{{ projectID }}">Films</a></li>
           {% endif %}
-          <li class="nav-item"><a class="nav-link
-            {% if '/help' in request.path %}
-              active
-            {% endif %}"
-            href="/help">Help</a></li>
-          <li class="nav-item"><a class="nav-link" href="https://gitlab.com/m00dawg/FilmLog/issues">Log a Bug</a></li>
-        </ul>
-        <form class="form-inline my-2 my-lg-0"
-          action="/search"
-          method="GET">
-          <input name="search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        </form>
-      </div>
-    </div>
-  </nav>
+        {% endif %}
+
+        {% for url,name in section_map %}
+          <li class="nav-item">
+            {% if url in request.path %}
+              <a class="nav-link active" href="{{ url }}">{{ name }}</a>
+            {% else %}
+              <a class="nav-link" href="{{ url }}">{{ name }}</a>
+            {% endif %}
+          </li>
+        {% endfor %}
+        <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+      {% else %}
+        <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+        <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+      {% endif %}
+      <li class="nav-item"><a class="nav-link
+        {% if '/help' in request.path %}
+          active
+        {% endif %}"
+        href="/help">Help</a></li>
+      <li class="nav-item"><a class="nav-link" href="https://gitlab.com/m00dawg/FilmLog/issues">Log a Bug</a></li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0"
+      action="/search"
+      method="GET">
+      <input name="search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+    </form>
+  </div>
+</nav>
 {% endblock %}
 
 <div class="container-fluid">
   {% block container %}
-    <div class="col-md-10 main">
-      <div id="content">
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <br />
-            <div class="alert alert-warning" role="alert">
-              <ul class=flashes>
-                {% for message in messages %}
-                <li>{{ message }}</li>
-                {% endfor %}
-              </ul>
-            </div>
-          {% endif %}
-        {% endwith %}
-        <br />
-        {% block content %}
-        {% endblock %}
-      </div>
+    <div id="content">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <br />
+          <div class="alert alert-warning" role="alert">
+            <ul class=flashes>
+              {% for message in messages %}
+              <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block content %}
+      {% endblock %}
     </div>
-  </div>
-  </main>
   {% endblock %}
 </div>
 

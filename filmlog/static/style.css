@@ -21,6 +21,10 @@ a:active{
 }
 */
 
+.page-header{
+  margin-top: 1%;
+}
+
 .card-header{
   border: 0px;
   font-size: 1.25em;
