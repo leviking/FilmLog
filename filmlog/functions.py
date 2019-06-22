@@ -82,6 +82,14 @@ def get_film_details(connection, binderID, projectID, filmID):
 
     return film
 
+def get_enlargers(connection):
+    """ Helper function to get enlargers """
+    userID = current_user.get_id()
+    qry = text("""SELECT enlargerID, name
+        FROM Enlargers
+        WHERE userID = :userID""")
+    return connection.execute(qry, userID=userID).fetchall()
+
 def optional_choices(name, choices):
     """ Helper function to append extra choices to a form.
         This is typically used to inject "None" as a choice. """

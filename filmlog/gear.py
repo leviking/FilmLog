@@ -11,16 +11,9 @@ from wtforms.validators import DataRequired, Optional, Length, NumberRange
 
 # Filmlog
 from filmlog.config import app, engine
-from filmlog.functions import next_id, insert, delete, optional_choices, get_film_types
+from filmlog.functions import next_id, insert, delete, optional_choices, \
+                              get_film_types, get_enlargers
 from filmlog.classes import MultiCheckboxField
-
-def get_enlargers(connection):
-    """ Helper function to get enlargers """
-    userID = current_user.get_id()
-    qry = text("""SELECT enlargerID, name
-        FROM Enlargers
-        WHERE userID = :userID""")
-    return connection.execute(qry, userID=userID).fetchall()
 
 def get_lenses(connection):
     """ Get the all user's lenses """

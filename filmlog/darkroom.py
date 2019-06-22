@@ -14,7 +14,8 @@ from wtforms.validators import DataRequired, Optional, NumberRange, Length
 from filmlog import functions
 from filmlog import files
 from filmlog.config import app, engine
-from filmlog.functions import optional_choices, zero_to_none, insert, next_id
+from filmlog.functions import optional_choices, zero_to_none, insert, next_id, \
+                              get_enlargers
 
 ## Functions
 def get_papers(connection):
