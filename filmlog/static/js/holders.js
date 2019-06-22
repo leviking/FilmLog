@@ -3,17 +3,17 @@ function updateHolderButtons(holderID, state) {
   const loadLocation = `/gear/holders/${holderID}`;
   let buttons = ' ';
   if (state === 'Loaded') {
-    buttons += `<button class="btn btn-dark" name="button" value="Expose" \
+    buttons += `<button class="btn btn-sm btn-dark" name="button" value="Expose" \
                 onclick="setHolderState('${holderID}', 'Expose')">Expose</button> `;
   }
   if (state === 'Loaded' || state === 'Exposed') {
-    buttons += `<button class="btn btn-secondary" name="button" value="Unload" \
+    buttons += `<button class="btn btn-sm btn-secondary" name="button" value="Unload" \
                 onclick="setHolderState('${holderID}', 'Unload')">Unload</button>`;
   }
   if (state === 'Empty') {
-    buttons += `<button class="btn btn-danger" name="button" value="Load" \
+    buttons += `<button class="btn btn-sm btn-danger" name="button" value="Load" \
                onclick="location.href='${loadLocation}'">Load</button> \
-               <button class="btn btn-warning" name="button" value="Reload" \
+               <button class="btn btn-sm btn-warning" name="button" value="Reload" \
                onclick="setHolderState('${holderID}', 'Reload')">Reload</button>`;
   }
   $(`#buttonsForHolderID${holderID}`).html(buttons);
