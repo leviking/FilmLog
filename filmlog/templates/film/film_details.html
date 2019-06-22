@@ -1,7 +1,7 @@
 
 <div class="page-header">
   <h1>
-    {{ film.title }} <small class="text-muted">{{ film.project }}</small>
+    <span id="title"></span> <small class="text-muted"><span id="projectName"></span></small>
     {% if not print_view %}
       <a href="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}?edit=true">
         <button type="button" class="btn btn-primary btn-sm">Edit</button>
@@ -17,46 +17,36 @@
   <div class="card-header border-0">Overview</div>
   <div class="card-body">
     <div class="row border-bottom py-2">
-      <div class="col-md-2"><strong>Camera</strong></div>
-      <div class="col-md-2">{{ film.camera }}</div>
-      <div class="col-md-2"><strong>File Date</strong></div>
-      <div class="col-md-2">{{ film.fileDate|to_date }}</div>
       <div class="col-md-2"><strong>File No</strong></div>
-      <div class="col-md-2">{{ film.fileNo }}</div>
+      <div class="col-md-2"><span id="file_no"></span></div>
+      <div class="col-md-2"><strong>File Date</strong></div>
+      <div class="col-md-2"><span id="file_date"></span></div>
+      <div class="col-md-2"><strong>Camera</strong></div>
+      <div class="col-md-2"><span id="camera"></span></div>
     </div>
 
-    {% if film.filmName %}
-      <div class="row border-bottom py-2">
-        <div class="col-md-2"><strong>Film</strong></div>
-        <div class="col-md-2">
-          {% if film.filmName %}
-            {{ film.brand }} {{ film.filmName }}
-          {% else %}
-            Unknown
-          {% endif %}
-        </div>
-        <div class="col-md-2"><strong>Size</strong></div>
-        <div class="col-md-2">{{ film.size }}</div>
-        <div class="col-md-2"><strong>ISO</strong></div>
-        <div class="col-md-2">{{ film.filmISO }}, shot at {{ film.shotISO }}</div>
-      </div>
-    {% endif %}
+    <div class="row border-bottom py-2" id="divFilmType">
+      <div class="col-md-2"><strong>Film</strong></div>
+      <div class="col-md-2"><span id="filmType"></span></div>
+      <div class="col-md-2"><strong>Size</strong></div>
+      <div class="col-md-2"><span id="filmSize"></div>
+      <div class="col-md-2"><strong>ISO</strong></div>
+      <div class="col-md-2"><span id="filmISO"></strong></div>
+    </div>
 
-    <div class="row border-bottom py-2">
+    <div class="row border-bottom py-2" id="divFilmDates">
       <div class="col-md-2"><strong>Loaded</strong></div>
-      <div class="col-md-2">{{ film.loaded|to_date }}</div>
+      <div class="col-md-2"><span id="loaded"></span></div>
       <div class="col-md-2"><strong>Unloaded</strong></div>
-      <div class="col-md-2">{{ film.unloaded|to_date }}</div>
-      <div class="col-md-2"><strong>Development</strong></div>
-      <div class="col-md-2">{{ film.developed|to_date }}</div>
+      <div class="col-md-2"><span id="unloaded"></span></div>
+      <div class="col-md-2"><strong>Developed</strong></div>
+      <div class="col-md-2"><span id="developed"></span></div>
     </div>
 
-    {% if film.development %}
-    <div class="row border-bottom py-2">
+    <div class="row border-bottom py-2" id="divDevelopment">
       <div class="col-md-2"><strong>Development</strong></div>
-      <div class="col-md-10">{{ film.development }}</div>
+      <div class="col-md-10"><span id="development"></span></div>
     </div>
-    {% endif %}
   </div>
 </div>
 <br />

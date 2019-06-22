@@ -131,14 +131,12 @@ def films_all(binderID, projectID):
 @api_blueprint.route('/binders/<int:binderID>/projects/<int:projectID>/films/<int:filmID>',
                      methods=['GET', 'DELETE'])
 @login_required
-# pylint: disable=unused-argument
-# Sort of required for pathing otherwise it throws errors
 def film_details(binderID, projectID, filmID):
     """ Get details of a film """
     connection = engine.connect()
     transaction = connection.begin()
-    #if request.method == 'GET':
-    #    return_status = films.get_all(connection, binderID, projectID)
+    if request.method == 'GET':
+        return_status = films.get(connection, binderID, projectID, filmID)
     if request.method == 'DELETE':
         return_status = films.delete(connection, filmID)
     transaction.commit()

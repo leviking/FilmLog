@@ -54,12 +54,14 @@ def get_all(connection, binderID, projectID):
             "id" : str(row['filmID']),
             "title" : row['title'],
             "file_no" : row['fileNo'],
-            "brand" : row['filmBrand'],
-            "film" : row['film'],
-            "box_speed" : row['filmBoxSpeed'],
             "iso" : row['iso'],
             "size" : row['size'],
             "exposures" : row['exposures'],
+            "film_type" : {
+                "brand" : row['filmBrand'],
+                "film" : row['film'],
+                "box_speed" : row['filmBoxSpeed'],
+            },
             "composite_id" : {
                 "binder_id" : binderID,
                 "project_id" : projectID,
@@ -69,6 +71,52 @@ def get_all(connection, binderID, projectID):
         films['data'].append(film)
     return jsonify(films), status.HTTP_200_OK
 
+def get(connection, binderID, projectID, filmID):
+    """ Get film """
+    userID = current_user.get_id()
+
+    qry = text("""SELECT title, fileNo, fileDate,
+        Films.iso AS iso, brand AS filmBrand, FilmTypes.name AS film,
+        FilmTypes.iso AS filmBoxSpeed, FilmSizes.size AS size, exposures,
+        development, Cameras.cameraID, Cameras.name AS cameraName
+        FROM Films
+        LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
+        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        LEFT OUTER JOIN Cameras ON Cameras.cameraID = Films.cameraID
+                                AND Cameras.userID = Films.userID
+        JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
+        WHERE filmID = :filmID AND Films.userID = :userID ORDER BY fileDate""")
+    films_query = connection.execute(qry,
+                                     filmID=filmID,
+                                     userID=userID).fetchone()
+    film = {
+        "data": {
+            "id" : filmID,
+            "title" : films_query['title'],
+            "file_no" : films_query['fileNo'],
+            "file_date" : films_query['fileDate'],
+            "iso" : films_query['iso'],
+            "size" : films_query['size'],
+            "exposures" : films_query['exposures'],
+            "development" : films_query['development'],
+            "film_type" : {
+                "brand" : films_query['filmBrand'],
+                "film" : films_query['film'],
+                "box_speed" : films_query['filmBoxSpeed'],
+            },
+            "camera" : {
+                "id" : films_query['cameraID'],
+                "name" : films_query['cameraName'],
+            },
+            "composite_id" : {
+                "binder_id" : binderID,
+                "project_id" : projectID,
+                "film_id": filmID,
+            }
+        }
+    }
+    return jsonify(film), status.HTTP_200_OK
+
 def post(connection, projectID):
     """ Add film """
     userID = current_user.get_id()
@@ -77,6 +125,11 @@ def post(connection, projectID):
 
     filmTypeID = zero_to_none(json['data']['filmTypeID'])
     filmSizeID = json['data']['filmSizeID']
+
+    if json['data']['fileDate']:
+        fileDate = json['data']['fileDate']
+    else:
+        fileDate = None
 
     qry = text("""INSERT INTO Films (userID, filmID, projectID, cameraID,
         filmTypeID, filmSizeID, iso, fileDate, loaded,
@@ -93,7 +146,7 @@ def post(connection, projectID):
                            filmTypeID=filmTypeID,
                            filmSizeID=filmSizeID,
                            iso=json['data']['shotISO'],
-                           fileDate=json['data']['fileDate'],
+                           fileDate=fileDate,
                            loaded=json['data']['loaded'],
                            unloaded=json['data']['unloaded'],
                            developed=json['data']['developed'],

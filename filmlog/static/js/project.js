@@ -13,8 +13,8 @@ function displayFilmRow(film) {
     iso = `at ${film.iso}`;
   }
 
-  if (film.brand) {
-    filmType = `${film.brand} ${film.film} ${film.box_speed} ${iso}`;
+  if (film.film_type.brand) {
+    filmType = `${film.film_type.brand} ${film.film_type.film} ${film.film_type.box_speed} ${iso}`;
   }
 
   let row = `<tr id="rowFilmID${film.id}">`;
@@ -29,11 +29,6 @@ function displayFilmRow(film) {
 }
 
 /* Manipulation functions */
-function getFilmOptions(films) {
-  jQuery(films).each((i, film) => {
-    $('#filmSizeID').append($(`<option value="${film.id}">${film.size}</option>`));
-  });
-}
 
 function getFilms() {
   $('#filmsTableBody').empty();
@@ -99,7 +94,6 @@ function deleteFilm(filmID) {
   });
 }
 
-
 $(document).ready(() => {
   /* Fancy Calendar */
   $('#fileDate').datepicker({ dateFormat: 'yy-mm-dd' });
@@ -108,41 +102,9 @@ $(document).ready(() => {
   $('#developed').datepicker({ dateFormat: 'yy-mm-dd' });
 
   /* Get some things */
-  // Make a call to pull a the current project the films reside under
-  jQuery.ajax({
-    type: 'GET',
-    url: `/api/v1/binders/${binderID}/projects/${projectID}`,
-    contentType: 'application/json',
-    dataType: 'json',
-    success(data) {
-      $('#projectName').html(data.data.name);
-    },
-  });
-
-  // Make a call to pull the film sizes
-  jQuery.ajax({
-    type: 'GET',
-    url: '/api/v1/filmsizes',
-    contentType: 'application/json',
-    dataType: 'json',
-    success(data) {
-      getFilmOptions(data.data);
-    },
-  });
-
-  // Make a call to pull the film sizes
-  jQuery.ajax({
-    type: 'GET',
-    url: '/api/v1/films',
-    contentType: 'application/json',
-    dataType: 'json',
-    success(data) {
-      $('#filmTypeID').append($('<option value="0">None</option>'));
-      jQuery(data.data).each((i, film) => {
-        $('#filmTypeID').append($(`<option value="${film.id}">${film.brand} ${film.name} ${film.iso}</option>`));
-      });
-    },
-  });
+  getProject(binderID, projectID);
+  getFilmSizes();
+  getFilmTypes();
 
   // Make a call to pull the user's active cameras
   jQuery.ajax({
