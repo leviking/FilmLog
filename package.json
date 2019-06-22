@@ -8,6 +8,7 @@
     "test": "tests"
   },
   "dependencies": {
+    "csslint": "^1.0.5",
     "eslint": "^5.16.0"
   },
   "devDependencies": {

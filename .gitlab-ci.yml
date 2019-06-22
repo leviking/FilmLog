@@ -28,5 +28,8 @@ python_lint:
 js_lint:
     script: "tests/javascript-lint.sh"
 
+css_lint:
+    script: "tests/css-lint.sh"
+
 import_database:
     script: "tests/import_database.sh $MYSQL_DATABASE mariadb root $MYSQL_ROOT_PASSWORD"

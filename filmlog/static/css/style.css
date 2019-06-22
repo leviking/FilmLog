@@ -20,9 +20,9 @@ a:hover{
 }
 
 .sidebar {
+  background-color: #dddddd;
   left: 0;
   padding-top: 1%;
-  background-color: #dddddd;
 }
 
 .sidebar a{
@@ -43,7 +43,7 @@ a:hover{
 }
 
 .card-header{
-  border: 0px;
+  border: 0;
   font-size: 1.25em;
   font-weight: bold;
 }
@@ -141,13 +141,13 @@ a:hover{
   display: flex;
 }
 
+/* End special div */
+
 .alert-fixed {
+    border-radius: 0;
+    left: 2.5%;
     position:fixed;
     top: 5%;
-    left: 2.5%;
     width: 50%;
     z-index:9999;
-    border-radius:0px
 }
-
-/* End special div */
