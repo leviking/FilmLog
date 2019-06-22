@@ -66,6 +66,7 @@ function showAlert(strong, message, color) {
   $('#alert').show();
 }
 
+// Helper Functions
 function formatDate(date) {
   if (date) {
     const newDate = new Date(date);

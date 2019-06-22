@@ -29,7 +29,7 @@ function getFilm() {
       if (film.film_type.film) {
         $('#filmType').html(`${film.film_type.brand} ${film.film_type.film}`);
         $('#filmSize').html(film.size);
-        $('#filmISO').html(`${film.film.box_speed}, shot at ${film.iso}`);
+        $('#filmISO').html(`${film.film_type.box_speed}, shot at ${film.iso}`);
       } else {
         $('#divFilmType').remove();
       }
