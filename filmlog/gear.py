@@ -12,7 +12,7 @@ from wtforms.validators import DataRequired, Optional, Length, NumberRange
 # Filmlog
 from filmlog.config import app, engine
 from filmlog.functions import next_id, insert, delete, optional_choices, \
-                              get_film_types, get_enlargers
+                              get_film_types
 from filmlog.classes import MultiCheckboxField
 
 def get_lenses(connection):

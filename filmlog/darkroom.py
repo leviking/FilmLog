@@ -8,13 +8,13 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
 from wtforms import StringField, IntegerField, SelectField, \
     DecimalField, TextAreaField, FileField
-from wtforms.validators import DataRequired, Optional, NumberRange, Length
+from wtforms.validators import DataRequired, Optional, NumberRange
 
 # Filmlog
 from filmlog import functions
 from filmlog import files
 from filmlog.config import app, engine
-from filmlog.functions import optional_choices, zero_to_none, insert, next_id, \
+from filmlog.functions import optional_choices, zero_to_none, insert, \
                               get_enlargers
 
 ## Functions

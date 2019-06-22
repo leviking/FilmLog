@@ -27,19 +27,7 @@
           <td>{{ print.printType }}</td>
           <td>{{ print.size }}</td>
           <td>{{ print.paperbrand }} {{ print.paperName }}</td>
-          <td>
-            {% if print.paperDeveloperName %}
-              {{ print.paperDeveloperName }} 1:{{ print.paperDeveloperDilution }}</td>
-            {% endif %}
-          </td>
-
           <td class="text-right">
-            <form role="form" class="form-horizontal"
-              action="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}/prints/{{ print.printID }}"
-              method="GET">
-              {{ form.csrf_token }}
-              <button name="button" value="editPrint" action="submit" class="btn btn-xs btn-success">Edit</button>
-            </form>
             <form role="form" class="form-horizontal"
               action="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}/prints/{{ print.printID }}"
               method="POST">
