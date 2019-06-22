@@ -288,6 +288,11 @@ def index():
     transaction.rollback()
     return render_template('public/index.html')
 
+@app.route('/contribute', methods=['GET'])
+def contribute():
+    return render_template('/public/contribute.html')
+
+
 # Binder List
 @app.route('/binders', methods=['GET'])
 @login_required
