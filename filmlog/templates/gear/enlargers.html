@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="row">
-{% include "darkroom/sidebar.html" %}
+{% include "gear/sidebar.html" %}
 <div class="col-10">
 
 <a name="Enlargers"><h1 class="page-header">Enlargers</h1></a>
@@ -25,7 +25,7 @@
       <td>{{ enlarger.notes }}</td>
       <td>
         <form role="form" class="form-horizontal"
-          action="/darkroom/enlargers"
+          action="/gear/enlargers"
           method="POST">
           {{ enlarger_lens_form.csrf_token }}
           <button name="button" value="deleteEnlarger" action="submit" class="btn btn-sm btn-danger">Delete</button>
@@ -43,7 +43,7 @@
   <div class="card-body">
     {{ form_errors(enlarger_form) }}
     <form role="form" class="form-horizontal"
-      action="/darkroom/enlargers"
+      action="/gear/enlargers"
       method="POST">
       {{ enlarger_form.csrf_token }}
       <div class="form-group row">
@@ -92,7 +92,7 @@
       <td>{{ lens.name }}</td>
       <td>
         <form role="form" class="form-horizontal"
-          action="/darkroom"
+          action="/gear/enlargers"
           method="POST">
           {{ enlarger_lens_form.csrf_token }}
           <button name="button" value="deleteEnlargerLens" action="submit" class="btn btn-sm btn-danger">Delete</button>
@@ -110,7 +110,7 @@
   <div class="card-body">
     {{ form_errors(enlarger_lens_form) }}
     <form role="form" class="form-horizontal"
-      action="/darkroom"
+      action="/gear/enlargers"
       method="POST">
       {{ enlarger_lens_form.csrf_token }}
       <div class="form-group row">

@@ -46,7 +46,6 @@ def section_mapping():
     """ Friendly Names For Sections """
     section_map = (
         ('/gear', 'Gear'),
-        ('/darkroom', 'Darkroom'),
         ('/developing', 'Developing'),
         ('/filmstock', 'Film Stock'),
         ('/filmtypes', 'Available Films'),

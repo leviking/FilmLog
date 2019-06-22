@@ -15,11 +15,28 @@ a:hover{
   color: #2244ff;
 }
 
-/*
-a:active{
-  color: #ff0000;
+.navbar{
+  width: 100%;
 }
-*/
+
+.sidebar {
+  left: 0;
+  padding-top: 1%;
+  background-color: #dddddd;
+}
+
+.sidebar a{
+  color: #3c4053;
+}
+
+.sidebar a:hover{
+  color: #1e212e;
+  font-weight: bold;
+}
+
+.main{
+  min-height: 100%;
+}
 
 .page-header{
   margin-top: 1%;
