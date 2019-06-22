@@ -23,6 +23,7 @@ a:hover{
   background-color: #dddddd;
   left: 0;
   padding-top: 1%;
+  display: block !important;
 }
 
 .sidebar a{
