@@ -75,7 +75,7 @@ a:hover{
 }
 
 .holderState{
-  font-size: 100%;
+
 }
 
 .holderEmpty{
@@ -151,4 +151,15 @@ a:hover{
     top: 5%;
     width: 50%;
     z-index:9999;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  td{
+    font-size: 0.75em;
+  }
+
+  .btn{
+    font-size: 0.75em;
+  }
 }
