@@ -15,10 +15,10 @@
         <th>Number</th>
         <th>Shutter</th>
         <th>Aperture</th>
-        <th>Lens</th>
-        <th>Metering</th>
-        <th>Flash</th>
-        <th>Filters</th>
+        <th class="table120Lens">Lens</th>
+        <th class="table120Metering">Metering</th>
+        <th class="table120Flash">Flash</th>
+        <th class="table35Filters">Filters</th>
         <th></th>
       </tr>
       {% for exposure in exposures %}
@@ -30,34 +30,34 @@
               {{ exposure.aperture }}
             {% endif %}
           </td>
-          <td>
+          <td class="table120Lens">
             {% if exposure.lens %}
               {{ exposure.lens }}
             {% endif %}
           </td>
-          <td>
+          <td class="table120Metering">
             {% if exposure.metering %}
                 {{ exposure.metering }}
             {% endif %}
-          <td>
+          <td class="table120Flash">
             {% if exposure.flash == 'No' %}
               -
             {% else %}
               &#x2713;
             {% endif %}
           </td>
-          <td>
+          <td class="table120Filters">
             {% for filter in exposure.filters %}
               {{ filter.code }}
             {% endfor %}
           </td>
           {% include 'film/exposurebuttons.html' %}
         </tr>
-        <tr>
+        <tr class="table120Notes">
           {% if exposure.notes %}
-            <td colspan="6">{{ exposure.notes }}</td>
+            <td class="table120Notes" colspan="6">{{ exposure.notes }}</td>
           {% else %}
-            <td colspan="6">&nbsp;</td>
+            <td class="table120Notes" colspan="6">&nbsp;</td>
           {% endif %}
         </tr>
       {% endfor %}

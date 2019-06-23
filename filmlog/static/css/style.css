@@ -170,4 +170,14 @@ a:hover{
     display: flex !important;
     width: 100%;
   }
+
+  .table35Lens, .table35Flash, .table35Notes, .table35Filters{
+    display: none;
+  }
+
+  .table120Lens, .table120Flash, .table120Metering, .table120Filters, .table120Notes{
+    display: none;
+  }
+
+
 }

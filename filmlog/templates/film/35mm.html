@@ -15,10 +15,10 @@
         <th>Number</th>
         <th>Shutter</th>
         <th>Aperture</th>
-        <th>Lens</th>
-        <th>Flash</th>
-        <th>Filters</th>
-        <th>Notes</th>
+        <th class="table35Lens">Lens</th>
+        <th class="table35Flash">Flash</th>
+        <th class="table35Filters">Filters</th>
+        <th class="table35Notes">Notes</th>
         <th></th>
       </tr>
       {% for exposure in exposures %}
@@ -34,24 +34,24 @@
               {{ exposure.aperture }}
             {% endif %}
           </td>
-          <td>
+          <td class="table35Lens">
             {% if exposure.lens %}
               {{ exposure.lens }}
             {% endif %}
           </td>
-          <td>
+          <td class="table35Flash">
             {% if exposure.flash == 'No' %}
               -
             {% else %}
               &#x2713;
             {% endif %}
           </td>
-          <td>
+          <td class="table35Filters">
             {% for filter in exposure.filters %}
               {{ filter.code }}
             {% endfor %}
           </td>
-          <td>
+          <td class="table35Notes">
             {% if exposure.notes %}
               {{ exposure.notes }}
             {% endif %}
