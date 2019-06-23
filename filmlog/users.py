@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash, \
 # Forms
 from flask_wtf import FlaskForm, RecaptchaField
 from wtforms import StringField, PasswordField, validators
+from wtforms.fields.html5 import EmailField
 from wtforms.validators import Length
 
 # Filmlog
@@ -53,7 +54,7 @@ class RegistrationForm(FlaskForm):
     """ New user registration form """
     username = StringField('Username', validators=[validators.input_required(),
                                                    Length(min=1, max=64)])
-    email = StringField('Email', validators=[validators.input_required(),
+    email = EmailField('Email', validators=[validators.input_required(),
                                              Length(min=1, max=256)])
 
     # pylint: disable=line-too-long
