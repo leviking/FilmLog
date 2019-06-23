@@ -114,6 +114,15 @@ a:hover{
   font-weight: bold;
 }
 
+.contribute{
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+.search{
+  font-size: 10pt;
+}
 
 .table-striped-by-two tr:nth-child(4n+1) {
   background-color: #f9f9f9;
@@ -123,11 +132,7 @@ a:hover{
   background-color: #f9f9f9;
 }
 
-.contribute{
-  margin-left: auto;
-  margin-right: auto;
-  width: 90%;
-}
+
 
 /* Special div to make alignment work for printing, particularly large format
    sheets where the information for each exposure is varied resulting in a
