@@ -55,7 +55,7 @@ class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[validators.input_required(),
                                                    Length(min=1, max=64)])
     email = EmailField('Email', validators=[validators.input_required(),
-                                             Length(min=1, max=256)])
+                                            Length(min=1, max=256)])
 
     # pylint: disable=line-too-long
     # This is ugly, but will be uglier in multiple lines
