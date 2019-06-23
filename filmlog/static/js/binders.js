@@ -6,7 +6,7 @@ function displayBinderRow(binder) {
   row += `<td><a href="/binders/${binder.id}/projects">${binder.name}</a></td>`;
   row += `<td>${binder.project_count}</td>`;
   row += `<td>${createdOn}</td>`;
-  row += `<td><button class="btn btn-danger" name="button" value="Delete" \
+  row += `<td><button class="btn btn-danger btn-sm" name="button" value="Delete" \
              onclick="deleteBinder(${binder.id})">Delete</button></td>`;
   $('#bindersTableBody').append($(row));
 }

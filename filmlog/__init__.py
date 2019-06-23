@@ -46,9 +46,8 @@ def section_mapping():
     """ Friendly Names For Sections """
     section_map = (
         ('/gear', 'Gear'),
-        ('/developing', 'Developing'),
-        ('/filmstock', 'Film Stock'),
-        ('/filmtypes', 'Available Films')
+        ('/developing', 'Dev'),
+        ('/filmstock', 'Stock'),
     )
     return dict(section_map=section_map)
 

@@ -7,6 +7,10 @@ pre{
   word-wrap: break-word;
 }
 
+body{
+  font-size: 11pt;
+}
+
 a{
   color: #3c4053;
   font-weight: bold;
@@ -120,7 +124,9 @@ a:hover{
 }
 
 .contribute{
-  width: 250px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
 }
 
 /* Special div to make alignment work for printing, particularly large format
@@ -158,5 +164,10 @@ a:hover{
 @media (max-width: 992px) {
   html{
     font-size: 0.75em;
+  }
+
+  .sidebar{
+    display: flex !important;
+    width: 100%;
   }
 }

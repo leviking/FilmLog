@@ -11,7 +11,7 @@ function displayProjectRow(project) {
   row += `<td><a href="/binders/${binderID}/projects/${project.id}">${project.name}</a></td>`;
   row += `<td>${project.film_count}</td>`;
   row += `<td>${createdOn}</td>`;
-  row += `<td><button class="btn btn-danger" name="button" value="Delete" \
+  row += `<td><button class="btn btn-danger btn-sm" name="button" value="Delete" \
              onclick="deleteProject(${project.id})">Delete</button></td>`;
   $('#projectsTableBody').append($(row));
 }

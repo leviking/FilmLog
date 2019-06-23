@@ -23,7 +23,7 @@ function displayFilmRow(film) {
   row += `<td>${film.exposures}</td>`;
   row += `<td>${film.size}</td>`;
   row += `<td>${filmType}</td>`;
-  row += `<td><button class="btn btn-danger" name="button" value="Delete" \
+  row += `<td><button class="btn btn-danger btn-sm" name="button" value="Delete" \
              onclick="deleteFilm(${film.id})">Delete</button></td>`;
   $('#filmsTableBody').append($(row));
 }
