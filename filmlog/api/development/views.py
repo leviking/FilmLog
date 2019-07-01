@@ -13,7 +13,7 @@ def index():
     return "Hello"
 
 # Developers
-@api_dev_blueprint.route('/developers', methods=['GET'])
+@api_dev_blueprint.route('/developers/', methods=['GET'])
 @login_required
 def developers_all():
     """ Get all developers """
