@@ -23,7 +23,6 @@ function getDevelopers() {
       });
       if ($("#retiredDevelopers").is(':empty')) {
         $("#retiredDevelopersHeading").remove();
-        console.log("EMPTY!");
       }
     },
   });

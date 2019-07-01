@@ -1,56 +1,43 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+<script src="/static/js/development/developer.js"></script>
+{% endblock %}
+
 {% block content %}
 <form role="form" class="form-horizontal" id="developerStateForm"
     action="/developing/developer/{{ developer.developerID }}"
   method="POST">
   {{ developer_form.csrf_token }}
-<h1 class="page-header">{{ developer.name }}
-  {% if developer.state == 'Active' %}
-    <button class="btn btn-warning btn-sm" name="button" value="retireDeveloper" action="submit">Retire</button>
-  {% else %}
-    <button class="btn btn-success btn-sm" name="button" value="unretireDeveloper" action="submit">Unretire</button>
-  {% endif %}
+<h1 class="page-header">
+  <span id="developerName"></span>
+  <button id="developerButton" name="button" class="btn btn-sm" action="submit"></button>
 </h1>
 </form>
 <ul>
   <li>
-    <strong>Mixed On:</strong> {{ developer.mixedOn }}
-    {% if developer.kind != 'Replenishment' %}
-      ({{ developer.age }} days old)
-    {% endif %}
+    <strong>Mixed On:</strong>
+    <span id="mixedOn"></span> (<span id="age"></span> days old)
   </li>
-  <li><strong>Capacity:</strong>
-    {% if developer.capacity >= 1000 %}
-     {{ developer.capacity / 1000 }} L
-    {% else %}
-      {{ developer.capacity }} ml
-    {% endif %}
-   </li>
-  <li><strong>Type:</strong> {{ developer.type }}</li>
-  <li><strong>Kind:</strong> {{ developer.kind }}
-  {% if developer.kind == 'Replenishment' %}
-    <ul>
-      <li><strong>Last Replenished:</strong> {{ developer.last_replenished }} Days Ago</li>
+  <li><strong>Capacity:</strong> <span id="capacity"></span></li>
+  <li><strong>Type:</strong> <span id="type"></span></li>
+  <li>
+    <strong>Kind:</strong> <span id="kind"></span>
+    <ul id="lastReplenishedUl" class="hidden">
+      <li>
+        <strong>Last Replenished:</strong>
+        <span id="lastReplenished"></span>
+      </li>
     </ul>
-  {% endif %}
   </li>
-  <li><strong>State:</strong>
-    {% if developer.state == 'Retired'%}
-      <span class="developerRetired">{{ developer.state }}</span>
-    {% else %}
-      {{ developer.state }}
-    {% endif %}
-  </li>
+  <li><strong>State:</strong> <span id="state"></span></li>
 </ul>
 
-{% if developer.notes %}
-<div class="border">
+<div id="notesDiv" class="border hidden">
   <h5>Notes</h5>
-  <div class="notes">{{ developer.notes }}</div>
+  <div id="notes" class="notes">{{ developer.notes }}</div>
 </div>
 <br />
-{% endif %}
 
 {% if form_errors(developer_form)
   or form_errors(developer_log_form) %}
