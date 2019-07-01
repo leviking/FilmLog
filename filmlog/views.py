@@ -29,6 +29,7 @@ from filmlog import users, filmstock, darkroom, files, gear, docs, \
 
 ## Blueprints
 from filmlog.api import api_blueprint
+from filmlog.api.development import api_dev_blueprint
 
 app = config.app
 engine = config.engine
@@ -36,6 +37,10 @@ csrf = config.csrf
 
 app.register_blueprint(api_blueprint, url_prefix='/api/v1', engine=engine)
 csrf.exempt(api_blueprint)
+
+app.register_blueprint(api_dev_blueprint, url_prefix='/api/v1/development',
+                                          engine=engine)
+csrf.exempt(api_dev_blueprint)
 
 ## Functions
 def encode_shutter(shutter):
