@@ -34,3 +34,14 @@ def developer(developerID):
         return_status = developers.get(connection, developerID)
     transaction.commit()
     return return_status
+
+## Developer Logs
+@api_dev_blueprint.route('/developers/<int:developerID>/logs', methods=['GET'])
+def developer_logs(developerID):
+    """ Get a developer """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = developers.get_logs(connection, developerID)
+    transaction.commit()
+    return return_status
