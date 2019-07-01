@@ -1,13 +1,9 @@
 """ Mixed Developers interactions for API """
 from datetime import datetime, timedelta
-from flask import jsonify, request, make_response
+from flask import jsonify
 from flask_login import current_user
 from flask_api import status
 from sqlalchemy.sql import text
-from sqlalchemy.exc import IntegrityError
-
-from filmlog.functions import next_id, zero_to_none, \
-                              time_to_seconds
 
 ## Developers
 def get_all(connection):
@@ -46,7 +42,6 @@ def get(connection, developerID):
                                          userID=userID,
                                          developerID=developerID).fetchone()
 
-
     # If it's a replenished developer, figure out how long it's been since
     # last replenishment
     if developer_query['kind'] == 'Replenishment':
@@ -57,8 +52,8 @@ def get(connection, developerID):
             AND mlReplaced != 0
             ORDER BY developerLogID DESC LIMIT 1""")
         last_replenished_query = connection.execute(qry,
-                                              userID=userID,
-                                              developerID=developerID).fetchone()
+                                                    userID=userID,
+                                                    developerID=developerID).fetchone()
         if last_replenished_query:
             last_replenished = last_replenished_query['last_replenished']
 
@@ -67,8 +62,8 @@ def get(connection, developerID):
         WHERE userID = :userID
         AND developerID = :developerID""")
     days_old_query = connection.execute(qry,
-                                          userID=userID,
-                                          developerID=developerID).fetchone()
+                                        userID=userID,
+                                        developerID=developerID).fetchone()
     days_old = days_old_query['days_old']
 
     developer = {
@@ -87,9 +82,8 @@ def get(connection, developerID):
     }
     return jsonify(developer), status.HTTP_200_OK
 
-
 # Get logs of a particular mixed developer
-def get_logs(connection, developerID, startDate = None):
+def get_logs(connection, developerID, startDate=None):
     """ Get a developer's logs """
     userID = current_user.get_id()
 
@@ -115,9 +109,9 @@ def get_logs(connection, developerID, startDate = None):
         AND loggedOn > :startDate
         ORDER BY loggedOn DESC""")
     log_query = connection.execute(qry,
-                                         userID=userID,
-                                         developerID=developerID,
-                                         startDate=startDate).fetchall()
+                                   userID=userID,
+                                   developerID=developerID,
+                                   startDate=startDate).fetchall()
 
     logs = {
         "data" : [],

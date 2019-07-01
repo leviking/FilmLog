@@ -39,7 +39,7 @@ app.register_blueprint(api_blueprint, url_prefix='/api/v1', engine=engine)
 csrf.exempt(api_blueprint)
 
 app.register_blueprint(api_dev_blueprint, url_prefix='/api/v1/development',
-                                          engine=engine)
+                       engine=engine)
 csrf.exempt(api_dev_blueprint)
 
 ## Functions
