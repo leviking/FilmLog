@@ -46,81 +46,49 @@
   {{ form_errors(developer_log_form) }}
 {% endif %}
 
-<h4>Total Films Developed</h4>
-<table class="table table-striped table-bordered">
-  <tr>
-    <th>Size</th>
-    <th>Film</th>
-    <th>Qty</th>
-  </tr>
-  {% for film in film_stats %}
-    <tr>
-      <td>{{ film.filmSize }}</td>
-      <td>
-        {% if film.filmName %}
-          {{ film.filmBrand }} {{ film.filmName }} {{ film.iso }}
-        {% else %}
-          Not Specified
-        {% endif %}
-      </td>
-      <td>{{ film.qty }}</td>
-    </tr>
-  {% else %}
-    <tr><td colspan="3">No Films Processed</td></tr>
-  {% endfor %}
-</table>
+<div class="row">
+  <div class="col-md-6">
+    <h4>Films Developed</h4>
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>Size</th>
+          <th>Film</th>
+          <th>Qty</th>
+        </tr>
+      </thead>
+      <tbody id="filmsTableBody"></tbody>
+    </table>
+  </div>
+  <div class="col-md-6">
+    <h4>Films Sizes</h4>
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>Size</th>
+          <th>Qty</th>
+          <th>Adjusted Qty</th>
+        </tr>
+      </thead>
+      <tbody id="sizesTableBody"></tbody>
+    </table>
+  </div>
+</div>
 
 <h4>Development Logs</h4>
 <table class="table table-striped table-bordered">
-  <tr>
-    <th>Developed On</th>
-    <th>Replenished Capacity (ml)</th>
-    <th>Used Capacity (ml)</th>
-    <th>Films Developed</th>
-    <th>Development Time</th>
-    <th>Temperature (C)</th>
-    <th>Notes</th>
-  </tr>
-  {% for log in developer_logs %}
+  <thead>
     <tr>
-      <td>
-        <a href="/developing/developer/{{ developer.developerID }}/log/{{ log.developerLogID }}">{{ log.loggedOn }}</a>
-      </td>
-      <td>{{ log.mlReplaced if log.mlReplaced}}</td>
-      <td>{{ log.mlUsed if log.mlUsed }}</td>
-      <td>
-        {% for film in log.films %}
-          {{ film.qty }}x {{ film.filmSize }}
-          {% if film.filmBrand %}
-            {{ film.filmBrand }} {{ film.filmName }} {{ film.iso }}
-          {% endif %}
-          {% if film.compensation %}
-            {% if film.compensation > 0 %}
-              Pushed +{{ film.compensation }}
-              {% if film.compensation > 1 %}
-                Stops
-              {% else %}
-                Stop
-              {% endif %}
-            {% elif film.compensation < 0 %}
-              Pulled {{ film.compensation }}
-              {% if film.compensation < 1 %}
-                Stops
-              {% else %}
-                Stop
-              {% endif %}
-            {% endif %}
-          {% endif %}
-          <br />
-        {% endfor %}
-      </td>
-      <td>{{ log.devTime if log.devTime }}</td>
-      <td>{{ log.temperature if log.temperature }}</td>
-      <td><div class="notes">{{ log.notes if log.notes }}</div></td>
+      <th>Developed</th>
+      <th>Replenished (ml)</th>
+      <th>Used (ml)</th>
+      <th>Films</th>
+      <th>Time</th>
+      <th>Temperature (C)</th>
+      <th>Notes</th>
     </tr>
-  {% else %}
-    <tr><td colspan="6">Nothing Logged</td></tr>
-  {% endfor %}
+  </thead>
+  <tbody id="logsTableBody"></tbody>
 </table>
 
 {% if developer.state == 'Active' %}

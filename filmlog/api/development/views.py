@@ -45,3 +45,14 @@ def developer_logs(developerID):
         return_status = developers.get_logs(connection, developerID)
     transaction.commit()
     return return_status
+
+## Developer's Films Developed
+@api_dev_blueprint.route('/developers/<int:developerID>/stats', methods=['GET'])
+def developer_stats(developerID):
+    """ Get a films developed """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = developers.get_developer_stats(connection, developerID)
+    transaction.commit()
+    return return_status

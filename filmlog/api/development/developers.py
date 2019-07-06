@@ -102,7 +102,8 @@ def get_logs(connection, developerID, startDate=None):
         AND developerLogID = :developerLogID""")
 
     qry = text("""SELECT developerLogID, loggedOn, mlReplaced, mlUsed,
-        temperature, devTime, notes
+        temperature, notes,
+        SECONDS_TO_DURATION(devTime) AS devTime
         FROM DeveloperLogs
         WHERE userID = :userID
         AND developerID = :developerID
@@ -152,3 +153,84 @@ def get_logs(connection, developerID, startDate=None):
             }
         )
     return jsonify(logs), status.HTTP_200_OK
+
+# Grab some fun developer stats (mostly how many films have been developed)
+def get_developer_stats(connection, developerID):
+    """ Get film stats for a particular developer """
+    userID = current_user.get_id()
+
+    qry = text("""SELECT FilmTypes.name AS filmName, iso, brand AS filmBrand,
+        size AS filmSize, SUM(qty) AS qty
+        FROM DeveloperLogs
+        JOIN DeveloperLogFilms ON DeveloperLogFilms.userID = DeveloperLogs.userID
+            AND DeveloperLogFilms.developerLogID = DeveloperLogs.developerLogID
+        LEFT OUTER JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
+        LEFT OUTER JOIN FilmBrands On FilmBrands.filmBrandID = FilmTypes.filmBrandID
+        JOIN FilmSizes ON FilmSizes.filmSizeID = DeveloperLogFilms.filmSizeID
+        WHERE DeveloperLogs.userID = :userID
+        AND DeveloperLogs.developerID = :developerID
+        GROUP BY DeveloperLogFilms.filmTypeID, DeveloperLogFilms.filmSizeID
+        ORDER BY brand, filmName""")
+    films_developed_query = connection.execute(qry,
+                                    userID=userID,
+                                    developerID=developerID).fetchall()
+
+    # Provide raw and offset count by film size. The offset is an adjustment
+    # for Kodak's recommended 80 sq inches typically for replenishment.
+    # For instance, it takes 4 4x5 sheets to equal 80 sq inches.
+    qry = text("""SELECT size, SUM(qty) AS qty,
+            CASE size
+                WHEN '35mm 12' THEN SUM(qty) / (1/3)
+                WHEN '35mm 24' THEN SUM(qty) / (2/3)
+                WHEN '220' THEN SUM(qty) * 2
+                WHEN '4x5' THEN SUM(qty) / 4
+                WHEN '5x7' THEN SUM(qty) / (80/35)
+                ELSE SUM(qty)
+            END AS 'adjustedQty'
+        FROM DeveloperLogs
+        JOIN DeveloperLogFilms ON DeveloperLogFilms.userID = DeveloperLogs.userID
+            AND DeveloperLogFilms.developerLogID = DeveloperLogs.developerLogID
+        JOIN FilmSizes ON FilmSizes.filmSizeID = DeveloperLogFilms.filmSizeID
+        WHERE DeveloperLogs.userID = :userID
+        AND DeveloperLogs.developerID = :developerID
+        GROUP BY DeveloperLogFilms.filmSizeID
+        ORDER BY qty""")
+    film_qty_query = connection.execute(qry,
+                                    userID=userID,
+                                    developerID=developerID).fetchall()
+
+    stats = {
+        "data" : {},
+    }
+
+    films_developed = {
+        "films" : [],
+    }
+
+    film_qty = {
+        "sizes" : [],
+    }
+
+    for film_developed in films_developed_query:
+        film = {
+            "name" : film_developed['filmName'],
+            "iso" : int(film_developed['iso']),
+            "brand" : film_developed['filmBrand'],
+            "size" : film_developed['filmSize'],
+            "qty" : int(film_developed['qty'])
+        }
+        films_developed['films'].append(film)
+
+    for film_size in film_qty_query:
+        size = {
+            "size" : film_size['size'],
+            "qty" : int(film_size['qty']),
+            "adjusted_qty" : str(film_size['adjustedQty'])
+        }
+        film_qty['sizes'].append(size);
+
+
+    stats['data'] = films_developed
+    stats['data'].update(film_qty)
+
+    return jsonify(stats), status.HTTP_200_OK

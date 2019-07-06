@@ -81,3 +81,10 @@ function isKnown(item) {
   }
   return 'Unknown';
 }
+
+function nullToEmpty(item) {
+  if(item) {
+    return item;
+  }
+  return '';
+}
