@@ -83,7 +83,7 @@ function isKnown(item) {
 }
 
 function nullToEmpty(item) {
-  if(item) {
+  if (item) {
     return item;
   }
   return '';

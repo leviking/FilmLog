@@ -172,8 +172,8 @@ def get_developer_stats(connection, developerID):
         GROUP BY DeveloperLogFilms.filmTypeID, DeveloperLogFilms.filmSizeID
         ORDER BY brand, filmName""")
     films_developed_query = connection.execute(qry,
-                                    userID=userID,
-                                    developerID=developerID).fetchall()
+                                               userID=userID,
+                                               developerID=developerID).fetchall()
 
     # Provide raw and offset count by film size. The offset is an adjustment
     # for Kodak's recommended 80 sq inches typically for replenishment.
@@ -196,8 +196,8 @@ def get_developer_stats(connection, developerID):
         GROUP BY DeveloperLogFilms.filmSizeID
         ORDER BY qty""")
     film_qty_query = connection.execute(qry,
-                                    userID=userID,
-                                    developerID=developerID).fetchall()
+                                        userID=userID,
+                                        developerID=developerID).fetchall()
 
     stats = {
         "data" : {},
@@ -227,8 +227,7 @@ def get_developer_stats(connection, developerID):
             "qty" : int(film_size['qty']),
             "adjusted_qty" : str(film_size['adjustedQty'])
         }
-        film_qty['sizes'].append(size);
-
+        film_qty['sizes'].append(size)
 
     stats['data'] = films_developed
     stats['data'].update(film_qty)
