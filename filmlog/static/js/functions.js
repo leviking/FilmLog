@@ -75,6 +75,21 @@ function formatDate(date) {
   return 'Unknown';
 }
 
+function formatDateTime(datetime) {
+  if (datetime) {
+    const newDate = new Date(datetime);
+    date = $.datepicker.formatDate('yy-mm-dd', newDate);
+    return `${date} ${newDate.getHours()}:${newDate.getMinutes()}:${newDate.getSeconds()}`;
+  }
+  return 'Unknown';
+}
+
+function subtractDays(date, days) {
+  const newDate = new Date(date);
+  newDate.setDate(newDate.getDate() - days);
+  return formatDateTime(newDate);
+}
+
 function isKnown(item) {
   if (item) {
     return item;

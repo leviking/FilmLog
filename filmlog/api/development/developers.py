@@ -83,13 +83,14 @@ def get(connection, developerID):
     return jsonify(developer), status.HTTP_200_OK
 
 # Get logs of a particular mixed developer
-def get_logs(connection, developerID, startDate=None):
+def get_logs(connection, developerID, startDate=None, endDate=None):
     """ Get a developer's logs """
     userID = current_user.get_id()
 
     if not startDate:
         startDate = datetime.today() - timedelta(days=30)
-    print(startDate)
+    if not endDate:
+        endDate = datetime.today()
 
     films_qry = text("""SELECT developerLogFilmID, size AS filmSize,
         FilmSizes.type AS filmSizeType, FilmSizes.format AS filmSizeFormat,
@@ -107,17 +108,20 @@ def get_logs(connection, developerID, startDate=None):
         FROM DeveloperLogs
         WHERE userID = :userID
         AND developerID = :developerID
-        AND loggedOn > :startDate
+        AND loggedOn >= :startDate
+        AND loggedOn <= :endDate
         ORDER BY loggedOn DESC""")
     log_query = connection.execute(qry,
                                    userID=userID,
                                    developerID=developerID,
-                                   startDate=startDate).fetchall()
+                                   startDate=startDate,
+                                   endDate=endDate).fetchall()
 
     logs = {
         "data" : [],
         "pagination" : {
-            "startDate" : startDate
+            "startDate" : startDate,
+            "endDate" : endDate
         }
     }
 

@@ -1,6 +1,9 @@
 """ Main view for Development part of API """
-from flask_login import login_required
+from dateutil.parser import parse
+
 from flask import request
+from flask_api import status
+from flask_login import login_required
 
 # Filmlog
 from filmlog.api.development import api_dev_blueprint, developers
@@ -38,11 +41,25 @@ def developer(developerID):
 ## Developer Logs
 @api_dev_blueprint.route('/developers/<int:developerID>/logs', methods=['GET'])
 def developer_logs(developerID):
-    """ Get a developer """
+    """ Get developer logs """
     connection = engine.connect()
     transaction = connection.begin()
+    startDate = None
+    endDate = None
     if request.method == 'GET':
-        return_status = developers.get_logs(connection, developerID)
+        if request.args.get('startDate'):
+            try:
+                parse(request.args.get('startDate'))
+            except ValueError:
+                return "FAILED", status.HTTP_400_BAD_REQUEST
+            startDate = request.args.get('startDate')
+        if request.args.get('endDate'):
+            try:
+                parse(request.args.get('endDate'))
+            except ValueError:
+                return "FAILED", status.HTTP_400_BAD_REQUEST
+            endDate = request.args.get('endDate')
+        return_status = developers.get_logs(connection, developerID, startDate, endDate)
     transaction.commit()
     return return_status
 
