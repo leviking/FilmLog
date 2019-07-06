@@ -174,7 +174,7 @@ def get_developer_stats(connection, developerID):
         WHERE DeveloperLogs.userID = :userID
         AND DeveloperLogs.developerID = :developerID
         GROUP BY DeveloperLogFilms.filmTypeID, DeveloperLogFilms.filmSizeID
-        ORDER BY brand, filmName""")
+        ORDER BY qty DESC""")
     films_developed_query = connection.execute(qry,
                                                userID=userID,
                                                developerID=developerID).fetchall()
@@ -198,7 +198,7 @@ def get_developer_stats(connection, developerID):
         WHERE DeveloperLogs.userID = :userID
         AND DeveloperLogs.developerID = :developerID
         GROUP BY DeveloperLogFilms.filmSizeID
-        ORDER BY qty""")
+        ORDER BY qty DESC""")
     film_qty_query = connection.execute(qry,
                                         userID=userID,
                                         developerID=developerID).fetchall()
