@@ -392,6 +392,7 @@ CREATE TABLE DeveloperLogs(
     devTime INT UNSIGNED DEFAULT NULL,
     notes TEXT DEFAULT NULL,
     PRIMARY KEY (userID, developerLogID),
+    KEY loggedOn_idx (loggedOn),
     CONSTRAINT DeveloperLogs_Developers_fk FOREIGN KEY (userID, developerID)
         REFERENCES Developers (userID, developerID) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE='InnoDB';

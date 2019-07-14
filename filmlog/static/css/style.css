@@ -20,6 +20,10 @@ a:hover{
   color: #2a429d;
 }
 
+.hidden{
+  display: none;
+}
+
 .navbar{
   width: 100%;
 }

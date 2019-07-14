@@ -16,3 +16,4 @@ itsdangerous
 click
 Pillow
 wtforms
+python-dateutil
