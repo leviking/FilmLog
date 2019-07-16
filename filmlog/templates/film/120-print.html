@@ -69,14 +69,6 @@
 </div>
 {% endif %}
 
-{% if film.notes %}
-<br />
-<div class="cardt">
-  <div class="card-header">Notes</div>
-  <div class="filmNotes">
-    {{ film.notes }}
-  </div>
-</div>
-{% endif %}
+{% include 'film/film_notes.html' %}
 
 {% endblock %}

@@ -37,6 +37,21 @@ body, span, div, table, tr, tbody, tfoot, td, hr {
   background-color: #f9f9f9;
 }
 
+.notes{
+  overflow-x: auto;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+
+.filmNotes .holderNotes{
+  margin-left: 4px;
+  margin-right: 4px;
+  white-space: pre-wrap;
+}
+
 /* Taken from https://gist.github.com/donnierayjones/6fd9802d992b2d8d6cfd */
 @media print {
   .col-md-1 { float:left; width:8%; }
