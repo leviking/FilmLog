@@ -79,7 +79,15 @@ function getLogs(startDate = null, endDate = null) {
         logs.forEach((log) => {
           let films = '';
           log.films.forEach((film) => {
-            films += `${film.qty}x ${film.brand} ${film.name} in ${film.size}<br />`;
+            let comp = '';
+            if (film.compensation) {
+              if (film.compensation > 0) {
+                comp = `+${film.compensation}`;
+              } else {
+                comp = `-${film.compensation}`;
+              }
+            }
+            films += `${film.qty}x ${film.brand} ${film.name} ${comp} in ${film.size}<br />`;
           });
 
           let row = '<tr>';
