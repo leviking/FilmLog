@@ -12,7 +12,7 @@ from wtforms.validators import DataRequired, Optional, Length, NumberRange
 # Filmlog
 from filmlog.config import app, engine
 from filmlog.functions import next_id, insert, delete, optional_choices, \
-                              get_film_types
+                              get_film_types, zero_to_none
 from filmlog.classes import MultiCheckboxField
 
 def get_lenses(connection):
@@ -421,7 +421,7 @@ def user_holder(holderID):
             connection.execute(qry,
                                name=form.name.data,
                                size=form.size.data,
-                               filmTypeID=form.filmTypeID.data,
+                               filmTypeID=zero_to_none(form.filmTypeID.data),
                                iso=form.iso.data,
                                compensation=form.compensation.data,
                                notes=form.notes.data,
@@ -437,7 +437,7 @@ def user_holder(holderID):
             connection.execute(qry,
                                name=form.name.data,
                                size=form.size.data,
-                               filmTypeID=form.filmTypeID.data,
+                               filmTypeID=zero_to_none(form.filmTypeID.data),
                                iso=form.iso.data,
                                compensation=form.compensation.data,
                                notes=form.notes.data,
