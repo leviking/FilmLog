@@ -22,17 +22,17 @@ function getFilm() {
         $('#loaded').html(formatDate(film.loaded));
         $('#unloaded').html(formatDate(film.unloaded));
         $('#developed').html(formatDate(film.developed));
-      } /*else {
+      } else {
         $('#divFilmDates').remove();
-      }*/
+      }
 
       if (film.film_type.film) {
         $('#filmType').html(`${film.film_type.brand} ${film.film_type.film}`);
         $('#filmSize').html(film.size);
         $('#filmISO').html(`${film.film_type.box_speed}, shot at ${film.iso}`);
-      } /*else {
+      } else {
         $('#divFilmType').remove();
-      }*/
+      }
 
       if (film.development) {
         $('#development').html(film.development);

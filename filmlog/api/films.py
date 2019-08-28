@@ -78,7 +78,8 @@ def get(connection, binderID, projectID, filmID):
     qry = text("""SELECT title, fileNo, fileDate,
         Films.iso AS iso, brand AS filmBrand, FilmTypes.name AS film,
         FilmTypes.iso AS filmBoxSpeed, FilmSizes.size AS size, exposures,
-        development, Cameras.cameraID, Cameras.name AS cameraName
+        development, Cameras.cameraID, Cameras.name AS cameraName,
+        loaded, unloaded, developed
         FROM Films
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
         LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
@@ -99,6 +100,9 @@ def get(connection, binderID, projectID, filmID):
             "size" : films_query['size'],
             "exposures" : films_query['exposures'],
             "development" : films_query['development'],
+            "loaded" : films_query['loaded'],
+            "unloaded" : films_query['unloaded'],
+            "developed" : films_query['developed'],
             "film_type" : {
                 "brand" : films_query['filmBrand'],
                 "film" : films_query['film'],
