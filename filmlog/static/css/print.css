@@ -57,10 +57,10 @@ pre{
 }
 
 .filmNotes .holderNotes{
+  border: 0;
   margin-left: 1px;
   margin-right: 1px;
   white-space: pre-wrap;
-  border: 0px;
 }
 
 /* Taken from https://gist.github.com/donnierayjones/6fd9802d992b2d8d6cfd */
