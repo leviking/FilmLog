@@ -163,8 +163,7 @@ def post(connection, projectID):
 
     # Decrement the logged film from the film stock if the film
     # type was provided and it is a roll film.
-    # If it's sheet film, we decrement only when need sheets
-    # are added.
+    # If it's sheet film, we decrement only when sheets are added.
     qry = text("""SELECT 1 FROM FilmSizes
         WHERE filmSizeID = :filmSizeID
         AND format = 'Roll'""")
