@@ -97,7 +97,7 @@ function getLogs(startDate = null, endDate = null) {
           row += `<td>${nullToEmpty(films)}</td>`;
           row += `<td>${nullToEmpty(log.dev_time)}</td>`;
           row += `<td>${nullToEmpty(log.temperature)}</td>`;
-          row += `<td>${nullToEmpty(log.notes)}</td>`;
+          row += `<td class="devNotes">${nullToEmpty(log.notes)}</td></tr>`;
 
           $('#logsTableBody').append($(row));
         });

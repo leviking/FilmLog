@@ -73,6 +73,10 @@ a:hover{
   white-space: pre-wrap;
 }
 
+.devNotes{
+  width: 40%;
+}
+
 .filmStockZero{
   color: #440000;
   font-weight: bold;
