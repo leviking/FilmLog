@@ -139,6 +139,7 @@ def get_logs(connection, developerID, startDate=None, endDate=None):
                     "format" : film['filmSizeFormat'],
                     "brand" : film['filmBrand'],
                     "name" : film['filmName'],
+                    "iso" : film['iso'],
                     "qty" : film['qty'],
                     "compensation" : film['compensation']
                 }

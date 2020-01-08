@@ -87,7 +87,7 @@ function getLogs(startDate = null, endDate = null) {
                 comp = `-${film.compensation}`;
               }
             }
-            films += `${film.qty}x ${film.brand} ${film.name} ${comp} in ${film.size}<br />`;
+            films += `${film.qty}x ${film.brand} ${film.name} ${film.iso} ${comp} in ${film.size}<br />`;
           });
 
           let row = '<tr>';
