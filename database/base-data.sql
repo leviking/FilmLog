@@ -128,3 +128,7 @@ INSERT INTO FilmSizes VALUES (10,'11x14', 'Ultra-Large', 'Sheet');
 
 INSERT INTO PaperDevelopers VALUES (1, 'Ilford Multigrade', '9');
 INSERT INTO PaperDevelopers VALUES (2, 'Ilford Multigrade', '14');
+INSERT INTO PaperDevelopers VALUES (3, 'Dektol', '0');
+INSERT INTO PaperDevelopers VALUES (4, 'Dektol', '1');
+INSERT INTO PaperDevelopers VALUES (5, 'Dektol', '2');
+INSERT INTO PaperDevelopers VALUES (6, 'Dektol', '3');
