@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script src="/static/js/user.js"></script>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-header">User Preferences</h1>
+<div class="card">
+  <div class="card-header">Flags</div>
+  <div class="card-body">
+    <table class="table table-striped table-bordered" id="holdersTable">
+    <tbody id="preferencesTableBody"></tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

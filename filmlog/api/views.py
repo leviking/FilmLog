@@ -4,7 +4,7 @@ from flask import request
 
 # Filmlog
 from filmlog.api import api_blueprint, binders, projects, filmstock, holders, \
-                        films, cameras
+                        films, cameras, user
 from filmlog.config import engine
 
 # http://jsonapi.org/format/
@@ -198,3 +198,17 @@ def holder_details(holderID):
         return_status = holders.patch(connection, holderID)
     transaction.commit()
     return return_status
+
+@api_blueprint.route('/user/preferences', methods=['GET', 'PATCH'])
+@login_required
+def user_preferences():
+    """ Get user's preferences """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = user.get_preferences(connection)
+    #if request.method == 'PATCH':
+    #        return_status = holders.patch(connection, holderID)
+    transaction.commit()
+    return return_status
+    """ Get detailed holder information """
