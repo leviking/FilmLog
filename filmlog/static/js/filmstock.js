@@ -35,6 +35,12 @@ function buildFilmStockTable(title, div, stock) {
   const tableID = `table${div}`;
   const tableBodyID = `tableBody${div}`;
 
+  /* If we have no stock, just return as there is nothing to display.
+     (We want to hide the header) */
+  if(stock.length == 0) {
+    return;
+  }
+
   if (title === 'Sheets') {
     filmType = 'Sheets';
   } else {
