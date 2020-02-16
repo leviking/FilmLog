@@ -207,8 +207,8 @@ def user_preferences():
     transaction = connection.begin()
     if request.method == 'GET':
         return_status = user.get_preferences(connection)
-    #if request.method == 'PATCH':
-    #        return_status = holders.patch(connection, holderID)
+    if request.method == 'PATCH':
+        return_status = user.patch_preferences(connection)
     transaction.commit()
     return return_status
     """ Get detailed holder information """
