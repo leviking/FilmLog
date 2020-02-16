@@ -7,8 +7,6 @@ function getPreferences() {
     contentType: 'application/json',
     dataType: 'json',
     success(data) {
-      let preferenceData = data.data;
-
       let preferences = '<tr id="autoUpdateFilmStock">';
         preferences += '<td><strong>Auto Update Film Stock</strong></td>';
         preferences += `<td><select id="autoUpdateFilmStockSelect" onchange='changeAutoUpdateFilmStock()'>`;

@@ -211,4 +211,3 @@ def user_preferences():
         return_status = user.patch_preferences(connection)
     transaction.commit()
     return return_status
-    """ Get detailed holder information """

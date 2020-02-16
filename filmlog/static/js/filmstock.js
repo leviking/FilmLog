@@ -37,7 +37,7 @@ function buildFilmStockTable(title, div, stock) {
 
   /* If we have no stock, just return as there is nothing to display.
      (We want to hide the header) */
-  if(stock.length === 0) {
+  if (stock.length === 0) {
     return;
   }
 
