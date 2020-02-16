@@ -111,6 +111,11 @@ def logout():
     logout_user()
     return redirect("/")
 
+@app.route('/user/preferences', methods=['GET'])
+def preferences():
+    """ User Preferences Pane """
+    return render_template('users/preferences.html')
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     """ Register a new user """
