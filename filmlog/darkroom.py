@@ -23,7 +23,8 @@ def get_papers(connection):
     qry = text("""SELECT paperID,
         CONCAT(PaperBrands.name, " ", Papers.name) AS name
         FROM Papers
-        JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID""")
+        JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID
+        ORDER BY CONCAT(PaperBrands.name, " ", Papers.name)""")
     return connection.execute(qry).fetchall()
 
 def get_paper_filters(connection):
