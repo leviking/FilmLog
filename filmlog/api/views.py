@@ -41,6 +41,18 @@ def cameras_active():
     transaction.commit()
     return return_status
 
+@api_blueprint.route('/cameras/<int:cameraID>',
+                     methods=['GET'])
+@login_required
+def camera(cameraID):
+    """ Get camera """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = cameras.get(connection, cameraID)
+    transaction.commit()
+    return return_status
+
 # Films
 @api_blueprint.route('/films', methods=['GET'])
 @login_required

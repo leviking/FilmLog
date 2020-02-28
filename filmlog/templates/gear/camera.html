@@ -1,18 +1,39 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+<script src="/static/js/camera.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="row">
 {% include "gear/sidebar.html" %}
 <div class="col-11">
 
-  <h1 class="page-header">{{ camera.name }} <small class="text-muted">{{ camera.filmSize }}</small></h1>
+  <h1 class="page-header"><span id="cameraName"></span></h1>
+  <ul>
+    <li><strong>Status:</strong> <span id="status"></span></li>
+    <li><strong>Film Size:</strong> <span id="filmSize"></span></li>
+    <li><strong>Integrated Shutter:</strong> <span id="integratedShutter"></span></li>
+  </ul>
 
   <h3>Lenses</h3>
-  <ul>
-  {% for lens in camera_lenses %}
-    <li>{{ lens.name }}</li>
-  {% endfor %}
-  </ul>
+  <ul id="lenses"></ul>
+
+  <div id="shutterSpeedsDiv" hidden>
+    <h3 id="shutterSpeedsHeader">Shutter Speeds</h3>
+    <table class="table table-striped table-bordered" id="shutterSpeedsDiv">
+      <thead class="thead-light">
+        <tr>
+          <th>Speed</th>
+          <th>Measured Speed</th>
+          <th>Ideal Microseconds</th>
+          <th>Measured Microseconds</th>
+          <th>Stops</th>
+        </tr>
+      </thead>
+      <tbody id="shutterSpeedsTableBody"></tbody>
+    </table>
+  </div>
 
   <div class="card">
     <div class="card-header">Edit Camera</div>
