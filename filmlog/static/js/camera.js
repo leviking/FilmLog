@@ -12,27 +12,26 @@ function getCamera() {
     contentType: 'application/json',
     dataType: 'json',
     success(data) {
-      let camera = data.data;
+      const camera = data.data;
       $('#cameraName').append(camera.name);
       $('#status').append(camera.status);
       $('#filmSize').append(camera.filmSize);
       $('#integratedShutter').append(camera.integratedShutter);
-      $.each(camera.lenses, function(i, lens) {
-        $('#lenses').append($(`<li>${lens.name}</li>`))
+      $.each(camera.lenses, (i, lens) => {
+        $('#lenses').append($(`<li>${lens.name}</li>`));
       });
-      if(camera.integratedShutter === 'Yes' && camera.shutterSpeeds.length > 0)
-      {
-        $('#shutterSpeedsDiv').prop('hidden', false)
-        $.each(camera.shutterSpeeds, function(i, speed) {
+      if (camera.integratedShutter === 'Yes' && camera.shutterSpeeds.length > 0) {
+        $('#shutterSpeedsDiv').prop('hidden', false);
+        $.each(camera.shutterSpeeds, (i, speed) => {
           let row = `<tr id="speed${speed.speed}">`;
           row += `<td>1/${speed.speed}</td>`;
           row += `<td>1/${speed.measuredSpeed}</td>`;
           row += `<td>${speed.idealSpeedMicroseconds}</td>`;
           row += `<td>${speed.measuredSpeedMicroseconds}</td>`;
           row += `<td>${speed.differenceStops}</td>`;
-          row += `</tr>`;
+          row += '</tr>';
           $('#shutterSpeedsTableBody').append($(row));
-          shutterSpeedDifferenceCSS(speed.differenceStops, `#speed${speed.speed}`)
+          shutterSpeedDifferenceCSS(speed.differenceStops, `#speed${speed.speed}`);
         });
       }
     },

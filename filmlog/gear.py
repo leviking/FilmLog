@@ -400,7 +400,13 @@ def user_holders():
                                notes=form.notes.data)
     form.populate_select_fields(connection)
     transaction.commit()
-    return render_template('/gear/holders.html', form=form)
+
+    if request.args.get('print'):
+        template = '/gear/holders-print.html'
+    else:
+        template = '/gear/holders.html'
+
+    return render_template(template, form=form)
 
 @app.route('/gear/holders/<int:holderID>', methods=['GET', 'POST'])
 @login_required

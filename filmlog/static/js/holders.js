@@ -1,3 +1,6 @@
+const searchParams = new URLSearchParams(window.location.search);
+const printView = searchParams.get('print');
+
 // Update the buttons of a holder in the UI
 function updateHolderButtons(holderID, state) {
   const loadLocation = `/gear/holders/${holderID}`;
@@ -99,7 +102,9 @@ function getHolders() {
         row += `<td>${holder.size}</td>`;
         row += `<td>${film}</td>`;
         row += `<td id="stateForHolderID${holder.id}">${holder.state}</td>`;
-        row += `<td id="buttonsForHolderID${holder.id}"></td></tr>`;
+        if (!printView) {
+          row += `<td id="buttonsForHolderID${holder.id}"></td></tr>`;
+        }
         $('#holdersTableBody').append($(row));
         updateHolderState(holder.id, holder.state);
       });

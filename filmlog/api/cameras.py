@@ -46,16 +46,16 @@ def get(connection, cameraID):
         AND CameraLenses.cameraID = :cameraID
         ORDER BY Lenses.name""")
     lenses_query = connection.execute(qry,
-                                      userID = userID,
-                                      cameraID = cameraID).fetchall()
+                                      userID=userID,
+                                      cameraID=cameraID).fetchall()
 
     qry = text("""SELECT cameraID, filmSize, status, name, integratedShutter
         FROM Cameras
         WHERE cameraID = :cameraID AND userID = :userID
         ORDER BY name""")
     camera_query = connection.execute(qry,
-                                     cameraID=cameraID,
-                                     userID=userID).fetchone()
+                                      cameraID=cameraID,
+                                      userID=userID).fetchone()
 
     lenses = []
     for lens in lenses_query:
@@ -84,8 +84,8 @@ def get(connection, cameraID):
             WHERE userID = :userID
             AND cameraID = :cameraID""")
         shutter_query = connection.execute(qry,
-                                         userID=userID,
-                                         cameraID=cameraID).fetchall()
+                                           userID=userID,
+                                           cameraID=cameraID).fetchall()
         shutter_speeds = []
         for shutter_speed in shutter_query:
             shutter_speeds.append(

@@ -84,20 +84,20 @@ function formatDateTime(datetime) {
   return 'Unknown';
 }
 
-function shutterSpeedDifferenceCSS(differenceStops, entity)
-{
-  if (differenceStops >= -0.25 && differenceStops <= 0)
-    $(entity).addClass("shutterTestGood");
-  else if (differenceStops <= -0.25 && differenceStops > -0.50)
-    $(entity).addClass('shutterTestFair');
-  else if (differenceStops <= -50)
-    $(entity).addClass('shutterTestPoor');
-  else if (differenceStops >= 0 && differenceStops <= 0.25)
+function shutterSpeedDifferenceCSS(differenceStops, entity) {
+  if (differenceStops >= -0.25 && differenceStops <= 0) {
     $(entity).addClass('shutterTestGood');
-  else if (differenceStops > 0.25 && differenceStops < 0.50)
+  } else if (differenceStops <= -0.25 && differenceStops > -0.50) {
     $(entity).addClass('shutterTestFair');
-  else if (differenceStops >= 0.50)
+  } else if (differenceStops <= -50) {
     $(entity).addClass('shutterTestPoor');
+  } else if (differenceStops >= 0 && differenceStops <= 0.25) {
+    $(entity).addClass('shutterTestGood');
+  } else if (differenceStops > 0.25 && differenceStops < 0.50) {
+    $(entity).addClass('shutterTestFair');
+  } else if (differenceStops >= 0.50) {
+    $(entity).addClass('shutterTestPoor');
+  }
 }
 
 

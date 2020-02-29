@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>The Film Log</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="/static/css/style.css" rel="stylesheet" media="all">
+<link href="/static/css/print.css" rel="stylesheet" media="all">
+<link href="/static/css/print-lens.css" rel="stylesheet" media="all">
+</head>
+
+{% block scripts %}
+<script src="/static/include/jquery-3.3.1.min.js"></script>
+<script src="/static/include/jquery-ui/1.12.1/jquery-ui.min.js"></script>
+<script src="/static/include/popper.min.js"></script>
+<script src="/static/include/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script src="/static/js/functions.js"></script>
+<script src="/static/js/holders.js"></script>
+{% endblock %}
+
+{% block body %}
+<body>
+  {% block container %}
+  <div class="container-fluid print">
+    {% block content %}
+    <div class="row">
+    <div class="col-12 filmHolders">
+      <h1 class="page-header">Film Holders</h1>
+      <table class="table table-striped table-bordered" id="holdersTable">
+        <thead class="thead-light">
+          <tr>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Film</th>
+            <th>State</th>
+          </tr>
+        </thead>
+        <tbody id="holdersTableBody"></tbody>
+      </table>
+    </div>
+    </div>
+    {% endblock %}
+  </div>
+  {% endblock %}
+</body>
+{% endblock %}
