@@ -309,7 +309,13 @@ def user_camera(cameraID):
     camera_form.populate_select_fields(connection)
     camera_form.populate_lens_selections(camera_lenses)
     transaction.commit()
-    return render_template('/gear/camera.html',
+
+    if request.args.get('print'):
+        template = '/gear/camera-print.html'
+    else:
+        template = '/gear/camera.html'
+
+    return render_template(template,
                            camera_form=camera_form,
                            camera=camera,
                            camera_lenses=camera_lenses,
