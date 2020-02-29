@@ -9,6 +9,7 @@
   {% include "gear/sidebar.html" %}
   <div class="col-11 main">
     <h1 class="page-header">Film Holders</h1>
+    <div>
     <table class="table table-striped table-bordered" id="holdersTable">
       <thead class="thead-light">
         <tr>
@@ -21,6 +22,10 @@
       </thead>
       <tbody id="holdersTableBody"></tbody>
     </table>
+    <a href="/gear/holders?print=true">
+      <button type="button" class="btn btn-primary">Print</button>
+    </a><br /><br />
+    </div>
 
     <div class="card">
       <div class="card-header">Add Film Holder</div>
