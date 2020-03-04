@@ -107,7 +107,7 @@ CREATE TABLE GlobalFilmTypes (
     kind enum('Color Negative','Black & White Negative','Color Slide','Black & White Slide', 'Motion Picture Color Negative') DEFAULT NULL,
     UNIQUE brand_name_iso_uq (filmBrandID, name, iso),
     KEY filmtypes_filmBrandID_fk (filmBrandID),
-    CONSTRAINT filmtypes_filmBrandID FOREIGN KEY (filmBrandID) REFERENCES FilmBrands (filmBrandID) ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT filmtypes_filmBrandID FOREIGN KEY (filmBrandID) REFERENCES GlobalFilmBrands (filmBrandID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
 CREATE TABLE FilmTypes (
