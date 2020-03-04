@@ -35,7 +35,7 @@ INSERT INTO `GlobalFilmBrands` VALUES (6,'Adox'),
 (13,'Ultrafine'),
 (14,'CatLABS');
 
-INSERT INTO `FilmTypes`
+INSERT INTO `GlobalFilmTypes`
 VALUES (1,1,'Ektar',100,'Color Negative'),
 (2,1,'Portra',160,'Color Negative'),
 (3,1,'Portra',400,'Color Negative'),
