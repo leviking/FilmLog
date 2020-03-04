@@ -385,7 +385,7 @@ CREATE TABLE MaxBlackTests(
   PRIMARY KEY (userID, paperID, filmTypeID),
   CONSTRAINT mbt_users FOREIGN KEY (userID) REFERENCES Users (userID),
   CONSTRAINT mbt_papers FOREIGN KEY (paperID) REFERENCES Papers (paperID),
-  CONSTRAINT mbt_filmTypes FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID),
+  CONSTRAINT mbt_filmTypes FOREIGN KEY (userID, filmTypeID) REFERENCES FilmTypes (userID, filmTypeID),
   CONSTRAINT mbt_enlargers FOREIGN KEY (userID, enlargerID) REFERENCES Enlargers (userID, enlargerID),
   CONSTRAINT mbt_enlargerLenses FOREIGN KEY (userID, enlargerLensID) REFERENCES EnlargerLenses (userID, enlargerLensID)
 ) ENGINE='InnoDB';
