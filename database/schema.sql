@@ -136,7 +136,7 @@ CREATE TABLE FilmStock(
     PRIMARY KEY (userID, filmTypeID, filmSizeID),
     KEY filmtypeID_fk (filmTypeID),
     CONSTRAINT FilmStock_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT FilmStock_filmTypeID_fk FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT FilmStock_FilmTypes_fk FOREIGN KEY (userID, filmTypeID) REFERENCES FilmTypes (userID, filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT FilmStock_filmSizeID_fk FOREIGN KEY (filmSizeID) REFERENCES FilmSizes (filmSizeID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
@@ -190,7 +190,7 @@ CREATE TABLE Films (
     KEY lensID_fk (lensID),
     CONSTRAINT Films_projectID_fk FOREIGN KEY (userID, projectID) REFERENCES Projects (userID, projectID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Films_Cameras_fk FOREIGN KEY (userID, cameraID) REFERENCES Cameras (userID, cameraID) ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT Films_filmTypeID_fk FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT Films_FilmTypes_fk FOREIGN KEY (userID, filmTypeID) REFERENCES FilmTypes (userID, filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Films_filmSizeID_fk FOREIGN KEY (filmSizeID) REFERENCES FilmSizes (filmSizeID) ON UPDATE CASCADE,
     CONSTRAINT Films_Lenses_fk FOREIGN KEY (userID, lensID) REFERENCES Lenses (userID, lensID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
@@ -211,7 +211,7 @@ CREATE TABLE Holders (
     PRIMARY KEY (userID, holderID),
     UNIQUE user_name_eq (userID, name),
     CONSTRAINT Holders_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT Holders_filmTypeID FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID) ON UPDATE CASCADE
+    CONSTRAINT Holders_FilmTypes_fk FOREIGN KEY (userID, filmTypeID) REFERENCES FilmTypes (userID, filmTypeID) ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 -- Both Roll and Sheet
@@ -236,7 +236,7 @@ CREATE TABLE Exposures(
     KEY filmTypeID_idx (filmTypeID),
     KEY lensID_idx (lensID),
     KEY userID_idx (userID),
-    CONSTRAINT Exposures_filmTypeID_fk FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT Exposures_FilmTypes_fk FOREIGN KEY (userID, filmTypeID) REFERENCES FilmTypes (userID, filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Exposures_Films_fk FOREIGN KEY (userID, filmID) REFERENCES Films (userID, filmID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Exposures_Lenses_fk FOREIGN KEY (userID, lensID) REFERENCES Lenses (userID, lensID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Exposures_filmSizeID_fk FOREIGN KEY (filmSizeID) REFERENCES FilmSizes (filmSizeID) ON DELETE RESTRICT ON UPDATE CASCADE,
