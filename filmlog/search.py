@@ -35,7 +35,7 @@ def search_index():
         JOIN Projects ON Projects.projectID = Films.projectID
             AND Projects.userID = Films.userID
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
-        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+            AND FilmTypes.userID = Films.userID
         JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
         JOIN Cameras ON Cameras.cameraID = Films.cameraID
             AND Cameras.userID = Films.userID

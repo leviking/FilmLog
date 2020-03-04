@@ -1,7 +1,8 @@
 """ User specific interactions, specifically logins """
 from flask import request, render_template, redirect, flash
 from sqlalchemy.sql import text
-from flask_login import LoginManager, login_user, logout_user, UserMixin
+from flask_login import LoginManager, login_user, logout_user, UserMixin, \
+    login_required
 from werkzeug.security import generate_password_hash, \
      check_password_hash
 
@@ -112,9 +113,16 @@ def logout():
     return redirect("/")
 
 @app.route('/user/preferences', methods=['GET'])
+@login_required
 def preferences():
     """ User Preferences Pane """
     return render_template('users/preferences.html')
+
+@app.route('/user/films', methods=['GET'])
+@login_required
+def films():
+    """ User Films"""
+    return render_template('users/films.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

@@ -260,25 +260,25 @@ def index():
         cameras = connection.execute(qry, userID=userID)
 
         qry = text("""SELECT
-            FilmBrands.brand AS brand, FilmTypes.name AS type, FilmTypes.iso AS iso,
+            FilmTypes.name AS type, FilmTypes.iso AS iso,
             COUNT(Films.filmTypeID) AS count
             FROM Films
             JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
-            JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
-            AND userID = :userID
+                AND FilmTypes.userID = Films.userID
+            WHERE Films.userID = :userID
             GROUP BY Films.filmTypeID
             ORDER BY COUNT(Films.filmTypeID) DESC""")
         favoriteRolls = connection.execute(qry, userID=userID)
 
         qry = text("""SELECT
-            FilmBrands.brand AS brand, FilmTypes.name AS type, FilmTypes.iso AS iso,
+            FilmTypes.name AS type, FilmTypes.iso AS iso,
             COUNT(Exposures.filmTypeID) AS count
             FROM Exposures
             JOIN Films on Films.filmID = Exposures.filmID
                 AND Films.userID = Exposures.userID
             JOIN FilmTypes ON FilmTypes.filmTypeID = Exposures.filmTypeID
-            JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
-            AND Exposures.userID = :userID
+                AND FilmTypes.userID = Films.userID
+            WHERE Exposures.userID = :userID
             GROUP BY Exposures.filmTypeID
             ORDER BY COUNT(Exposures.filmTypeID) DESC""")
         favoriteSheets = connection.execute(qry, userID=userID)
@@ -428,7 +428,6 @@ def user_film(binderID, projectID, filmID):
         Lenses.name AS lens, flash, metering, subject, Exposures.notes, development,
         Exposures.iso AS shotISO,
         FilmTypes.name AS filmType, FilmTypes.iso AS filmISO,
-        FilmBrands.brand AS filmBrand,
         Holders.name AS holderName,
         Holders.holderID AS holderID
         FROM Exposures
@@ -437,7 +436,7 @@ def user_film(binderID, projectID, filmID):
         LEFT JOIN Holders ON Holders.holderID = Exposures.holderID
             AND Holders.userID = Exposures.userID
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Exposures.filmTypeID
-        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+            AND FilmTypes.userID = Exposures.userID
         WHERE filmID = :filmID
         AND Exposures.userID = :userID
         ORDER BY exposureNumber""")

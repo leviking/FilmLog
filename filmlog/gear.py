@@ -462,12 +462,12 @@ def user_holder(holderID):
         IF(exposed, "Exposed",
             IF(loaded, "Loaded", "Unloaded")) AS state,
         loaded, unloaded, exposed,
-        Holders.filmTypeID, Holders.iso, brand AS filmBrand, FilmTypes.name AS filmName,
+        Holders.filmTypeID, Holders.iso, FilmTypes.name AS filmName,
         FilmTypes.iso AS filmISO, compensation, notes
         FROM Holders
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Holders.filmTypeID
-        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
-        WHERE userID = :userID
+            AND FilmTypes.userID = Holders.userID
+        WHERE Holders.userID = :userID
         AND holderID = :holderID""")
 
     holder = connection.execute(qry,

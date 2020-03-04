@@ -20,7 +20,7 @@ INSERT INTO `Migrations` VALUES ('20180811-22'),
 ('20190607'),
 ('20190608');
 
-INSERT INTO `FilmBrands` VALUES (6,'Adox'),
+INSERT INTO `GlobalFilmBrands` VALUES (6,'Adox'),
 (9,'Arista.EDU'),
 (4,'Bergger'),
 (7,'Cinestill'),

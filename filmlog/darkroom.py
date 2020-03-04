@@ -215,7 +215,7 @@ def user_tests():
     userID = current_user.get_id()
 
     qry = text("""SELECT CONCAT(PaperBrands.name, ' ', Papers.name) AS paper,
-        CONCAT(FilmBrands.brand, ' ', FilmTypes.name, ' ', FilmTypes.iso) AS film,
+        CONCAT(FilmTypes.name, ' ', FilmTypes.iso) AS film,
         Enlargers.name AS enlarger,
         EnlargerLenses.name AS lens,
         aperture, size, SEC_TO_TIME(exposureTime) AS exposureTime
@@ -223,7 +223,7 @@ def user_tests():
         JOIN Papers ON Papers.paperID = MaxBlackTests.paperID
         JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID
         JOIN FilmTypes ON FilmTypes.filmTypeID = MaxBlackTests.filmTypeID
-        JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+            AND FilmTypes.userID = MaxBlackTests.userID
         LEFT OUTER JOIN Enlargers ON Enlargers.userID = MaxBlackTests.userID
             AND Enlargers.enlargerID = MaxBlackTests.enlargerID
         LEFT OUTER JOIN EnlargerLenses ON EnlargerLenses.userID = MaxBlackTests.userID

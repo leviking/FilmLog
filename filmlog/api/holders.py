@@ -15,20 +15,20 @@ def get_all(connection):
     qry = text("""SELECT holderID, Holders.name, size,
         IF(exposed, "Exposed",
             IF(loaded, "Loaded", "Empty")) AS state,
-        Holders.filmTypeID, Holders.iso, brand AS filmBrand, FilmTypes.name AS filmType,
+        Holders.filmTypeID, Holders.iso, FilmTypes.name AS filmType,
         FilmTypes.iso AS filmISO
         FROM Holders
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Holders.filmTypeID
-        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
-        WHERE userID = :userID ORDER BY Holders.name""")
+            AND FilmTypes.userID = Holders.userID
+        WHERE Holders.userID = :userID ORDER BY Holders.name""")
     holders = connection.execute(qry, userID=userID).fetchall()
 
     holders_json = {
         "data": []
     }
     for row in holders:
-        if row['filmBrand']:
-            film = row['filmBrand'] + ' ' + row['filmType'] + ' ' + str(row['filmISO'])
+        if row['filmType']:
+            film = row['filmType'] + ' ' + str(row['filmISO'])
         else:
             film = None
         item = {

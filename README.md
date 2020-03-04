@@ -23,8 +23,8 @@ GRANT ALL ON FilmLogDev.* TO 'FilmLog'@'localhost' IDENTIFIED BY 'password';
     you can optionally use. The script will populate the base schema, some
     sensible values for things like available films, and create a test user
     (the username and password are both 'dev') into a FilmLogDev database.
-  * Install virtualenv for Python 2.6: 
-    http://flask.pocoo.org/docs/0.12/installation/
+  * Install virtualenv for Python 3.6:
+    https://flask.palletsprojects.com/en/1.1.x/installation/ 
   * Activate the virtualenv
 ```
 . venv/bin/activate

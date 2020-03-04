@@ -54,17 +54,32 @@ def camera(cameraID):
     return return_status
 
 # Films
-@api_blueprint.route('/films', methods=['GET'])
+@api_blueprint.route('/films', methods=['GET', 'POST'])
 @login_required
 def films_list():
-    """ Get global films """
+    """ Get user's film types """
     connection = engine.connect()
     transaction = connection.begin()
 
     if request.method == 'GET':
-        return_status = films.get_film_list(connection)
+        return_status = films.get_film_types(connection)
+    elif request.method == 'POST':
+        return_status = films.add_film_type(connection)
     transaction.commit()
     return return_status
+
+@api_blueprint.route('/films/<int:filmTypeID>',
+                     methods=['DELETE'])
+@login_required
+def film_type_details(filmTypeID):
+    """ Get film type details """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'DELETE':
+        return_status = films.delete_film_type(connection, filmTypeID)
+    transaction.commit()
+    return return_status
+
 
 # Binders
 @api_blueprint.route('/binders', methods=['GET', 'POST'])

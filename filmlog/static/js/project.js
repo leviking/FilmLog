@@ -13,8 +13,8 @@ function displayFilmRow(film) {
     iso = `at ${film.iso}`;
   }
 
-  if (film.film_type.brand) {
-    filmType = `${film.film_type.brand} ${film.film_type.film} ${film.film_type.box_speed} ${iso}`;
+  if (film.film_type.film) {
+    filmType = `${film.film_type.film} ${film.film_type.box_speed} ${iso}`;
   }
 
   let row = `<tr id="rowFilmID${film.id}">`;

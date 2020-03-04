@@ -56,10 +56,10 @@ def filmstock():
                                        userID=userID)
 
     qry = text("""SELECT FilmTypes.filmTypeID AS filmTypeID,
-        FilmBrands.brand AS brand, FilmTypes.name AS type, iso
+        FilmTypes.name AS type, iso
         FROM FilmTypes
-        JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID""")
-    films = connection.execute(qry).fetchall()
+        WHERE userID = :userID""")
+    films = connection.execute(qry, userID=userID).fetchall()
 
     transaction.commit()
     return render_template('filmstock.html',

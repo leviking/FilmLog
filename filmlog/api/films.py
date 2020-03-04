@@ -32,15 +32,15 @@ def auto_decrement_film_stock(connection, filmTypeID, filmSizeID):
 
 ## Films
 def get_all(connection, binderID, projectID):
-    """ Get all films """
+    """ Get all films of a project """
     userID = current_user.get_id()
 
     qry = text("""SELECT filmID, title, fileNo,
-        Films.iso AS iso, brand AS filmBrand, FilmTypes.name AS film,
+        Films.iso AS iso, FilmTypes.name AS film,
         FilmTypes.iso AS filmBoxSpeed, FilmSizes.size AS size, exposures
         FROM Films
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
-        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+            AND FilmTypes.userID = Films.userID
         JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
         WHERE projectID = :projectID AND Films.userID = :userID ORDER BY fileDate""")
     films_query = connection.execute(qry,
@@ -58,7 +58,6 @@ def get_all(connection, binderID, projectID):
             "size" : row['size'],
             "exposures" : row['exposures'],
             "film_type" : {
-                "brand" : row['filmBrand'],
                 "film" : row['film'],
                 "box_speed" : row['filmBoxSpeed'],
             },
@@ -72,17 +71,17 @@ def get_all(connection, binderID, projectID):
     return jsonify(films), status.HTTP_200_OK
 
 def get(connection, binderID, projectID, filmID):
-    """ Get film """
+    """ Get film from project """
     userID = current_user.get_id()
 
     qry = text("""SELECT title, fileNo, fileDate,
-        Films.iso AS iso, brand AS filmBrand, FilmTypes.name AS film,
+        Films.iso AS iso, FilmTypes.name AS film,
         FilmTypes.iso AS filmBoxSpeed, FilmSizes.size AS size, exposures,
         development, Cameras.cameraID, Cameras.name AS cameraName,
         loaded, unloaded, developed
         FROM Films
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
-        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+            AND FilmTypes.userID = Films.userID
         LEFT OUTER JOIN Cameras ON Cameras.cameraID = Films.cameraID
                                 AND Cameras.userID = Films.userID
         JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
@@ -104,7 +103,6 @@ def get(connection, binderID, projectID, filmID):
             "unloaded" : films_query['unloaded'],
             "developed" : films_query['developed'],
             "film_type" : {
-                "brand" : films_query['filmBrand'],
                 "film" : films_query['film'],
                 "box_speed" : films_query['filmBoxSpeed'],
             },
@@ -207,14 +205,19 @@ def get_film_sizes(connection):
         film_sizes['data'].append(film)
     return jsonify(film_sizes), status.HTTP_200_OK
 
-# Get Public films
-def get_film_list(connection):
-    """ Get a list of all the available films """
-    qry = text("""SELECT filmTypeID, brand, name, iso, kind
+# Get Users Film Types
+def get_film_types(connection):
+    """ Get a list of all the user's films """
+    userID = current_user.get_id()
+    qry = text("""SELECT FilmTypes.filmTypeID, name, FilmTypes.iso, kind,
+        COUNT(Films.filmID) AS filmCount
         FROM FilmTypes
-        JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
-        ORDER BY brand, name, iso, kind""")
-    films_query = connection.execute(qry).fetchall()
+        LEFT OUTER JOIN Films ON Films.filmTypeID = FilmTypes.filmTypeID
+            AND Films.userID = FilmTypes.userID
+        WHERE FilmTypes.userID = :userID
+        GROUP BY FilmTypes.filmTypeID
+        ORDER BY name, iso, kind, filmCount""")
+    films_query = connection.execute(qry, userID=userID).fetchall()
 
     films = {
         "data": []
@@ -222,10 +225,48 @@ def get_film_list(connection):
     for row in films_query:
         film = {
             "id" : row['filmTypeID'],
-            "brand" : row['brand'],
             "name" : row['name'],
             "iso" : row['iso'],
             "kind" : row['kind'],
+            "count" : row['filmCount']
         }
         films['data'].append(film)
     return jsonify(films), status.HTTP_200_OK
+
+def delete_film_type(connection, filmTypeID):
+    """ Delete a film type """
+    userID = current_user.get_id()
+    qry = text("""DELETE FROM FilmTypes
+                  WHERE userID = :userID AND filmTypeID = :filmTypeID""")
+    try:
+        connection.execute(qry,
+                           userID=userID,
+                           filmTypeID=filmTypeID)
+    except IntegrityError:
+        return "FAILED", status.HTTP_403_FORBIDDEN
+    return "OK", status.HTTP_204_NO_CONTENT
+
+def add_film_type(connection):
+    """ Add film type """
+    userID = current_user.get_id()
+    json = request.get_json()
+    nextFilmTypeID = next_id(connection, 'filmTypeID', 'FilmTypes')
+
+    if int(json['data']['iso']) < 0:
+        return "FAILED", status.HTTP_400_BAD_REQUEST
+
+    qry = text("""INSERT INTO FilmTypes (userID, filmTypeID, name, iso, kind)
+        VALUES (:userID, :filmTypeID, :name, :iso, :kind)""")
+    try:
+        connection.execute(qry,
+                           userID=userID,
+                           filmTypeID=nextFilmTypeID,
+                           name=zero_to_none(json['data']['name']),
+                           iso=zero_to_none(json['data']['iso']),
+                           kind=zero_to_none(json['data']['kind']))
+    except IntegrityError:
+        return "FAILED", status.HTTP_409_CONFLICT
+
+    json['data']['id'] = str(nextFilmTypeID)
+    resp = make_response(jsonify(json))
+    return resp, status.HTTP_201_CREATED

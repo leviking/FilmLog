@@ -93,13 +93,13 @@ CREATE TABLE CameraShutterSpeeds(
         (userID, cameraID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
-CREATE TABLE FilmBrands(
+CREATE TABLE GlobalFilmBrands(
     filmBrandID TINYINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
     brand varchar(64) NOT NULL,
     UNIQUE brand_uq (brand)
 ) ENGINE='InnoDB';
 
-CREATE TABLE FilmTypes (
+CREATE TABLE GlobalFilmTypes (
     filmTypeID SMALLINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
     filmBrandID TINYINT UNSIGNED NOT NULL,
     name varchar(64) NOT NULL,
@@ -108,6 +108,17 @@ CREATE TABLE FilmTypes (
     UNIQUE brand_name_iso_uq (filmBrandID, name, iso),
     KEY filmtypes_filmBrandID_fk (filmBrandID),
     CONSTRAINT filmtypes_filmBrandID FOREIGN KEY (filmBrandID) REFERENCES FilmBrands (filmBrandID) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE='InnoDB';
+
+CREATE TABLE FilmTypes (
+    userID INT UNSIGNED NOT NULL,
+    filmTypeID SMALLINT UNSIGNED NOT NULL,
+    name varchar(64) NOT NULL,
+    iso smallint unsigned,
+    kind enum('Color Negative','Black & White Negative','Color Slide','Black & White Slide', 'Motion Picture Color Negative') DEFAULT NULL,
+    PRIMARY KEY (userID, filmTypeID),
+    UNIQUE KEY user_name_iso_uq (userID, name, iso),
+    CONSTRAINT FilmTypes_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
 CREATE TABLE FilmSizes (
