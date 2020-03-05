@@ -18,7 +18,8 @@ before_script:
     - virtualenv venv
     - source venv/bin/activate
     - pip install -r requirements.txt
-    - pip install pylint==1.9.2
+#    - pip install pylint==1.9.2
+    - pip install pylint
     - pip install pylint-flask
     - npm install
 
