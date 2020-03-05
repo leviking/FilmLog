@@ -14,7 +14,7 @@ cache:
 
 before_script:
     - apt-get update -y
-    - apt-get install -y python-pip python-dev build-essential mariadb-client libmariadbclient-dev-compat virtualenv nodejs npm
+    - apt-get install -y python-pip python-dev python3-dev build-essential mariadb-client libmariadbclient-dev-compat virtualenv nodejs npm
 #    - virtualenv venv
     - virtualenv -p python3 venv
     - source venv/bin/activate
