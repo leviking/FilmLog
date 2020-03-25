@@ -195,7 +195,6 @@ CREATE TABLE Films (
     CONSTRAINT Films_Lenses_fk FOREIGN KEY (userID, lensID) REFERENCES Lenses (userID, lensID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
-
 CREATE TABLE Holders (
     userID INT UNSIGNED NOT NULL,
     holderID SMALLINT UNSIGNED NOT NULL,
@@ -267,12 +266,6 @@ CREATE TABLE ExposureFilters(
 ) ENGINE='InnoDB';
 
 -- Darkroom
-CREATE TABLE PaperBrands(
-    paperBrandID TINYINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
-    name VARCHAR(32) NOT NULL,
-    UNIQUE name_iq (name)
-) ENGINE='InnoDB';
-
 CREATE TABLE PaperDevelopers(
     paperDeveloperID TINYINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
     name VARCHAR(32) NOT NULL,
@@ -281,15 +274,15 @@ CREATE TABLE PaperDevelopers(
 ) ENGINE='InnoDB';
 
 CREATE TABLE Papers(
-    paperID TINYINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
-    paperBrandID TINYINT UNSIGNED NOT NULL,
+    userID INT UNSIGNED NOT NULL,
+    paperID TINYINT UNSIGNED NOT NULL,
     type ENUM('Resin Coated', 'Fibre Base', 'Cotton Rag'),
     grade ENUM('Multi', 'Fixed'),
     surface ENUM('Glossy', 'Pearl', 'Satin', 'Semi-Matt', 'Matt'),
     tone ENUM('Cool', 'Neutral', 'Warm'),
     name varchar(64),
-    KEY paperBrandID_fk (paperBrandID),
-    CONSTRAINT papers_paperBrandID FOREIGN KEY (paperBrandID) REFERENCES PaperBrands (paperBrandID) ON DELETE RESTRICT ON UPDATE CASCADE
+    PRIMARY KEY (userID, paperID),
+    CONSTRAINT papers_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
 CREATE TABLE PaperFilters(
@@ -336,7 +329,8 @@ CREATE TABLE ContactSheets(
     PRIMARY KEY (filmID, userID),
     CONSTRAINT ContactSheets_Files_fk FOREIGN KEY (userID, fileID) REFERENCES Files (userID, fileID),
     CONSTRAINT ContactSheets_EnlargerLenses_fk FOREIGN KEY (userID, enlargerLensID) REFERENCES EnlargerLenses (userID, enlargerLensID) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT ContactSheets_Enlargers_fk FOREIGN KEY (userID, enlargerID) REFERENCES Enlargers (userID, enlargerID)
+    CONSTRAINT ContactSheets_Enlargers_fk FOREIGN KEY (userID, enlargerID) REFERENCES Enlargers (userID, enlargerID),
+    CONSTRAINT ContactSheets_Papers_fk FOREIGN KEY (userID, paperID) REFERENCES Papers (userID, paperID)
 ) ENGINE='InnoDB';
 
 CREATE TABLE Prints (
@@ -362,7 +356,7 @@ CREATE TABLE Prints (
     KEY paperFilterID_fk (paperFilterID),
     KEY film_exposure_fk (filmID, exposureNumber),
     KEY user_film_exposure (userID, filmID, exposureNumber),
-    CONSTRAINT prints_paperID_fk FOREIGN KEY (paperID) REFERENCES Papers (paperID) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT Prints_Papers_fk FOREIGN KEY (userID, paperID) REFERENCES Papers (userID, paperID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT prints_paperFilterID_fk FOREIGN KEY (paperFilterID) REFERENCES PaperFilters (paperFilterID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Prints_Exposures_fk FOREIGN KEY (userID, filmID, exposureNumber) REFERENCES Exposures (userID, filmID, exposureNumber),
     CONSTRAINT Prints_Files_fk FOREIGN KEY (userID, fileID) REFERENCES Files (userID, fileID) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -384,7 +378,7 @@ CREATE TABLE MaxBlackTests(
   notes TEXT,
   PRIMARY KEY (userID, paperID, filmTypeID),
   CONSTRAINT mbt_users FOREIGN KEY (userID) REFERENCES Users (userID),
-  CONSTRAINT mbt_papers FOREIGN KEY (paperID) REFERENCES Papers (paperID),
+  CONSTRAINT mbt_papers FOREIGN KEY (userID, paperID) REFERENCES Papers (userID, paperID),
   CONSTRAINT mbt_filmTypes FOREIGN KEY (userID, filmTypeID) REFERENCES FilmTypes (userID, filmTypeID),
   CONSTRAINT mbt_enlargers FOREIGN KEY (userID, enlargerID) REFERENCES Enlargers (userID, enlargerID),
   CONSTRAINT mbt_enlargerLenses FOREIGN KEY (userID, enlargerLensID) REFERENCES EnlargerLenses (userID, enlargerLensID)

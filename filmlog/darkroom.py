@@ -20,12 +20,12 @@ from filmlog.functions import optional_choices, zero_to_none, insert, \
 ## Functions
 def get_papers(connection):
     """ Helper function to get available papers """
-    qry = text("""SELECT paperID,
-        CONCAT(PaperBrands.name, " ", Papers.name) AS name
+    userID = current_user.get_id()
+    qry = text("""SELECT paperID, name
         FROM Papers
-        JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID
-        ORDER BY CONCAT(PaperBrands.name, " ", Papers.name)""")
-    return connection.execute(qry).fetchall()
+        WHERE userID = :userID
+        ORDER BY name""")
+    return connection.execute(qry, userID=userID).fetchall()
 
 def get_paper_filters(connection):
     """ Helper function to grab paper filters """
@@ -214,14 +214,14 @@ def user_tests():
     transaction = connection.begin()
     userID = current_user.get_id()
 
-    qry = text("""SELECT CONCAT(PaperBrands.name, ' ', Papers.name) AS paper,
+    qry = text("""SELECT Papers.name AS paper,
         CONCAT(FilmTypes.name, ' ', FilmTypes.iso) AS film,
         Enlargers.name AS enlarger,
         EnlargerLenses.name AS lens,
         aperture, size, SEC_TO_TIME(exposureTime) AS exposureTime
         FROM MaxBlackTests
         JOIN Papers ON Papers.paperID = MaxBlackTests.paperID
-        JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID
+            AND Papers.userID = MaxBlackTests.userID
         JOIN FilmTypes ON FilmTypes.filmTypeID = MaxBlackTests.filmTypeID
             AND FilmTypes.userID = MaxBlackTests.userID
         LEFT OUTER JOIN Enlargers ON Enlargers.userID = MaxBlackTests.userID
@@ -288,14 +288,14 @@ def user_prints(binderID, projectID, filmID):
         PaperDevelopers.name AS paperDeveloperName,
         PaperDevelopers.dilution AS paperDeveloperDilution,
         Papers.name AS paperName,
-        PaperBrands.name AS paperBrand, PaperFilters.name AS paperFilterName,
+        PaperFilters.name AS paperFilterName,
         printType, size, aperture, ndFilter, headHeight, Prints.notes, fileID,
         EnlargerLenses.name AS lens,
         Enlargers.name AS enlarger,
         SECONDS_TO_DURATION(exposureTime) AS exposureTime
         FROM Prints
         LEFT OUTER JOIN Papers ON Papers.paperID = Prints.paperID
-        LEFT OUTER JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID
+            AND Papers.userID = Prints.userID
         LEFT OUTER JOIN PaperFilters ON PaperFilters.paperFilterID = Prints.paperFilterID
         LEFT OUTER JOIN PaperDevelopers ON PaperDevelopers.paperDeveloperID = Prints.paperDeveloperID
         LEFT OUTER JOIN EnlargerLenses ON EnlargerLenses.enlargerLensID = Prints.enlargerLensID
@@ -400,8 +400,8 @@ def print_exposure(binderID, projectID, filmID, printID):
         SECONDS_TO_DURATION(exposureTime) AS exposureTime
         FROM Prints
         LEFT OUTER JOIN Papers ON Papers.paperID = Prints.paperID
+            AND Papers.userID = Prints.userID
         LEFT OUTER JOIN PaperDevelopers ON PaperDevelopers.paperDeveloperID = Prints.paperDeveloperID
-        LEFT OUTER JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID
         LEFT OUTER JOIN PaperFilters ON PaperFilters.paperFilterID = Prints.paperFilterID
         LEFT OUTER JOIN EnlargerLenses ON EnlargerLenses.enlargerLensID = Prints.enlargerLensID
             AND EnlargerLenses.userID = Prints.userID
@@ -489,7 +489,7 @@ def contactsheet(binderID, projectID, filmID):
 
     # Get contact sheet info
     qry = text("""SELECT fileID, Papers.name AS paperName,
-        PaperBrands.name AS paperBrand, PaperFilters.name AS paperFilterName,
+        PaperFilters.name AS paperFilterName,
         EnlargerLenses.name AS lens, Enlargers.name AS enlarger,
         aperture, headHeight, ContactSheets.notes,
         ContactSheets.paperID AS paperID,
@@ -498,7 +498,7 @@ def contactsheet(binderID, projectID, filmID):
         SECONDS_TO_DURATION(exposureTime) AS exposureTime
         FROM ContactSheets
         LEFT OUTER JOIN Papers ON Papers.paperID = ContactSheets.paperID
-        LEFT OUTER JOIN PaperBrands ON PaperBrands.paperBrandID = Papers.paperBrandID
+            AND Papers.userID = ContactSheets.userID
         LEFT OUTER JOIN PaperFilters ON PaperFilters.paperFilterID = ContactSheets.paperFilterID
         LEFT OUTER JOIN EnlargerLenses ON EnlargerLenses.enlargerLensID = ContactSheets.enlargerLensID
             AND EnlargerLenses.userID = ContactSheets.userID
