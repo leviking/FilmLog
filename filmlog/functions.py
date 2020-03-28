@@ -28,12 +28,13 @@ def next_id(connection, field, table):
 
 def get_film_types(connection):
     """ Get a friendly output of the film types (e.g. Kodak T-Max 100) """
+    userID = current_user.get_id()
     qry = text("""SELECT filmTypeID,
-        CONCAT(brand, " ", name, " ", iso)
+        CONCAT(name, " ", iso)
         FROM FilmTypes
-        JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
-        ORDER BY brand, name""")
-    return connection.execute(qry).fetchall()
+        WHERE userID = :userID
+        ORDER BY name""")
+    return connection.execute(qry, userID=userID).fetchall()
 
 def get_film_sizes(connection):
     """ Get all the available film sizes (e.g. 35mm, 4x5) """
@@ -46,7 +47,7 @@ def get_film_details(connection, binderID, projectID, filmID):
         For sheets, each "film" is more of a sub project. """
     userID = current_user.get_id()
 
-    qry = text("""SELECT filmID, Films.projectID, Projects.name AS project, brand,
+    qry = text("""SELECT filmID, Films.projectID, Projects.name AS project,
         FilmTypes.name AS filmName, FilmTypes.iso AS filmISO,
         Films.iso AS shotISO, fileNo, fileDate, FilmSizes.size AS size,
         Films.filmSizeID AS filmSizeID,
@@ -62,7 +63,7 @@ def get_film_details(connection, binderID, projectID, filmID):
         JOIN Binders ON Binders.binderID = Projects.binderID
             AND  Binders.userID = Films.userID
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
-        LEFT OUTER JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+            AND FilmTypes.userID = Films.userID
         JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
         LEFT JOIN Cameras ON Cameras.cameraID = Films.cameraID
             AND Cameras.userID = Films.userID

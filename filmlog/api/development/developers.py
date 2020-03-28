@@ -94,12 +94,12 @@ def get_logs(connection, developerID, startDate=None, endDate=None):
 
     films_qry = text("""SELECT developerLogFilmID, size AS filmSize,
         FilmSizes.type AS filmSizeType, FilmSizes.format AS filmSizeFormat,
-        FilmTypes.name AS filmName, iso, brand AS filmBrand, qty, compensation
+        FilmTypes.name AS filmName, iso, qty, compensation
         FROM DeveloperLogFilms
         LEFT OUTER JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
-        LEFT OUTER JOIN FilmBrands On FilmBrands.filmBrandID = FilmTypes.filmBrandID
+            AND FilmTypes.userID = DeveloperLogFilms.userID
         JOIN FilmSizes ON FilmSizes.filmSizeID = DeveloperLogFilms.filmSizeID
-        WHERE userID = :userID
+        WHERE DeveloperLogFilms.userID = :userID
         AND developerLogID = :developerLogID""")
 
     qry = text("""SELECT developerLogID, loggedOn, mlReplaced, mlUsed,
@@ -137,7 +137,6 @@ def get_logs(connection, developerID, startDate=None, endDate=None):
                     "size" : film['filmSize'],
                     "type" : film['filmSizeType'],
                     "format" : film['filmSizeFormat'],
-                    "brand" : film['filmBrand'],
                     "name" : film['filmName'],
                     "iso" : film['iso'],
                     "qty" : film['qty'],
@@ -164,13 +163,13 @@ def get_developer_stats(connection, developerID):
     """ Get film stats for a particular developer """
     userID = current_user.get_id()
 
-    qry = text("""SELECT FilmTypes.name AS filmName, iso, brand AS filmBrand,
+    qry = text("""SELECT FilmTypes.name AS filmName, iso
         size AS filmSize, SUM(qty) AS qty
         FROM DeveloperLogs
         JOIN DeveloperLogFilms ON DeveloperLogFilms.userID = DeveloperLogs.userID
             AND DeveloperLogFilms.developerLogID = DeveloperLogs.developerLogID
         LEFT OUTER JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
-        LEFT OUTER JOIN FilmBrands On FilmBrands.filmBrandID = FilmTypes.filmBrandID
+            AND FilmTypes.userID = DeveloperLogFilms.userID
         JOIN FilmSizes ON FilmSizes.filmSizeID = DeveloperLogFilms.filmSizeID
         WHERE DeveloperLogs.userID = :userID
         AND DeveloperLogs.developerID = :developerID
@@ -220,7 +219,6 @@ def get_developer_stats(connection, developerID):
         film = {
             "name" : film_developed['filmName'],
             "iso" : int(film_developed['iso']),
-            "brand" : film_developed['filmBrand'],
             "size" : film_developed['filmSize'],
             "qty" : int(film_developed['qty'])
         }

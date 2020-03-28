@@ -12,13 +12,13 @@ def get_all(connection):
 
     qry = text("""SELECT FilmStock.filmTypeID AS filmTypeID,
         FilmStock.filmSizeID AS filmSizeID, FilmSizes.size AS size, qty,
-        FilmBrands.brand AS brand, FilmTypes.name AS type, iso
+        FilmTypes.name AS type, iso
         FROM FilmStock
         JOIN FilmTypes ON FilmTypes.filmTypeID = FilmStock.filmTypeID
-        JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+            AND FilmTypes.userID = FilmStock.userID
         JOIN FilmSizes ON FilmSizes.filmSizeID = FilmStock.filmSizeID
-        WHERE userID = :userID
-        ORDER BY size, brand, type, iso""")
+        WHERE FilmStock.userID = :userID
+        ORDER BY size, type, iso""")
     stock = connection.execute(qry, userID=userID).fetchall()
 
     filmstock = {
@@ -27,7 +27,6 @@ def get_all(connection):
     for row in stock:
         item = {
             "id" : str(row['filmTypeID']) + ':' + str(row['filmSizeID']),
-            "brand" : row['brand'],
             "type" : row['type'],
             "iso" : row['iso'],
             "size" : row['size'],
@@ -46,12 +45,12 @@ def get(connection, filmTypeID, filmSizeID):
 
     qry = text("""SELECT FilmStock.filmTypeID AS filmTypeID,
         FilmStock.filmSizeID AS filmSizeID, FilmSizes.size AS size, qty,
-        FilmBrands.brand AS brand, FilmTypes.name AS type, iso
+        FilmTypes.name AS type, iso
         FROM FilmStock
         JOIN FilmTypes ON FilmTypes.filmTypeID = FilmStock.filmTypeID
-        JOIN FilmBrands ON FilmBrands.filmBrandID = FilmTypes.filmBrandID
+            FilmTypes.userID = FilmStock.userID
         JOIN FilmSizes ON FilmSizes.filmSizeID = FilmStock.filmSizeID
-        WHERE userID = :userID
+        WHERE FilmStock.userID = :userID
         AND FilmStock.filmTypeID = :filmTypeID
         AND FilmStock.filmSizeID = :filmSizeID""")
     stock = connection.execute(qry,
@@ -62,7 +61,6 @@ def get(connection, filmTypeID, filmSizeID):
     filmstock = {
         "data" : {
             "id" : str(filmTypeID) + ':' + str(filmSizeID),
-            "brand" : stock['brand'],
             "type" : stock['type'],
             "iso" : stock['iso'],
             "size" : stock['size'],

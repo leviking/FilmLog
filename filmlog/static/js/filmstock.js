@@ -54,7 +54,7 @@ function buildFilmStockTable(title, div, stock) {
 
   jQuery(stock).each((i, item) => {
     let row = `<tr id="rowFilm:${item.id}">`;
-    row += `<td>${item.brand} ${item.type}</td>`;
+    row += `<td>${item.type}</td>`;
     row += `<td>${item.iso}</td>`;
     row += `<td>${item.size}</td>`;
     row += `<td id="film:${item.id}:Qty">${item.qty}</td>`;

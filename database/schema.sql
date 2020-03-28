@@ -93,13 +93,13 @@ CREATE TABLE CameraShutterSpeeds(
         (userID, cameraID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
-CREATE TABLE FilmBrands(
+CREATE TABLE GlobalFilmBrands(
     filmBrandID TINYINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
     brand varchar(64) NOT NULL,
     UNIQUE brand_uq (brand)
 ) ENGINE='InnoDB';
 
-CREATE TABLE FilmTypes (
+CREATE TABLE GlobalFilmTypes (
     filmTypeID SMALLINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
     filmBrandID TINYINT UNSIGNED NOT NULL,
     name varchar(64) NOT NULL,
@@ -107,7 +107,18 @@ CREATE TABLE FilmTypes (
     kind enum('Color Negative','Black & White Negative','Color Slide','Black & White Slide', 'Motion Picture Color Negative') DEFAULT NULL,
     UNIQUE brand_name_iso_uq (filmBrandID, name, iso),
     KEY filmtypes_filmBrandID_fk (filmBrandID),
-    CONSTRAINT filmtypes_filmBrandID FOREIGN KEY (filmBrandID) REFERENCES FilmBrands (filmBrandID) ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT filmtypes_filmBrandID FOREIGN KEY (filmBrandID) REFERENCES GlobalFilmBrands (filmBrandID) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE='InnoDB';
+
+CREATE TABLE FilmTypes (
+    userID INT UNSIGNED NOT NULL,
+    filmTypeID SMALLINT UNSIGNED NOT NULL,
+    name varchar(64) NOT NULL,
+    iso smallint unsigned,
+    kind enum('Color Negative','Black & White Negative','Color Slide','Black & White Slide', 'Motion Picture Color Negative') DEFAULT NULL,
+    PRIMARY KEY (userID, filmTypeID),
+    UNIQUE KEY user_name_iso_uq (userID, name, iso),
+    CONSTRAINT FilmTypes_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
 CREATE TABLE FilmSizes (
@@ -125,7 +136,7 @@ CREATE TABLE FilmStock(
     PRIMARY KEY (userID, filmTypeID, filmSizeID),
     KEY filmtypeID_fk (filmTypeID),
     CONSTRAINT FilmStock_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT FilmStock_filmTypeID_fk FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT FilmStock_FilmTypes_fk FOREIGN KEY (userID, filmTypeID) REFERENCES FilmTypes (userID, filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT FilmStock_filmSizeID_fk FOREIGN KEY (filmSizeID) REFERENCES FilmSizes (filmSizeID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
@@ -179,11 +190,10 @@ CREATE TABLE Films (
     KEY lensID_fk (lensID),
     CONSTRAINT Films_projectID_fk FOREIGN KEY (userID, projectID) REFERENCES Projects (userID, projectID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Films_Cameras_fk FOREIGN KEY (userID, cameraID) REFERENCES Cameras (userID, cameraID) ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT Films_filmTypeID_fk FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT Films_FilmTypes_fk FOREIGN KEY (userID, filmTypeID) REFERENCES FilmTypes (userID, filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Films_filmSizeID_fk FOREIGN KEY (filmSizeID) REFERENCES FilmSizes (filmSizeID) ON UPDATE CASCADE,
     CONSTRAINT Films_Lenses_fk FOREIGN KEY (userID, lensID) REFERENCES Lenses (userID, lensID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
-
 
 CREATE TABLE Holders (
     userID INT UNSIGNED NOT NULL,
@@ -200,7 +210,7 @@ CREATE TABLE Holders (
     PRIMARY KEY (userID, holderID),
     UNIQUE user_name_eq (userID, name),
     CONSTRAINT Holders_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT Holders_filmTypeID FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID) ON UPDATE CASCADE
+    CONSTRAINT Holders_FilmTypes_fk FOREIGN KEY (userID, filmTypeID) REFERENCES FilmTypes (userID, filmTypeID) ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 -- Both Roll and Sheet
@@ -225,7 +235,7 @@ CREATE TABLE Exposures(
     KEY filmTypeID_idx (filmTypeID),
     KEY lensID_idx (lensID),
     KEY userID_idx (userID),
-    CONSTRAINT Exposures_filmTypeID_fk FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT Exposures_FilmTypes_fk FOREIGN KEY (userID, filmTypeID) REFERENCES FilmTypes (userID, filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Exposures_Films_fk FOREIGN KEY (userID, filmID) REFERENCES Films (userID, filmID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Exposures_Lenses_fk FOREIGN KEY (userID, lensID) REFERENCES Lenses (userID, lensID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Exposures_filmSizeID_fk FOREIGN KEY (filmSizeID) REFERENCES FilmSizes (filmSizeID) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -256,12 +266,6 @@ CREATE TABLE ExposureFilters(
 ) ENGINE='InnoDB';
 
 -- Darkroom
-CREATE TABLE PaperBrands(
-    paperBrandID TINYINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
-    name VARCHAR(32) NOT NULL,
-    UNIQUE name_iq (name)
-) ENGINE='InnoDB';
-
 CREATE TABLE PaperDevelopers(
     paperDeveloperID TINYINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
     name VARCHAR(32) NOT NULL,
@@ -270,15 +274,15 @@ CREATE TABLE PaperDevelopers(
 ) ENGINE='InnoDB';
 
 CREATE TABLE Papers(
-    paperID TINYINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
-    paperBrandID TINYINT UNSIGNED NOT NULL,
+    userID INT UNSIGNED NOT NULL,
+    paperID TINYINT UNSIGNED NOT NULL,
     type ENUM('Resin Coated', 'Fibre Base', 'Cotton Rag'),
     grade ENUM('Multi', 'Fixed'),
     surface ENUM('Glossy', 'Pearl', 'Satin', 'Semi-Matt', 'Matt'),
     tone ENUM('Cool', 'Neutral', 'Warm'),
     name varchar(64),
-    KEY paperBrandID_fk (paperBrandID),
-    CONSTRAINT papers_paperBrandID FOREIGN KEY (paperBrandID) REFERENCES PaperBrands (paperBrandID) ON DELETE RESTRICT ON UPDATE CASCADE
+    PRIMARY KEY (userID, paperID),
+    CONSTRAINT papers_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
 CREATE TABLE PaperFilters(
@@ -325,7 +329,8 @@ CREATE TABLE ContactSheets(
     PRIMARY KEY (filmID, userID),
     CONSTRAINT ContactSheets_Files_fk FOREIGN KEY (userID, fileID) REFERENCES Files (userID, fileID),
     CONSTRAINT ContactSheets_EnlargerLenses_fk FOREIGN KEY (userID, enlargerLensID) REFERENCES EnlargerLenses (userID, enlargerLensID) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT ContactSheets_Enlargers_fk FOREIGN KEY (userID, enlargerID) REFERENCES Enlargers (userID, enlargerID)
+    CONSTRAINT ContactSheets_Enlargers_fk FOREIGN KEY (userID, enlargerID) REFERENCES Enlargers (userID, enlargerID),
+    CONSTRAINT ContactSheets_Papers_fk FOREIGN KEY (userID, paperID) REFERENCES Papers (userID, paperID)
 ) ENGINE='InnoDB';
 
 CREATE TABLE Prints (
@@ -351,7 +356,7 @@ CREATE TABLE Prints (
     KEY paperFilterID_fk (paperFilterID),
     KEY film_exposure_fk (filmID, exposureNumber),
     KEY user_film_exposure (userID, filmID, exposureNumber),
-    CONSTRAINT prints_paperID_fk FOREIGN KEY (paperID) REFERENCES Papers (paperID) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT Prints_Papers_fk FOREIGN KEY (userID, paperID) REFERENCES Papers (userID, paperID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT prints_paperFilterID_fk FOREIGN KEY (paperFilterID) REFERENCES PaperFilters (paperFilterID) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT Prints_Exposures_fk FOREIGN KEY (userID, filmID, exposureNumber) REFERENCES Exposures (userID, filmID, exposureNumber),
     CONSTRAINT Prints_Files_fk FOREIGN KEY (userID, fileID) REFERENCES Files (userID, fileID) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -373,8 +378,8 @@ CREATE TABLE MaxBlackTests(
   notes TEXT,
   PRIMARY KEY (userID, paperID, filmTypeID),
   CONSTRAINT mbt_users FOREIGN KEY (userID) REFERENCES Users (userID),
-  CONSTRAINT mbt_papers FOREIGN KEY (paperID) REFERENCES Papers (paperID),
-  CONSTRAINT mbt_filmTypes FOREIGN KEY (filmTypeID) REFERENCES FilmTypes (filmTypeID),
+  CONSTRAINT mbt_papers FOREIGN KEY (userID, paperID) REFERENCES Papers (userID, paperID),
+  CONSTRAINT mbt_filmTypes FOREIGN KEY (userID, filmTypeID) REFERENCES FilmTypes (userID, filmTypeID),
   CONSTRAINT mbt_enlargers FOREIGN KEY (userID, enlargerID) REFERENCES Enlargers (userID, enlargerID),
   CONSTRAINT mbt_enlargerLenses FOREIGN KEY (userID, enlargerLensID) REFERENCES EnlargerLenses (userID, enlargerLensID)
 ) ENGINE='InnoDB';

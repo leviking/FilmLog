@@ -250,6 +250,8 @@ def user_developer(developerID):
     developer_log_results = connection.execute(qry,
                                                userID=userID,
                                                developerID=developerID).fetchall()
+    # pylint complains but this took a while to get working so leaving as is.
+    # pylint: disable=unnecessary-comprehension
     developer_logs = [{key: value for (key, value) in row.items()}
                       for row in developer_log_results]
 

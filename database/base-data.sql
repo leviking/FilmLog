@@ -20,7 +20,7 @@ INSERT INTO `Migrations` VALUES ('20180811-22'),
 ('20190607'),
 ('20190608');
 
-INSERT INTO `FilmBrands` VALUES (6,'Adox'),
+INSERT INTO `GlobalFilmBrands` VALUES (6,'Adox'),
 (9,'Arista.EDU'),
 (4,'Bergger'),
 (7,'Cinestill'),
@@ -35,7 +35,7 @@ INSERT INTO `FilmBrands` VALUES (6,'Adox'),
 (13,'Ultrafine'),
 (14,'CatLABS');
 
-INSERT INTO `FilmTypes`
+INSERT INTO `GlobalFilmTypes`
 VALUES (1,1,'Ektar',100,'Color Negative'),
 (2,1,'Portra',160,'Color Negative'),
 (3,1,'Portra',400,'Color Negative'),
