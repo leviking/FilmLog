@@ -265,7 +265,7 @@ def user_developer(developerID):
         LEFT OUTER JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
             AND FilmTypes.userID = DeveloperLogFilms.userID
         JOIN FilmSizes ON FilmSizes.filmSizeID = DeveloperLogFilms.filmSizeID
-        WHERE userID = :userID
+        WHERE DeveloperLogFilms.userID = :userID
         AND developerLogID = :developerLogID""")
 
     for index, log in enumerate(developer_logs):
@@ -395,9 +395,8 @@ def user_developer_log(developerID, developerLogID):
         qty, compensation
         FROM DeveloperLogFilms
         LEFT OUTER JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
-
         JOIN FilmSizes ON FilmSizes.filmSizeID = DeveloperLogFilms.filmSizeID
-        WHERE userID = :userID
+        WHERE DeveloperLogFilms.userID = :userID
         AND developerLogID = :developerLogID""")
     films = connection.execute(qry,
                                userID=userID,
