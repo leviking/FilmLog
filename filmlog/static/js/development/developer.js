@@ -87,7 +87,7 @@ function getLogs(startDate = null, endDate = null) {
                 comp = `-${film.compensation}`;
               }
             }
-            films += `${film.qty}x ${film.brand} ${film.name} ${film.iso} ${comp} in ${film.size}<br />`;
+            films += `${film.qty}x ${film.name} ${film.iso} ${comp} in ${film.size}<br />`;
           });
 
           let row = '<tr>';
@@ -122,7 +122,7 @@ function getFilmStats() {
       films.forEach((film) => {
         let row = `<tr>`;
         row += `<td>${film.size}</td>`;
-        row += `<td>${film.brand} ${film.name} ${film.iso}</td>`;
+        row += `<td>${film.name} ${film.iso}</td>`;
         row += `<td>${film.qty}</td>`;
         row += `</tr>`;
 
