@@ -260,7 +260,7 @@ def user_developer(developerID):
     # but this works.
     qry = text("""SELECT developerLogFilmID, size AS filmSize,
         DeveloperLogFilms.filmTypeID, FilmTypes.name AS filmName, iso,
-        brand AS filmBrand, qty, compensation
+        qty, compensation
         FROM DeveloperLogFilms
         LEFT OUTER JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
             AND FilmTypes.userID = DeveloperLogFilms.userID
@@ -275,18 +275,18 @@ def user_developer(developerID):
         developer_logs[index]['films'] = films
 
     # Grab film statistics
-    qry = text("""SELECT FilmTypes.name AS filmName, iso, brand AS filmBrand,
+    qry = text("""SELECT FilmTypes.name AS filmName, iso,
         size AS filmSize, SUM(qty) AS qty
         FROM DeveloperLogs
         JOIN DeveloperLogFilms ON DeveloperLogFilms.userID = DeveloperLogs.userID
             AND DeveloperLogFilms.developerLogID = DeveloperLogs.developerLogID
         LEFT OUTER JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
-        LEFT OUTER JOIN FilmBrands On FilmBrands.filmBrandID = FilmTypes.filmBrandID
+            AND FilmTypes.userID = DeveloperLogFilms.userID
         JOIN FilmSizes ON FilmSizes.filmSizeID = DeveloperLogFilms.filmSizeID
         WHERE DeveloperLogs.userID = :userID
         AND DeveloperLogs.developerID = :developerID
         GROUP BY DeveloperLogFilms.filmTypeID, DeveloperLogFilms.filmSizeID
-        ORDER BY brand, filmName""")
+        ORDER BY filmName""")
     film_stats = connection.execute(qry,
                                     userID=userID,
                                     developerID=developerID).fetchall()
@@ -392,10 +392,10 @@ def user_developer_log(developerID, developerLogID):
     # but this works.
     qry = text("""SELECT developerLogFilmID, size AS filmSize,
         DeveloperLogFilms.filmTypeID, FilmTypes.name AS filmName, iso,
-        brand AS filmBrand, qty, compensation
+        qty, compensation
         FROM DeveloperLogFilms
         LEFT OUTER JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
-        LEFT OUTER JOIN FilmBrands On FilmBrands.filmBrandID = FilmTypes.filmBrandID
+
         JOIN FilmSizes ON FilmSizes.filmSizeID = DeveloperLogFilms.filmSizeID
         WHERE userID = :userID
         AND developerLogID = :developerLogID""")
