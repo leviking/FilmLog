@@ -263,7 +263,7 @@ def user_developer(developerID):
         brand AS filmBrand, qty, compensation
         FROM DeveloperLogFilms
         LEFT OUTER JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
-        LEFT OUTER JOIN FilmBrands On FilmBrands.filmBrandID = FilmTypes.filmBrandID
+            AND FilmTypes.userID = DeveloperLogFilms.userID
         JOIN FilmSizes ON FilmSizes.filmSizeID = DeveloperLogFilms.filmSizeID
         WHERE userID = :userID
         AND developerLogID = :developerLogID""")
