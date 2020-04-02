@@ -46,7 +46,7 @@ function getFilmTypes() {
     success(data) {
       $('#filmTypeID').append($('<option value="0">None</option>'));
       jQuery(data.data).each((i, film) => {
-        $('#filmTypeID').append($(`<option value="${film.id}">${film.brand} ${film.name} ${film.iso}</option>`));
+        $('#filmTypeID').append($(`<option value="${film.id}">${film.name} ${film.iso}</option>`));
       });
     },
   });

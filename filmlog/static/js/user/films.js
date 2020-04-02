@@ -13,8 +13,6 @@ function deleteFilmRow(filmTypeID) {
   $(tr).remove();
 }
 
-
-
 function getFilms() {
   jQuery.ajax({
     type: 'GET',

@@ -124,6 +124,12 @@ def films():
     """ User Films"""
     return render_template('users/films.html')
 
+@app.route('/user/papers', methods=['GET'])
+@login_required
+def papers():
+    """ User Papers"""
+    return render_template('users/papers.html')
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     """ Register a new user """

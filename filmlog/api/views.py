@@ -4,7 +4,7 @@ from flask import request
 
 # Filmlog
 from filmlog.api import api_blueprint, binders, projects, filmstock, holders, \
-                        films, cameras, user
+                        films, cameras, user, paper
 from filmlog.config import engine
 
 # http://jsonapi.org/format/
@@ -223,6 +223,19 @@ def holder_details(holderID):
     #    return_status = filmstock.get(connection, filmTypeID, filmSizeID)
     if request.method == 'PATCH':
         return_status = holders.patch(connection, holderID)
+    transaction.commit()
+    return return_status
+
+@api_blueprint.route('/papers', methods=['GET'])
+@login_required
+def papers_all():
+    """ Get User's Papers """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = paper.get_all(connection)
+    #if request.method == 'PATCH':
+    #    return_status = holders.patch(connection, holderID)
     transaction.commit()
     return return_status
 
