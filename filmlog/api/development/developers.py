@@ -163,7 +163,7 @@ def get_developer_stats(connection, developerID):
     """ Get film stats for a particular developer """
     userID = current_user.get_id()
 
-    qry = text("""SELECT FilmTypes.name AS filmName, iso
+    qry = text("""SELECT FilmTypes.name AS filmName, iso,
         size AS filmSize, SUM(qty) AS qty
         FROM DeveloperLogs
         JOIN DeveloperLogFilms ON DeveloperLogFilms.userID = DeveloperLogs.userID
