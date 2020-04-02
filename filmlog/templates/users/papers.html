@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script src="/static/js/user/papers.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+{% include "users/sidebar.html" %}
+<div class="col-md-10 main">
+<h1 class="page-header">Your Darkroom Papers</h1>
+
+    <table class="table table-striped table-bordered" id="userPapersTable">
+      <thead>
+        <tr><th>Name</th><th>Type</th><th>Grade</th><th>Surface</th><th>Tone</th><th>Prints</th><th></th></tr>
+      </thead>
+      <tbody id="papersTableBody"></tbody>
+    </table>
+
+    <div class="card">
+      <div class="card-header"><strong>Add Film</strong></div>
+      <div class="card-body">
+        <form method="post" action="#" id="filmTypeForm">
+          <div class="form-group">
+            <div class="col-sm-4">
+              <label for="filmName">Name</label>
+              <input type="text" class="form-control" id="filmName"
+                     maxlength="64" placeholder="Kodak Porta VS" required />
+            </div>
+            <div class="col-sm-2">
+               <label for="filmISO">ISO</label>
+               <input type="number" class="form-control" id="filmISO"
+                      maxlength="8" min="1" max="65535" placeholder="100" required />
+            </div>
+            <div class="col-sm-4">
+               <label for="filmKind">Kind</label>
+               <select id="filmKind"class="form-control" >
+                <option value="Black & White Negative">Black & White Negative</option>
+                <option value="Black & White Slide">Black & White Slide</option>
+                <option value="Color Negative">Color Negative</option>
+                <option value="Color Slide">Color Slide</option>
+                <option value="Motion Picture Color Negative">Motion Picture Color Negative</option>
+              </select>
+            </div>
+          </div>
+          <div class="button-bar">
+            <button class="btn btn-success" type="submit">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+<br />
+</div>
+{% endblock %}
