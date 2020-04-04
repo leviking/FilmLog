@@ -3,6 +3,7 @@ EXPOSE 80
 
 RUN apt-get update -y && \
     apt-get install -y python-pip python3-pip python3-dev python-virtualenv \
+                       libjpeg-dev zlib1g-dev \
                        build-essential mariadb-client libmariadbclient-dev apache2 libapache2-mod-wsgi-py3
 RUN rm /etc/apache2/sites-enabled/000-default.conf
 COPY ./docker/apache-filmlog.conf /etc/apache2/sites-available/filmlog.conf
