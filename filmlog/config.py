@@ -10,7 +10,10 @@ from filmlog import database
 app = Flask('filmlog')
 engine = database.engine
 
-config = configparser.ConfigParser()
+# config = configparser.ConfigParser()
+# Enable using env variables (e.g. for Dockerizing)
+#config = configparser.SafeConfigParser(os.environ)
+config = configparser.SafeConfigParser()
 config.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../config.ini'))
 
 app.secret_key = config.get('session', 'secret_key')
