@@ -56,7 +56,7 @@ def get_film_details(connection, binderID, projectID, filmID):
         title,
         FilmTypes.filmTypeID AS filmTypeID, loaded, unloaded, developed, development,
         Cameras.name AS camera,
-        Cameras.cameraID AS cameraID, notes
+        Cameras.cameraID AS cameraID, Films.notes
         FROM Films
         JOIN Projects ON Projects.projectID = Films.projectID
             AND Projects.userID = Films.userID
