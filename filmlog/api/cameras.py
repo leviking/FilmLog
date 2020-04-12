@@ -49,7 +49,7 @@ def get(connection, cameraID):
                                       userID=userID,
                                       cameraID=cameraID).fetchall()
 
-    qry = text("""SELECT cameraID, filmSize, status, name, integratedShutter
+    qry = text("""SELECT cameraID, filmSize, status, name, notes, integratedShutter
         FROM Cameras
         WHERE cameraID = :cameraID AND userID = :userID
         ORDER BY name""")
@@ -73,7 +73,8 @@ def get(connection, cameraID):
             "filmSize" : camera_query['filmSize'],
             "integratedShutter" : camera_query['integratedShutter'],
             "status" : camera_query['status'],
-            "lenses" : lenses
+            "notes" : camera_query['notes'],
+            "lenses" : lenses,
         }
     }
 
@@ -99,3 +100,26 @@ def get(connection, cameraID):
             )
         camera['data']['shutterSpeeds'] = shutter_speeds
     return jsonify(camera), status.HTTP_200_OK
+
+def post(connection):
+    """ Insert a new camera """
+    userID = current_user.get_id()
+    json = request.get_json()
+    nextCameraID = next_id(connection, 'cameraID', 'Cameras')
+    qry = text("""INSERT INTO Cameras
+        (userID, cameraID, filmSize, integratedShutter, status, name, notes)
+        VALUES (:userID, :cameraID, :filmSize, :integratedShutter, :status, :name, :notes)""")
+    try:
+        connection.execute(qry,
+                           userID=userID,
+                           cameraID=nextCameraID,
+                           filmSize=json['data']['filmSize'],
+                           integratedShutter=json['data']['integratedShutter'],
+                           status=json['data']['status'],
+                           name=json['data']['name'],
+                           notes=json['data']['notes'])
+    except IntegrityError:
+        return "FAILED", status.HTTP_409_CONFLICT
+    json['data']['id'] = str(nextCameraID)
+    resp = make_response(jsonify(json))
+    return resp, status.HTTP_201_CREATED

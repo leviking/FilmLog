@@ -43,6 +43,7 @@ CREATE TABLE Cameras (
     integratedShutter ENUM('Yes', 'No') DEFAULT 'No',
     status ENUM('Active', 'Inactive') DEFAULT 'Active',
     name varchar(64) NOT NULL,
+    notes TEXT DEFAULT NULL,
     PRIMARY KEY (userID, cameraID),
     UNIQUE user_name_eq (userID, name),
     CONSTRAINT Cameras_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE

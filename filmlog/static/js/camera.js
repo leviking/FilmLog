@@ -17,6 +17,11 @@ function getCamera() {
       $('#status').append(camera.status);
       $('#filmSize').append(camera.filmSize);
       $('#integratedShutter').append(camera.integratedShutter);
+      if (camera.notes) {
+        $('#notes').append(camera.notes);
+      } else {
+        $('#noteDiv').prop('hidden', true);
+      }
       $.each(camera.lenses, (i, lens) => {
         $('#lenses').append($(`<li>${lens.name}</li>`));
       });
