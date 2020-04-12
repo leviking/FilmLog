@@ -226,7 +226,7 @@ def holder_details(holderID):
     transaction.commit()
     return return_status
 
-@api_blueprint.route('/papers', methods=['GET'])
+@api_blueprint.route('/papers', methods=['GET', 'POST'])
 @login_required
 def papers_all():
     """ Get User's Papers """
@@ -234,8 +234,18 @@ def papers_all():
     transaction = connection.begin()
     if request.method == 'GET':
         return_status = paper.get_all(connection)
-    #if request.method == 'PATCH':
-    #    return_status = holders.patch(connection, holderID)
+    if request.method == 'POST':
+        return_status = paper.post(connection)
+    transaction.commit()
+    return return_status
+
+@api_blueprint.route('/papers/<int:paperID>', methods=['DELETE'])
+@login_required
+def papers_delete(paperID):
+    """ Delete Paper """
+    connection = engine.connect()
+    transaction = connection.begin()
+    return_status = paper.delete(connection, paperID)
     transaction.commit()
     return return_status
 

@@ -282,6 +282,7 @@ CREATE TABLE Papers(
     tone ENUM('Cool', 'Neutral', 'Warm'),
     name varchar(64),
     PRIMARY KEY (userID, paperID),
+    UNIQUE user_name (userID, name),
     CONSTRAINT papers_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 

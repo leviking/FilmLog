@@ -31,7 +31,7 @@ function getPapers() {
         row += `<td>${paper.tone}</td>`;
         row += `<td>${paper.prints}</td>`;
         row += `<td><button name="button" value="delete" class="btn btn-sm btn-danger" \
-                 onclick="deleteFilmType('${paper.id}', '${paper.count}')">Delete</button></td>`;
+                 onclick="deletePaper('${paper.id}', '${paper.count}')">Delete</button></td>`;
        row += '</tr>';
         $('#papersTableBody').append($(row));
       });
@@ -40,43 +40,50 @@ function getPapers() {
 }
 
 /* Manipulation Functions */
-function addFilmType() {
-  const name = $('#filmName').val();
-  const iso = $('#filmISO').val();
-  const kind = $('#filmKind').val()
-  const newFilmType = { data: {
+function addPaper() {
+  const name = $('#name').val();
+  const type = $('#type').val();
+  const grade = $('#grade').val();
+  const surface = $('#surface').val();
+  const tone = $('#tone').val();
+
+  const newPaper = { data: {
       name: name,
-      iso: iso,
-      kind: kind}};
+      type: type,
+      grade: grade,
+      surface: surface,
+      tone: tone }};
 
   jQuery.ajax({
     type: 'POST',
-    url: '/api/v1/films',
-    data: JSON.stringify(newFilmType),
+    url: '/api/v1/papers',
+    data: JSON.stringify(newPaper),
     contentType: 'application/json',
     dataType: 'json',
     success(data) {
-      getFilms();
-      $('#filmTypeForm')[0].reset();
+      getPapers();
+      $('#paperForm')[0].reset();
       window.scrollTo(0, 0);
     },
     statusCode: {
-      400() { showAlert('Cannot Add Film Type', 'Bad data', 'danger'); },
-      409() { showAlert('Cannot Add Film Type', 'It already exists', 'danger'); } },
+      400() { showAlert('Cannot Add Paper', 'Bad data', 'danger'); },
+      409() { showAlert('Cannot Add Paper', 'It already exists', 'danger'); } },
   });
 }
 
-function deleteFilmType(filmTypeID, count) {
-  if(count > 0) {
-    showAlert('Cannot Delete Film', 'It has logged films associated with it', 'danger');
-    return;
-  }
+function deletePaper(paperID) {
   jQuery.ajax({
     type: 'DELETE',
-    url: `/api/v1/films/${filmTypeID}`,
+    url: `/api/v1/papers/${paperID}`,
     contentType: 'application/json',
     dataType: 'json',
-    success: deleteFilmRow(filmTypeID),
+    success(data) {
+      deletePaperRow(paperID);
+      getPapers();
+      window.scrollTo(0, 0);
+    },
+    statusCode: {
+      403() { showAlert('Cannot Delete Paper', 'It may have prints associated with it', 'danger'); } },
   });
 }
 
@@ -85,5 +92,5 @@ $(document).ready(() => { getPapers(); });
 // Add Film on form submission
 $('form').on('submit', (e) => {
   e.preventDefault();
-  addFilmType();
+  addPaper();
 });
