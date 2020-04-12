@@ -11,7 +11,7 @@ config.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../config.
 
 db_url = os.getenv('DB_URL')
 if not db_url:
-    db_url = config.get('database', 'url');
+    db_url = config.get('database', 'url')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 engine = create_engine(db_url,

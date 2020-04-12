@@ -5,7 +5,7 @@ from flask_login import current_user
 from sqlalchemy.sql import text
 from sqlalchemy.exc import IntegrityError
 
-from filmlog.functions import next_id, zero_to_none
+from filmlog.functions import next_id
 
 ## Papers
 def get_all(connection):
