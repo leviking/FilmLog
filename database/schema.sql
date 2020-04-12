@@ -36,6 +36,41 @@ CREATE TABLE Files(
     CONSTRAINT Files_Users_fk FOREIGN KEY (userID) REFERENCES Users (userID)
 ) ENGINE='InnoDB';
 
+CREATE TABLE GlobalFilmBrands(
+    filmBrandID TINYINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
+    brand varchar(64) NOT NULL,
+    UNIQUE brand_uq (brand)
+) ENGINE='InnoDB';
+
+CREATE TABLE GlobalFilmTypes (
+    filmTypeID SMALLINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
+    filmBrandID TINYINT UNSIGNED NOT NULL,
+    name varchar(64) NOT NULL,
+    iso smallint unsigned,
+    kind enum('Color Negative','Black & White Negative','Color Slide','Black & White Slide', 'Motion Picture Color Negative') DEFAULT NULL,
+    UNIQUE brand_name_iso_uq (filmBrandID, name, iso),
+    KEY filmtypes_filmBrandID_fk (filmBrandID),
+    CONSTRAINT filmtypes_filmBrandID FOREIGN KEY (filmBrandID) REFERENCES GlobalFilmBrands (filmBrandID) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE='InnoDB';
+
+CREATE TABLE FilmTypes (
+    userID INT UNSIGNED NOT NULL,
+    filmTypeID SMALLINT UNSIGNED NOT NULL,
+    name varchar(64) NOT NULL,
+    iso smallint unsigned,
+    kind enum('Color Negative','Black & White Negative','Color Slide','Black & White Slide', 'Motion Picture Color Negative') DEFAULT NULL,
+    PRIMARY KEY (userID, filmTypeID),
+    UNIQUE KEY user_name_iso_uq (userID, name, iso),
+    CONSTRAINT FilmTypes_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE='InnoDB';
+
+CREATE TABLE FilmSizes (
+    filmSizeID TINYINT UNSIGNED NOT NULL PRIMARY KEY,
+    size VARCHAR(32),
+    type ENUM('Miniature', 'Small', 'Medium', 'Large', 'Ultra-Large') NOT NULL,
+    format ENUM('Roll', 'Sheet')
+) ENGINE='InnoDB';
+
 CREATE TABLE Cameras (
     userID INT UNSIGNED NOT NULL,
     cameraID SMALLINT UNSIGNED NOT NULL,
@@ -94,41 +129,6 @@ CREATE TABLE CameraShutterSpeeds(
     PRIMARY KEY (userID, cameraID, speed),
     CONSTRAINT CameraShutterSpeeds_Cameras FOREIGN KEY (userID, cameraID) REFERENCES Cameras
         (userID, cameraID) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE='InnoDB';
-
-CREATE TABLE GlobalFilmBrands(
-    filmBrandID TINYINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
-    brand varchar(64) NOT NULL,
-    UNIQUE brand_uq (brand)
-) ENGINE='InnoDB';
-
-CREATE TABLE GlobalFilmTypes (
-    filmTypeID SMALLINT UNSIGNED NOT NULL auto_increment PRIMARY KEY,
-    filmBrandID TINYINT UNSIGNED NOT NULL,
-    name varchar(64) NOT NULL,
-    iso smallint unsigned,
-    kind enum('Color Negative','Black & White Negative','Color Slide','Black & White Slide', 'Motion Picture Color Negative') DEFAULT NULL,
-    UNIQUE brand_name_iso_uq (filmBrandID, name, iso),
-    KEY filmtypes_filmBrandID_fk (filmBrandID),
-    CONSTRAINT filmtypes_filmBrandID FOREIGN KEY (filmBrandID) REFERENCES GlobalFilmBrands (filmBrandID) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE='InnoDB';
-
-CREATE TABLE FilmTypes (
-    userID INT UNSIGNED NOT NULL,
-    filmTypeID SMALLINT UNSIGNED NOT NULL,
-    name varchar(64) NOT NULL,
-    iso smallint unsigned,
-    kind enum('Color Negative','Black & White Negative','Color Slide','Black & White Slide', 'Motion Picture Color Negative') DEFAULT NULL,
-    PRIMARY KEY (userID, filmTypeID),
-    UNIQUE KEY user_name_iso_uq (userID, name, iso),
-    CONSTRAINT FilmTypes_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE='InnoDB';
-
-CREATE TABLE FilmSizes (
-    filmSizeID TINYINT UNSIGNED NOT NULL PRIMARY KEY,
-    size VARCHAR(32),
-    type ENUM('Miniature', 'Small', 'Medium', 'Large', 'Ultra-Large') NOT NULL,
-    format ENUM('Roll', 'Sheet')
 ) ENGINE='InnoDB';
 
 CREATE TABLE FilmStock(
