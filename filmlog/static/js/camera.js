@@ -2,25 +2,6 @@
 const currentURL = $(location).attr('href');
 const cameraID = currentURL.split('/')[5];
 
-// Load film into camera
-function loadFilm() {
-  const filmTypeID = $('#filmType').val()
-  console.log(filmTypeID);
-
-  jQuery.ajax({
-    type: 'PATCH',
-    url: `/api/v1/cameras/${cameraID}/loadFilm/${filmTypeID}`,
-    contentType: 'application/json',
-    statusCode: {
-      200() {
-        getCamera();
-        $('#loadFilmForm')[0].reset();
-        window.scrollTo(0, 0);
-      },
-      400() { showAlert('Cannot Load Film', 'Bad data', 'danger'); } },
-  });
-}
-
 // Make a call to get camera details
 function getCamera() {
   // Get camera details
@@ -38,10 +19,9 @@ function getCamera() {
       if (camera.filmLoaded) {
         $('#filmLoadedName').html(camera.filmLoaded.name);
         $('#filmLoadedISO').html(camera.filmLoaded.iso);
-      }
-      else {
-        $('#filmLoadedName').html("None");
-        $('#filmLoadedISO').html("");
+      } else {
+        $('#filmLoadedName').html('None');
+        $('#filmLoadedISO').html('');
       }
       if (camera.notes) {
         $('#notes').html(camera.notes);
@@ -71,15 +51,32 @@ function getCamera() {
   });
 }
 
+// Load film into camera
+function loadFilm() {
+  const filmTypeID = $('#filmType').val();
+
+  jQuery.ajax({
+    type: 'PATCH',
+    url: `/api/v1/cameras/${cameraID}/loadFilm/${filmTypeID}`,
+    contentType: 'application/json',
+    statusCode: {
+      200() {
+        getCamera();
+        $('#loadFilmForm')[0].reset();
+        window.scrollTo(0, 0);
+      },
+      400() { showAlert('Cannot Load Film', 'Bad data', 'danger'); },
+    },
+  });
+}
+
 $(document).ready(() => {
   getCamera();
   getFilmTypes();
-  console.log("READY");
 });
 
 // Load Film on form submission
 $('#loadFilmForm').on('submit', (e) => {
   e.preventDefault();
-  console.log("SUBMIT");
   loadFilm();
 });

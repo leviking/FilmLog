@@ -1,6 +1,6 @@
 /* Figure out the URL parameters */
-const currentURL = $(location).attr('href');
-const cameraID = currentURL.split('/')[5];
+// cconst currentURL = $(location).attr('href');
+// const cameraID = currentURL.split('/')[5];
 
 // Make a call to get cameras
 function getCameras() {
@@ -22,7 +22,7 @@ function getCameras() {
           row += '<td></td>';
         }
         row += `<td>${camera.status}</td>`;
-       row += '</tr>';
+        row += '</tr>';
         $('#camerasTableBody').append($(row));
       });
     },
