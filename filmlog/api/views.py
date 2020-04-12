@@ -37,7 +37,6 @@ def cameras_active():
 
     if request.method == 'GET':
         return_status = cameras.get_all(connection)
-
     transaction.commit()
     return return_status
 
@@ -50,6 +49,18 @@ def camera(cameraID):
     transaction = connection.begin()
     if request.method == 'GET':
         return_status = cameras.get(connection, cameraID)
+    transaction.commit()
+    return return_status
+
+@api_blueprint.route('/cameras/<int:cameraID>/loadFilm/<int:filmTypeID>',
+                     methods=['PATCH'])
+@login_required
+def load_camera(cameraID, filmTypeID):
+    """ Get camera """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'PATCH':
+        return_status = cameras.loadFilm(connection, cameraID, filmTypeID)
     transaction.commit()
     return return_status
 

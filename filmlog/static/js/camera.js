@@ -2,6 +2,24 @@
 const currentURL = $(location).attr('href');
 const cameraID = currentURL.split('/')[5];
 
+// Load film into camera
+function loadFilm() {
+  const filmTypeID = $('#filmType').val()
+  console.log(filmTypeID);
+
+  jQuery.ajax({
+    type: 'PATCH',
+    url: `/api/v1/cameras/${cameraID}/loadFilm/${filmTypeID}`,
+    contentType: 'application/json',
+    statusCode: {
+      200() {
+        getCamera();
+        $('#loadFilmForm')[0].reset();
+        window.scrollTo(0, 0);
+      },
+      400() { showAlert('Cannot Load Film', 'Bad data', 'danger'); } },
+  });
+}
 
 // Make a call to get camera details
 function getCamera() {
@@ -13,19 +31,29 @@ function getCamera() {
     dataType: 'json',
     success(data) {
       const camera = data.data;
-      $('#cameraName').append(camera.name);
-      $('#status').append(camera.status);
-      $('#filmSize').append(camera.filmSize);
-      $('#integratedShutter').append(camera.integratedShutter);
+      $('#cameraName').html(camera.name);
+      $('#status').html(camera.status);
+      $('#filmSize').html(camera.filmSize);
+      $('#integratedShutter').html(camera.integratedShutter);
+      if (camera.filmLoaded) {
+        $('#filmLoadedName').html(camera.filmLoaded.name);
+        $('#filmLoadedISO').html(camera.filmLoaded.iso);
+      }
+      else {
+        $('#filmLoadedName').html("None");
+        $('#filmLoadedISO').html("");
+      }
       if (camera.notes) {
-        $('#notes').append(camera.notes);
+        $('#notes').html(camera.notes);
       } else {
         $('#noteDiv').prop('hidden', true);
       }
       $.each(camera.lenses, (i, lens) => {
+        $('#lenses').empty();
         $('#lenses').append($(`<li>${lens.name}</li>`));
       });
       if (camera.integratedShutter === 'Yes' && camera.shutterSpeeds.length > 0) {
+        $('#shutterSpeedsTableBody').empty();
         $('#shutterSpeedsDiv').prop('hidden', false);
         $.each(camera.shutterSpeeds, (i, speed) => {
           let row = `<tr id="speed${speed.speed}">`;
@@ -43,5 +71,15 @@ function getCamera() {
   });
 }
 
+$(document).ready(() => {
+  getCamera();
+  getFilmTypes();
+  console.log("READY");
+});
 
-$(document).ready(() => { getCamera(); });
+// Load Film on form submission
+$('#loadFilmForm').on('submit', (e) => {
+  e.preventDefault();
+  console.log("SUBMIT");
+  loadFilm();
+});

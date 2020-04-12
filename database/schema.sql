@@ -39,6 +39,7 @@ CREATE TABLE Files(
 CREATE TABLE Cameras (
     userID INT UNSIGNED NOT NULL,
     cameraID SMALLINT UNSIGNED NOT NULL,
+    loadedFilmTypeID SMALLINT UNSIGNED DEFAULT NULL,
     filmSize ENUM('35mm', '120', '220', '4x5', '8x10') NOT NULL,
     integratedShutter ENUM('Yes', 'No') DEFAULT 'No',
     status ENUM('Active', 'Inactive') DEFAULT 'Active',
@@ -46,7 +47,8 @@ CREATE TABLE Cameras (
     notes TEXT DEFAULT NULL,
     PRIMARY KEY (userID, cameraID),
     UNIQUE user_name_eq (userID, name),
-    CONSTRAINT Cameras_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT Cameras_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT Cameras_FilmTypes_fk FOREIGN KEY (userID, loadedFilmTypeID) REFERENCES FilmTypes (userID, filmTypeID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
 CREATE TABLE Lenses(

@@ -15,13 +15,6 @@ function getProject(binderID, projectID) {
   });
 }
 
-// Get Film Options
-function getFilmOptions(films) {
-  jQuery(films).each((i, film) => {
-    $('#filmSizeID').append($(`<option value="${film.id}">${film.size}</option>`));
-  });
-}
-
 // Get Film Sizes
 function getFilmSizes() {
   jQuery.ajax({
@@ -30,7 +23,9 @@ function getFilmSizes() {
     contentType: 'application/json',
     dataType: 'json',
     success(data) {
-      getFilmOptions(data.data);
+      jQuery(data.data).each((i, size) => {
+        $('#filmSize').append($(`<option value="${size.id}">${size.size}</option>`));
+      });
     },
   });
 }
@@ -44,9 +39,9 @@ function getFilmTypes() {
     contentType: 'application/json',
     dataType: 'json',
     success(data) {
-      $('#filmTypeID').append($('<option value="0">None</option>'));
+      $('#filmType').append($('<option value="0">None</option>'));
       jQuery(data.data).each((i, film) => {
-        $('#filmTypeID').append($(`<option value="${film.id}">${film.name} ${film.iso}</option>`));
+        $('#filmType').append($(`<option value="${film.id}">${film.name} ${film.iso}</option>`));
       });
     },
   });

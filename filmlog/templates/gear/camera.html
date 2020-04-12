@@ -8,11 +8,11 @@
 <div class="row">
 {% include "gear/sidebar.html" %}
 <div class="col-11">
-
   <h1 class="page-header"><span id="cameraName"></span></h1>
   <ul>
     <li><strong>Status:</strong> <span id="status"></span></li>
     <li><strong>Film Size:</strong> <span id="filmSize"></span></li>
+    <li><strong>Film Loaded:</strong> <span id="filmLoadedName"></span> <span id="filmLoadedISO"></span></li>
     <li><strong>Integrated Shutter:</strong> <span id="integratedShutter"></span></li>
   </ul>
 
@@ -26,7 +26,7 @@
 
   <div id="shutterSpeedsDiv" hidden>
     <h3 id="shutterSpeedsHeader">Shutter Speeds</h3>
-    <table class="table table-striped table-bordered" id="shutterSpeedsDiv">
+    <table class="table table-striped table-bordered" id="shutterSpeedsTable">
       <thead class="thead-light">
         <tr>
           <th>Speed</th>
@@ -45,6 +45,27 @@
       <button type="button" class="btn btn-sm btn-primary">Print</button>
     </a><br /><br />
   </div>
+
+  <div class="card">
+    <div class="card-header">Load Film</div>
+    <div class="card-body">
+      <form method="post" action="#" id="loadFilmForm">
+        <div class="form-group">
+          <div class="col-sm-6">
+            <label for="filmType">Film</label>
+            <select id="filmType" class="form-control" ></select>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-6">
+            <div class="button-bar">
+              <button class="btn btn-success" name="loadButton" action="submit" value="load">Load</button>
+            </div>
+          </div>
+        </div>
+    </form>
+  </div>
+</div>
 
   <div class="card">
     <div class="card-header">Edit Camera</div>
