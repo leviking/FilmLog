@@ -29,7 +29,8 @@ function getPapers() {
         row += `<td>${paper.grade}</td>`;
         row += `<td>${paper.surface}</td>`;
         row += `<td>${paper.tone}</td>`;
-        row += `<td>${paper.prints}</td>`;
+        row += `<td>${paper.numPrints}</td>`;
+        row += `<td>${paper.numContactSheets}</td>`;
         row += `<td><button name="button" value="delete" class="btn btn-sm btn-danger" \
                  onclick="deletePaper('${paper.id}', '${paper.count}')">Delete</button></td>`;
        row += '</tr>';
@@ -83,7 +84,7 @@ function deletePaper(paperID) {
       window.scrollTo(0, 0);
     },
     statusCode: {
-      403() { showAlert('Cannot Delete Paper', 'It may have prints associated with it', 'danger'); } },
+      403() { showAlert('Cannot Delete Paper', 'It may have prints and contact sheets associated with it', 'danger'); } },
   });
 }
 

@@ -13,7 +13,7 @@ def get_all(connection):
     userID = current_user.get_id()
 
     qry = text("""SELECT Papers.paperID, type, grade, surface, tone, name,
-        COUNT(Prints.printID) AS prints
+        numPrints, numContactSheets
         FROM Papers
         LEFT OUTER JOIN Prints ON Prints.paperID = Papers.paperID
             AND Prints.userID = Papers.userID
@@ -34,7 +34,8 @@ def get_all(connection):
             "surface" : row['surface'],
             "tone" : row['tone'],
             "name" : row['name'],
-            "prints" : row['prints'],
+            "numPrints" : row['numPrints'],
+            "numContactSheets" : row['numContactSheets'],
         }
         papers['data'].append(paper)
     return jsonify(papers), status.HTTP_200_OK

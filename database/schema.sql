@@ -283,6 +283,8 @@ CREATE TABLE Papers(
     grade ENUM('Multi', 'Fixed'),
     surface ENUM('Glossy', 'Pearl', 'Satin', 'Semi-Matt', 'Matt'),
     tone ENUM('Cool', 'Neutral', 'Warm'),
+    numPrints SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    numContactSheets SMALLINT UNSIGNED NOT NULL DEFAULT 0,
     name varchar(64),
     PRIMARY KEY (userID, paperID),
     UNIQUE user_name (userID, name),
@@ -516,6 +518,46 @@ CREATE TRIGGER ExposureCountDecrement
         BEGIN
             UPDATE Films SET exposures = exposures - 1
             WHERE filmID = OLD.filmID
+            AND userID = OLD.userID;
+        END;
+//
+
+CREATE TRIGGER PrintsCountIncrement
+    BEFORE INSERT ON Prints
+        FOR EACH ROW
+        BEGIN
+            UPDATE Papers SET numPrints = numPrints + 1
+            WHERE paperID = NEW.paperID
+            AND userID = NEW.userID;
+        END;
+//
+
+CREATE TRIGGER PrintsCountDecrement
+    BEFORE DELETE ON Prints
+        FOR EACH ROW
+        BEGIN
+            UPDATE Papers SET numPrints = numPrints - 1
+            WHERE paperID = OLD.paperID
+            AND userID = OLD.userID;
+        END;
+//
+
+CREATE TRIGGER ContactSheetsCountIncrement
+    BEFORE INSERT ON ContactSheets
+        FOR EACH ROW
+        BEGIN
+            UPDATE Papers SET numContactSheets = numContactSheets + 1
+            WHERE paperID = NEW.paperID
+            AND userID = NEW.userID;
+        END;
+//
+
+CREATE TRIGGER ContactSheetsCountDecrement
+    BEFORE DELETE ON ContactSheets
+        FOR EACH ROW
+        BEGIN
+            UPDATE Papers SET numContactSheets = numContactSheets - 1
+            WHERE paperID = OLD.paperID
             AND userID = OLD.userID;
         END;
 //
