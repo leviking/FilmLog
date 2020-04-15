@@ -14,7 +14,7 @@ function displayFilmRow(film) {
     iso = `at ${film.iso}`;
   }
 
-  if (film.film_type.film == 'Multiple') {
+  if (film.film_type.film === 'Multiple') {
     boxSpeed = '';
     iso = '';
   } else {
