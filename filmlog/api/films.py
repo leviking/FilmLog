@@ -36,12 +36,16 @@ def get_all(connection, binderID, projectID):
     userID = current_user.get_id()
 
     qry = text("""SELECT filmID, title, fileNo,
-        Films.iso AS iso, FilmTypes.name AS film,
-        FilmTypes.iso AS filmBoxSpeed, FilmSizes.size AS size, exposures
-        FROM Films
-        LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
-            AND FilmTypes.userID = Films.userID
-        JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
+            Films.iso AS iso,
+            IF(FilmTypes.name IS NOT NULL, FilmTypes.name,
+                (SELECT IF(COUNT(DISTINCT(filmTypeID)) > 1, 'Multiple', NULL)
+                FROM Exposures WHERE Exposures.filmID = Films.filmID
+                AND Exposures.userID = Films.userID)) AS film,
+            FilmTypes.iso AS filmBoxSpeed, FilmSizes.size AS size, exposures
+            FROM Films
+            LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Films.filmTypeID
+                AND FilmTypes.userID = Films.userID
+            JOIN FilmSizes ON FilmSizes.filmSizeID = Films.filmSizeID
         WHERE projectID = :projectID AND Films.userID = :userID ORDER BY fileDate""")
     films_query = connection.execute(qry,
                                      projectID=projectID,

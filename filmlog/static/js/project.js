@@ -8,13 +8,21 @@ const projectID = currentURL.split('/')[6];
 function displayFilmRow(film) {
   let filmType = '';
   let iso = '';
+  let boxSpeed = '';
 
   if (film.iso) {
     iso = `at ${film.iso}`;
   }
 
+  if (film.film_type.film == 'Multiple') {
+    boxSpeed = '';
+    iso = '';
+  } else {
+    boxSpeed = film.film_type.box_speed;
+  }
+
   if (film.film_type.film) {
-    filmType = `${film.film_type.film} ${film.film_type.box_speed} ${iso}`;
+    filmType = `${film.film_type.film} ${boxSpeed} ${iso}`;
   }
 
   let row = `<tr id="rowFilmID${film.id}">`;
