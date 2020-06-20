@@ -203,6 +203,7 @@ CREATE TABLE Holders (
     holderID SMALLINT UNSIGNED NOT NULL,
     name VARCHAR(64) NOT NULL,
     size ENUM('4x5', '5x7', '8x10', '11x14') DEFAULT '4x5' NOT NULL,
+    status ENUM ('Active', 'Retired') DEFAULT 'Active' NOT NULL,
     loaded DATE DEFAULT NULL,
     exposed DATE DEFAULT NULL,
     unloaded DATE DEFAULT NULL,

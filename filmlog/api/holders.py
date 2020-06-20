@@ -9,7 +9,7 @@ from filmlog.functions import next_id
 
 ## Holders Stock
 def get_all(connection):
-    """ Get all user's holders """
+    """ Get all user's (active) holders """
     userID = current_user.get_id()
 
     qry = text("""SELECT holderID, Holders.name, size,
@@ -20,7 +20,8 @@ def get_all(connection):
         FROM Holders
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Holders.filmTypeID
             AND FilmTypes.userID = Holders.userID
-        WHERE Holders.userID = :userID ORDER BY Holders.name""")
+        WHERE Holders.userID = :userID
+        AND Holders.status = 'Active' ORDER BY Holders.name""")
     holders = connection.execute(qry, userID=userID).fetchall()
 
     holders_json = {
@@ -100,4 +101,4 @@ def patch(connection, holderID):
 
     resp = make_response(jsonify(json))
     resp.headers['Location'] = "/holders/" + str(holderID)
-    return resp, status.HTTP_200_OK
+    return resp, status.HTTP_204_NO_CONTENT

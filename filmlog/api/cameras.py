@@ -150,6 +150,51 @@ def post(connection):
     resp = make_response(jsonify(json))
     return resp, status.HTTP_201_CREATED
 
+def patch(connection, cameraID):
+    """ Update a camera """
+    userID = current_user.get_id()
+    json = request.get_json()
+
+    # Update camera
+    qry = text("""UPDATE Cameras
+        SET filmSize = :filmSize,
+            integratedShutter = :integratedShutter,
+            status = :status,
+            name = :name,
+            notes = :notes
+        WHERE userID = :userID
+        AND cameraID = :cameraID""")
+    try:
+        connection.execute(qry,
+                           filmSize=json['data']['filmSize'],
+                           integratedShutter=json['data']['integratedShutter'],
+                           status=json['data']['status'],
+                           name=json['data']['name'],
+                           notes=json['data']['notes'],
+                           userID=userID,
+                           cameraID=cameraID)
+    except IntegrityError:
+        return "FAILED", status.HTTP_409_CONFLICT
+
+    # Update lenses
+    # Remove and repopulate lenses based on selection
+    qry = text("""DELETE FROM CameraLenses
+        WHERE cameraID = :cameraID
+        AND userID = :userID""")
+    connection.execute(qry, cameraID=cameraID, userID=userID)
+
+    qry = text("""INSERT INTO CameraLenses
+        (userID, cameraID, lensID)
+        VALUES (:userID, :cameraID, :lensID)""")
+    for lensID in json['data']['lenses']:
+        connection.execute(qry,
+                           userID=userID,
+                           cameraID=cameraID,
+                           lensID=lensID['lensID'])
+
+    resp = make_response(jsonify(json))
+    return resp, status.HTTP_204_NO_CONTENT
+
 def loadFilm(connection, cameraID, filmTypeID):
     """ Load Film Into Camera"""
     userID = current_user.get_id()

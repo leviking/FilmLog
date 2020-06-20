@@ -2,6 +2,8 @@
 const currentURL = $(location).attr('href');
 const cameraID = currentURL.split('/')[5];
 
+let camera = null;
+
 // Make a call to get camera details
 function getCamera() {
   // Get camera details
@@ -11,7 +13,7 @@ function getCamera() {
     contentType: 'application/json',
     dataType: 'json',
     success(data) {
-      const camera = data.data;
+      camera = data.data;
       $('#cameraName').html(camera.name);
       $('#status').html(camera.status);
       $('#filmSize').html(camera.filmSize);
@@ -68,6 +70,10 @@ function loadFilm() {
       400() { showAlert('Cannot Load Film', 'Bad data', 'danger'); },
     },
   });
+}
+
+function updateCamera() {
+  
 }
 
 $(document).ready(() => {

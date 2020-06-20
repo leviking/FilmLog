@@ -41,7 +41,7 @@ def cameras_active():
     return return_status
 
 @api_blueprint.route('/cameras/<int:cameraID>',
-                     methods=['GET'])
+                     methods=['GET', 'PATCH'])
 @login_required
 def camera(cameraID):
     """ Get camera """
@@ -49,6 +49,8 @@ def camera(cameraID):
     transaction = connection.begin()
     if request.method == 'GET':
         return_status = cameras.get(connection, cameraID)
+    if request.method == 'PATCH':
+        return_status = cameras.patch(connection, cameraID)
     transaction.commit()
     return return_status
 
