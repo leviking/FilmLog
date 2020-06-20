@@ -4,11 +4,12 @@ from flask_login import current_user
 from flask_api import status
 from sqlalchemy.sql import text
 from sqlalchemy.exc import IntegrityError
+# from filmlog.config import app For app.logger.debug
 
 from filmlog.functions import next_id
 
 ## Holders Stock
-def get_all(connection):
+def get_all(connection, holder_status='active'):
     """ Get all user's (active) holders """
     userID = current_user.get_id()
 
@@ -21,8 +22,8 @@ def get_all(connection):
         LEFT OUTER JOIN FilmTypes ON FilmTypes.filmTypeID = Holders.filmTypeID
             AND FilmTypes.userID = Holders.userID
         WHERE Holders.userID = :userID
-        AND Holders.status = 'Active' ORDER BY Holders.name""")
-    holders = connection.execute(qry, userID=userID).fetchall()
+        AND Holders.status = :status ORDER BY Holders.name""")
+    holders = connection.execute(qry, userID=userID, status=holder_status).fetchall()
 
     holders_json = {
         "data": []

@@ -226,6 +226,18 @@ def holders_all():
     transaction.commit()
     return return_status
 
+@api_blueprint.route('/holders/<string:status>', methods=['GET'])
+@login_required
+def holders_all_status(status):
+    """ Get all user's holders filmstock information """
+    connection = engine.connect()
+    transaction = connection.begin()
+
+    if request.method == 'GET':
+        return_status = holders.get_all(connection, status)
+    transaction.commit()
+    return return_status
+
 @api_blueprint.route('/holders/<int:holderID>', methods=['GET', 'PATCH'])
 @login_required
 def holder_details(holderID):

@@ -9,8 +9,9 @@
   {% include "gear/sidebar.html" %}
   <div class="col-11 main">
     <h1 class="page-header">Film Holders</h1>
+    <h3 class="page-header">Active</h3>
     <div>
-    <table class="table table-striped table-bordered" id="holdersTable">
+    <table class="table table-striped table-bordered" id="activeHoldersTable">
       <thead class="thead-light">
         <tr>
           <th>Name</th>
@@ -20,11 +21,21 @@
           <th></th>
         </tr>
       </thead>
-      <tbody id="holdersTableBody"></tbody>
+      <tbody id="activeHoldersTableBody"></tbody>
     </table>
     <a href="/gear/holders?print=true">
       <button type="button" class="btn btn-sm btn-primary">Print</button>
     </a><br /><br />
+    <h3 class="page-header">Retired</h3>
+    <table class="table table-striped table-bordered" id="retiredHoldersTable">
+      <thead class="thead-light">
+        <tr>
+          <th>Name</th>
+          <th>Size</th>
+        </tr>
+      </thead>
+      <tbody id="retiredHoldersTableBody"></tbody>
+    </table>
     </div>
 
     <div class="card">

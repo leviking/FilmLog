@@ -84,11 +84,11 @@ function setHolderState(holderID, action) {
 }
 
 // Make a call to pull a list of all the user's holders
-function getHolders() {
-  $('#holdersTableBody').empty();
+function getActiveHolders() {
+  $('#activeHoldersTableBody').empty();
   jQuery.ajax({
     type: 'GET',
-    url: '/api/v1/holders',
+    url: '/api/v1/holders/active',
     contentType: 'application/json',
     dataType: 'json',
     success(data) {
@@ -105,8 +105,26 @@ function getHolders() {
         if (!printView) {
           row += `<td id="buttonsForHolderID${holder.id}"></td></tr>`;
         }
-        $('#holdersTableBody').append($(row));
+        $('#activeHoldersTableBody').append($(row));
         updateHolderState(holder.id, holder.state);
+      });
+    },
+  });
+}
+
+function getRetiredHolders() {
+  $('#retiredHoldersTableBody').empty();
+  jQuery.ajax({
+    type: 'GET',
+    url: '/api/v1/holders/retired',
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      jQuery(data.data).each((i, holder) => {
+        let row = `<tr id="rowHolderID${holder.id}">`;
+        row += `<td><a href="/gear/holders/${holder.id}">${holder.name}</a></td>`;
+        row += `<td>${holder.size}</td></tr>`;
+        $('#retiredHoldersTableBody').append($(row));
       });
     },
   });
@@ -135,14 +153,17 @@ function addHolder() {
     dataType: 'json',
     success(data) {
       // We re-generate the table so it sorts properly
-      getHolders(data.data);
+      getActiveHolders(data.data);
       $('#holderForm')[0].reset();
     },
     statusCode: { 409() { showAlert('Cannot Add Holder', 'It already exists', 'danger'); } },
   });
 }
 
-$(document).ready(() => { getHolders(); });
+$(document).ready(() => {
+  getActiveHolders();
+  getRetiredHolders();
+});
 
 // Add Holder on form submission
 $('form').on('submit', (e) => {

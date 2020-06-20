@@ -98,9 +98,10 @@ def get_lenses(connection, cameraID):
 def get_filters(connection):
     """ Get the user's filters. """
     userID = current_user.get_id()
-    qry = text("""SELECT filterID, name
+    qry = text("""SELECT filterID, code
         FROM Filters
-        WHERE userID = :userID""")
+        WHERE userID = :userID
+        ORDER BY code""")
     return connection.execute(qry,
                               userID=userID).fetchall()
 
@@ -109,7 +110,9 @@ def get_holders(connection):
     userID = current_user.get_id()
     qry = text("""SELECT holderID, name
         FROM Holders
-        WHERE userID = :userID""")
+        WHERE userID = :userID
+        AND status = 'Active'
+        ORDER BY name""")
     return connection.execute(qry,
                               userID=userID).fetchall()
 
