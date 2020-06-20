@@ -118,6 +118,10 @@ class HolderForm(FlaskForm):
                                 ('5x7', '5x7'),
                                 ('8x10', '8x10'),
                                 ('11x14', '11x14')])
+    status = SelectField('Status',
+                       validators=[DataRequired()],
+                       choices=[('Active', 'Active'),
+                                ('Retired', 'Retired')])
     filmTypeID = SelectField('Film',
                              validators=[Optional()],
                              coerce=int)
@@ -426,13 +430,15 @@ def user_holder(holderID):
         form = HolderForm()
         if request.form['button'] == 'updateHolder':
             qry = text("""UPDATE Holders
-                SET name = :name, size = :size, filmTypeID = :filmTypeID,
+                SET name = :name, size = :size, status = :status,
+                filmTypeID = :filmTypeID,
                 iso = :iso, compensation = :compensation, notes = :notes
                 WHERE userID = :userID
                 AND holderID = :holderID""")
             connection.execute(qry,
                                name=form.name.data,
                                size=form.size.data,
+                               status=form.status.data,
                                filmTypeID=zero_to_none(form.filmTypeID.data),
                                iso=form.iso.data,
                                compensation=form.compensation.data,
@@ -461,6 +467,7 @@ def user_holder(holderID):
     qry = text("""SELECT holderID, Holders.name, size,
         IF(exposed, "Exposed",
             IF(loaded, "Loaded", "Unloaded")) AS state,
+        status,
         loaded, unloaded, exposed,
         Holders.filmTypeID, Holders.iso, FilmTypes.name AS filmName,
         FilmTypes.iso AS filmISO, compensation, notes
