@@ -15,6 +15,7 @@
         <th>Type</th>
         <th>Size</th>
         <th>Paper</th>
+        <th>Time</th>
         <th></th>
       </tr>
       {% for print in prints %}
@@ -27,6 +28,7 @@
           <td>{{ print.printType }}</td>
           <td>{{ print.size }}</td>
           <td>{{ print.paperName }}</td>
+          <td>{{ print.exposureTime }}</td>
           <td class="text-right">
             <form role="form" class="form-horizontal"
               action="/binders/{{ binderID }}/projects/{{ film.projectID }}/films/{{ film.filmID }}/prints/{{ print.printID }}"

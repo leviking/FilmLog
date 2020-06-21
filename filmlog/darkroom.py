@@ -380,9 +380,11 @@ def print_exposure(binderID, projectID, filmID, printID):
                        ndFilter=form.ndFilter.data,
                        headHeight=form.headHeight.data,
                        exposureTime=functions.time_to_seconds(form.exposureTime.data),
+                       #exposureTime=form.exposureTime.data,
                        printType=form.printType.data,
                        size=form.size.data,
                        notes=form.notes.data)
+                app.logger.debug(functions.time_to_seconds(form.exposureTime.data))
                 transaction.commit()
                 return redirect('/binders/' + str(binderID)
                                 + '/projects/' + str(projectID)

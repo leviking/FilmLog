@@ -129,11 +129,9 @@ def time_to_seconds(time):
     if time:
         if ':' not in time:
             if int(time) > 0:
-                #app.logger(int(time))
                 return int(time)
         else:
             m, s = time.split(':')
-            #app.logger(int(m) * 60 + int(s))
             return int(m) * 60 + int(s)
     raise ValidationError('Time in wrong format, it should be MM:SS.')
 
