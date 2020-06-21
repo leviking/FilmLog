@@ -119,9 +119,9 @@ class HolderForm(FlaskForm):
                                 ('8x10', '8x10'),
                                 ('11x14', '11x14')])
     status = SelectField('Status',
-                       validators=[DataRequired()],
-                       choices=[('Active', 'Active'),
-                                ('Retired', 'Retired')])
+                         validators=[DataRequired()],
+                         choices=[('Active', 'Active'),
+                                  ('Retired', 'Retired')])
     filmTypeID = SelectField('Film',
                              validators=[Optional()],
                              coerce=int)

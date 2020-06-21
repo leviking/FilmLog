@@ -72,10 +72,6 @@ function loadFilm() {
   });
 }
 
-function updateCamera() {
-  
-}
-
 $(document).ready(() => {
   getCamera();
   getFilmTypes();
