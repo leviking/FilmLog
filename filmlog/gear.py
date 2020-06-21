@@ -68,6 +68,9 @@ class CameraForm(FlaskForm):
                                   ('Inactive', 'Inactive')])
     lenses = MultiCheckboxField('Lenses',
                                 validators=[Optional()])
+    notes = TextAreaField('Notes',
+                          validators=[Optional()],
+                          filters=[lambda x: x or None])
 
     def populate_select_fields(self, connection):
         """ Helper function to populate select fields """
@@ -263,13 +266,15 @@ def user_camera(cameraID):
             qry = text("""UPDATE Cameras
                 SET name = :name,
                     filmSize = :filmSize,
-                    status = :status
+                    status = :status,
+                    notes = :notes
                 WHERE userID = :userID
                 AND cameraID = :cameraID""")
             connection.execute(qry,
                                name=camera_form.name.data,
                                filmSize=camera_form.filmSize.data,
                                status=camera_form.status.data,
+                               notes=camera_form.notes.data,
                                userID=userID,
                                cameraID=cameraID)
 
