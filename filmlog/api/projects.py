@@ -39,7 +39,8 @@ def get_all(connection, binderID):
 def get(connection, binderID, projectID):
     """ Get specific project """
     userID = current_user.get_id()
-    qry = text("""SELECT projectID, name, filmCount, createdOn FROM Projects
+    qry = text("""SELECT projectID, name, filmCount, createdOn, notes
+        FROM Projects
         WHERE binderID = :binderID
         AND projectID = :projectID
         AND userID = :userID
@@ -54,6 +55,7 @@ def get(connection, binderID, projectID):
             "id" : projectID,
             "binderID" : binderID,
             "name" : projects_query['name'],
+            "notes" : projects_query['notes'],
             "film_count" : projects_query['filmCount'],
             "created_on" : projects_query['createdOn'],
         }

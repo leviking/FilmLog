@@ -138,3 +138,8 @@ $('#filmForm').on('submit', (e) => {
   e.preventDefault();
   addFilm();
 });
+
+$('#editProjectForm').on('submit', (e) => {
+  e.preventDefault();
+  updateProject();
+});

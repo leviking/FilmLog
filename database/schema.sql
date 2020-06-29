@@ -161,6 +161,7 @@ CREATE TABLE Projects(
     filmCount SMALLINT UNSIGNED NOT NULL DEFAULT 0,
     createdOn TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     name varchar(64) NOT NULL,
+    notes TEXT DEFAULT NULL,
     PRIMARY KEY(userID, projectID),
     UNIQUE KEY binder_name_uq (userID, binderID, name),
     CONSTRAINT Projects_Binders_fk FOREIGN KEY (userID, binderID) REFERENCES Binders (userID, binderID) ON DELETE RESTRICT ON UPDATE CASCADE
