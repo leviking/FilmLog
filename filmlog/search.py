@@ -28,7 +28,7 @@ def search_index():
 
     qry = text("""SELECT filmID, Films.projectID, binderID,
         title, fileNo, fileDate,
-        Films.iso AS iso, brand, FilmTypes.name AS filmName,
+        Films.iso AS iso, FilmTypes.name AS filmName,
         FilmSizes.size AS size, exposures,
         Cameras.name AS camera
         FROM Films

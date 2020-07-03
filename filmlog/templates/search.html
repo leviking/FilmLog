@@ -47,8 +47,8 @@
               <td>{{ film.camera }}</td>
               <td>{{ film.size }}</td>
               <td>
-                {% if film.brand %}
-                  {{ film.brand }} {{ film.filmName }}
+                {% if film.filmName %}
+                  {{ film.filmName }}
                   {% if film.iso %}
                    at {{ film.iso }}
                   {% endif %}
