@@ -1,7 +1,8 @@
 /* Figure out the URL parameters */
 const currentURL = $(location).attr('href');
 const developerID = currentURL.split('/')[5];
-let lastLogDate = null;
+const days = 30;
+let lastLogDate = subtractDays($.datepicker.formatDate('yy/mm/dd', new Date()), 30);
 
 // Make a call to pull a list of all the user's developers
 function getDeveloper() {
@@ -102,7 +103,12 @@ function getLogs(startDate = null, endDate = null) {
           $('#logsTableBody').append($(row));
         });
       } else {
-        $('#moreLogsLink').remove();
+        // If we didn't find any logs, bump up the last log date
+        // in case the user wants to look further back.
+        // There should be a better way to do this since we can easily
+        // find out what the oldest log is, but it works for now.
+        lastLogDate = subtractDays(lastLogDate, days);
+        // $('#moreLogsLink').remove();
       }
     },
   });
@@ -144,18 +150,16 @@ function getFilmStats() {
 }
 
 function getMoreLogs() {
-  let startDate = subtractDays(lastLogDate, 30);
+  let startDate = subtractDays(lastLogDate, days);
   let endDate = formatDateTime(lastLogDate);
   console.log(startDate);
   console.log(endDate);
-  //endDate.setDate(endDate.getDate() - 30);
-  //console.log(endDate);
-  getLogs(startDate, endDate);
+  logs = getLogs(startDate, endDate);
 }
 
 $(document).ready(() => {
   getDeveloper();
-  getLogs();
+  getLogs(subtractDays($.datepicker.formatDate('yy/mm/dd', new Date()), days), $.datepicker.formatDate('yy/mm/dd', new Date()));
   getFilmStats();
 });
 
