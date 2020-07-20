@@ -159,7 +159,8 @@ function getMoreLogs() {
 
 $(document).ready(() => {
   getDeveloper();
-  getLogs(subtractDays($.datepicker.formatDate('yy/mm/dd', new Date()), days), $.datepicker.formatDate('yy/mm/dd', new Date()));
+  //getLogs(subtractDays($.datepicker.formatDate('yy/mm/dd', new Date()), days), $.datepicker.formatDate('yy/mm/dd', new Date()));
+  getLogs(subtractDays($.datepicker.formatDate('yy/mm/dd', new Date()), days), null);
   getFilmStats();
 });
 
