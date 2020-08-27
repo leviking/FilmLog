@@ -260,7 +260,7 @@ def user_developer(developerID):
     # but this works.
     qry = text("""SELECT developerLogFilmID, size AS filmSize,
         DeveloperLogFilms.filmTypeID, FilmTypes.name AS filmName, iso,
-        qty, compensation
+        qty, IF(compensation > 0, CONCAT('+', compensation), compensation)
         FROM DeveloperLogFilms
         LEFT OUTER JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
             AND FilmTypes.userID = DeveloperLogFilms.userID
@@ -392,7 +392,7 @@ def user_developer_log(developerID, developerLogID):
     # but this works.
     qry = text("""SELECT developerLogFilmID, size AS filmSize,
         DeveloperLogFilms.filmTypeID, FilmTypes.name AS filmName, iso,
-        qty, compensation
+        qty, IF(compensation > 0, CONCAT('+', compensation), compensation) AS compensation
         FROM DeveloperLogFilms
         LEFT OUTER JOIN FilmTypes On FilmTypes.filmTypeID = DeveloperLogFilms.filmTypeID
         JOIN FilmSizes ON FilmSizes.filmSizeID = DeveloperLogFilms.filmSizeID

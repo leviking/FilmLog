@@ -85,7 +85,7 @@ function getLogs(startDate = null, endDate = null) {
               if (film.compensation > 0) {
                 comp = `+${film.compensation}`;
               } else {
-                comp = `-${film.compensation}`;
+                comp = `${film.compensation}`;
               }
             }
             films += `${film.qty}x ${film.name} ${film.iso} ${comp} in ${film.size}<br />`;
