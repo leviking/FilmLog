@@ -13,8 +13,6 @@ CREATE TABLE DevRecipes (
     CONSTRAINT DevRecipes_Users_fk FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
-
-
 CREATE TABLE FilmTests (
   userID INT UNSIGNED NOT NULL,
   filmTestID INT UNSIGNED NOT NULL,
@@ -54,11 +52,10 @@ CREATE TABLE FilmTestSteps (
 -- INSERT INTO DevRecipes VALUES (1, 1, 'XTOL-R', 'Black and White', 0, (60 * 8.5), 20, 'Water', 'Rotary', 'Test');
 -- INSERT INTO FilmTests VALUES (1, 1, 1, 1, 1, 1, '20', '35mm', 12, 5.6, 2, NULL, NULL, NULL, NULL)
 
-
 CREATE VIEW FilterStepsView AS
-SELECT stepNumber, stepDensity
-LOG10(lux * exp * 1000) - stepDensity AS LogE,
+SELECT FilmTestSteps.userID, FilmTestSteps.filmTestID, stepNumber, stepDensity,
+LOG10(lux * 1/exposureTime * 1000) - stepDensity AS LogE,
 stepFilmDensity
-FROM Steps
-JOIN FilmTests ON FilmTests.filmTestID = Steps.filmTestID
-    AND FilmTests.userID = Steps.userID
+FROM FilmTestSteps
+JOIN FilmTests ON FilmTests.filmTestID = FilmTestSteps.filmTestID
+    AND FilmTests.userID = FilmTestSteps.userID;
