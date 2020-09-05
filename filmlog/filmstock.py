@@ -25,7 +25,9 @@ class FilmStockForm(FlaskForm):
                                    DataRequired()])
 
     def __init__(self, connection):
-        super(FilmStockForm, self).__init__()
+        #super(FilmStockForm, self).__init__()
+        #super(FilmStockForm).__init__()
+        super().__init__()
         self.connection = connection
         self.filmTypeID.choices = get_film_types(connection)
         self.filmSizeID.choices = get_film_sizes(connection)

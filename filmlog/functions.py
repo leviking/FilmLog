@@ -143,7 +143,7 @@ def validate_exposure_time(form, field):
     try:
         time_to_seconds(field.data)
     except Exception:
-        raise ValidationError('Time in wrong format, it should be in MM:SS or in seconds.')
+        raise ValidationError('Time in wrong format, should be MM:SS.') from None
 
 # Unused (see SECONDS_TO_DURATION MySQL function instead)
 #def seconds_to_time(seconds):
