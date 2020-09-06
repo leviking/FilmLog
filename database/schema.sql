@@ -451,6 +451,7 @@ CREATE TABLE DevRecipes (
     prebath ENUM('No', 'Water') NOT NULL DEFAULT 'No',
     stop ENUM('Stop Bath', 'Water') NOT NULL DEFAULT 'Stop Bath',
     agitation ENUM('Rotary', 'Hand-Inversions', 'Dip and Dunk', 'Tray') NOT NULL DEFAULT 'Hand-Inversions',
+    rotaryRPM TINYINT UNSIGNED DEFAULT NULL,
     notes TEXT,
     PRIMARY KEY (userID, devRecipeID),
     CONSTRAINT DevRecipes_Users_fk FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE RESTRICT ON UPDATE CASCADE
