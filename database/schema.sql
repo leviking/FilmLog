@@ -448,6 +448,7 @@ CREATE TABLE DevRecipes (
     dilution TINYINT NOT NULL DEFAULT 0,
     time SMALLINT UNSIGNED NOT NULL,
     temperature TINYINT UNSIGNED NOT NULL,
+    prebath ENUM('No', 'Water') NOT NULL DEFAULT 'No',
     stop ENUM('Stop Bath', 'Water') NOT NULL DEFAULT 'Stop Bath',
     agitation ENUM('Rotary', 'Hand-Inversions', 'Dip and Dunk', 'Tray') NOT NULL DEFAULT 'Hand-Inversions',
     description TEXT,
