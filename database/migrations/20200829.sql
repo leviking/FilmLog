@@ -48,7 +48,7 @@ CREATE TABLE FilmTests (
   fstop DECIMAL (3,1) UNSIGNED NOT NULL,
   exposureTime SMALLINT DEFAULT NULL,
   gamma DECIMAL(3,2) UNSIGNED DEFAULT NULL,
-  expLog DECIMAL (3,2) UNSIGNED AS (LOG10(lux * exposureTime * 1000)) VIRTUAL,
+  expLog DECIMAL (3,2) UNSIGNED AS (ROUND(LOG10(lux * exposureTime * 1000), 2)) VIRTUAL,
   PRIMARY KEY (userID, filmTestID),
   CONSTRAINT FilmTests_DevRecipes_fk FOREIGN KEY (userID, devRecipeID) REFERENCES DevRecipes (userID, devRecipeID) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT FilmTests_StepTablets_fk FOREIGN KEY (userID, stepTabletID) REFERENCES StepTablets (userID, stepTabletID) ON DELETE CASCADE ON UPDATE CASCADE,
