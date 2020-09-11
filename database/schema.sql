@@ -526,7 +526,7 @@ JOIN StepTabletSteps ON StepTabletSteps.stepTabletID = StepTablets.stepTabletID
     AND StepTabletSteps.stepNumber = FilmTestSteps.stepNumber;
 
 CREATE VIEW FilmTestsView AS
-SELECT FilmTypes.name AS filmName, FilmTypes.iso AS filmISO,
+SELECT FilmTests.filmTestID, FilmTypes.name AS filmName, FilmTypes.iso AS filmISO,
 developer, SEC_TO_TIME(time) AS devTime, Filters.code AS filter,
 lux, fstop,
 gamma, contrastIndex
