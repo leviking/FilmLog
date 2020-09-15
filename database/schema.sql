@@ -514,18 +514,6 @@ CREATE TABLE FilmTestSteps (
   CONSTRAINT FilmTestSteps_FilmTests_fk FOREIGN KEY (userID, filmTestID) REFERENCES FilmTests (userID, filmTestID)
 ) ENGINE='InnoDB';
 
-CREATE VIEW FilmTestStepsView AS
-SELECT FilmTestSteps.userID, FilmTestSteps.filmTestID, FilmTestSteps.stepNumber, stepDensity,
-LOG10(lux * 1/exposureTime * 1000) - stepDensity AS LogE, filmDensity
-FROM FilmTestSteps
-JOIN FilmTests ON FilmTests.filmTestID = FilmTestSteps.filmTestID
-    AND FilmTests.userID = FilmTestSteps.userID
-JOIN StepTablets ON StepTablets.stepTabletID = FilmTests.stepTabletID
-    AND StepTablets.userID = FilmTests.userID
-JOIN StepTabletSteps ON StepTabletSteps.stepTabletID = StepTablets.stepTabletID
-    AND StepTabletSteps.userID = StepTablets.userID
-    AND StepTabletSteps.stepNumber = FilmTestSteps.stepNumber;
-
 CREATE VIEW FilmTestsView AS
 SELECT FilmTests.filmTestID, FilmTypes.name AS filmName, FilmTypes.iso AS filmISO,
 developer, SEC_TO_TIME(time) AS devTime, Filters.code AS filter,
@@ -539,6 +527,18 @@ JOIN FilmTypes ON FilmTypes.userID = FilmTests.userID
 JOIN Filters ON Filters.userID = FilmTests.userID
     AND Filters.filterID = FilmTests.filterID
 ORDER BY filmName, filmISO, devTime;
+
+CREATE VIEW FilmTestStepsView AS
+SELECT FilmTestSteps.userID, FilmTestSteps.filmTestID, FilmTestSteps.stepNumber, stepDensity,
+ROUND(LOG10(lux * 1/exposureTime * 1000) - stepDensity, 2) AS LogE, filmDensity
+FROM FilmTestSteps
+JOIN FilmTests ON FilmTests.filmTestID = FilmTestSteps.filmTestID
+    AND FilmTests.userID = FilmTestSteps.userID
+JOIN StepTablets ON StepTablets.stepTabletID = FilmTests.stepTabletID
+    AND StepTablets.userID = FilmTests.userID
+JOIN StepTabletSteps ON StepTabletSteps.stepTabletID = StepTablets.stepTabletID
+    AND StepTabletSteps.userID = StepTablets.userID
+    AND StepTabletSteps.stepNumber = FilmTestSteps.stepNumber;
 
 -- Functions
 DROP FUNCTION IF EXISTS SECONDS_TO_DURATION;
