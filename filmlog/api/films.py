@@ -274,3 +274,43 @@ def add_film_type(connection):
     json['data']['id'] = str(nextFilmTypeID)
     resp = make_response(jsonify(json))
     return resp, status.HTTP_201_CREATED
+
+def get_film_tests(connection, filmTypeID):
+    """ Get film tests summary """
+    userID = current_user.get_id()
+    qry = text("""SELECT FilmTests.filmTestID, DevRecipes.devRecipeID,
+    FilmTypes.name AS filmName, FilmTypes.iso,
+    developer, time AS devTime,
+    filmSize, baseFog, dMax, gamma, contrastIndex
+    FROM FilmTests
+    JOIN DevRecipes ON DevRecipes.userID = FilmTests.userID
+        AND DevRecipes.devRecipeID = FilmTests.devRecipeID
+    JOIN FilmTypes ON FilmTypes.userID = FilmTests.userID
+        AND FilmTypes.filmTypeID = FilmTests.filmTypeID
+    WHERE FilmTests.userID = :userID
+    AND FilmTests.filmTypeID = :filmTypeID
+    ORDER BY filmName, iso, devTime""")
+    films_query = connection.execute(qry,
+        userID=userID,
+        filmTypeID=filmTypeID).fetchall()
+
+    filmTests = {
+        "data": []
+    }
+    for row in films_query:
+        film = {
+            "id" : row['filmTestID'],
+            "filmTestID" : row['filmTestID'],
+            "devRecipeID" : row['devRecipeID'],
+            "filmName" : row['filmName'],
+            "iso" : row['iso'],
+            "developer": row['developer'],
+            "devTime" : row['devTime'],
+            "filmSize" : row['filmSize'],
+            "baseFog" : row['baseFog'],
+            "dMax" : row['dMax'],
+            "gamma" : row['gamma'],
+            "contrastIndex" : row['contrastIndex']
+        }
+        filmTests['data'].append(film)
+    return jsonify(filmTests), status.HTTP_200_OK

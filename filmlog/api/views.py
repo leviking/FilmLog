@@ -93,6 +93,17 @@ def film_type_details(filmTypeID):
     transaction.commit()
     return return_status
 
+@api_blueprint.route('/film/<int:filmTypeID>/tests',
+                      methods=['GET'])
+@login_required
+def film_tests(filmTypeID):
+    """ Get user's film types """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = films.get_film_tests(connection, filmTypeID)
+    transaction.commit()
+    return return_status
 
 # Binders
 @api_blueprint.route('/binders', methods=['GET', 'POST'])
