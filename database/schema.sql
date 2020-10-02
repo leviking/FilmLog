@@ -517,7 +517,7 @@ CREATE TABLE FilmTestSteps (
 
 CREATE VIEW FilmTestsView AS
 SELECT FilmTests.filmTestID, FilmTypes.name AS filmName, FilmTypes.iso AS filmISO,
-developer, SEC_TO_TIME(time) AS devTime, Filters.code AS filter,
+filmSize, developer, SEC_TO_TIME(time) AS devTime, Filters.code AS filter,
 lux, fstop,
 gamma, contrastIndex
 FROM FilmTests
