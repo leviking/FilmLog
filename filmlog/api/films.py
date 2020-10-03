@@ -307,10 +307,10 @@ def get_film_tests(connection, filmTypeID):
             "developer": row['developer'],
             "devTime" : row['devTime'],
             "filmSize" : row['filmSize'],
-            "baseFog" : row['baseFog'],
-            "dMax" : row['dMax'],
-            "gamma" : row['gamma'],
-            "contrastIndex" : row['contrastIndex']
+            "baseFog" : float(row['baseFog']),
+            "dMax" : float(row['dMax']),
+            "gamma" : float(row['gamma']),
+            "contrastIndex" : float(row['contrastIndex'])
         }
         filmTests['data'].append(film)
     return jsonify(filmTests), status.HTTP_200_OK
