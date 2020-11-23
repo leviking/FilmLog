@@ -110,8 +110,7 @@ class TestForm(FlaskForm):
 class PrintForm(FlaskForm):
     """ Form for prints """
     exposureNumber = SelectField('Exposure #',
-                                 validators=[DataRequired()],
-                                 coerce=int)
+                                 validators=[DataRequired()])
     paperID = SelectField('Paper',
                           validators=[Optional()],
                           coerce=int)
