@@ -1,0 +1,23 @@
+---
+- hosts: web
+
+  tasks:
+    - name: Update packages via pip
+      shell: cd {{ filmlog_root }} && . venv/bin/activate && pip3 install --upgrade -r requirements.txt
+      become: true
+      become_user: filmlog
+    
+    - name: Pull from git
+      shell: cd {{ filmlog_root }} && git pull
+      become: true
+      become_user: filmlog
+
+    - name: Run Database migations
+      shell: cd {{ filmlog_root }} && . venv/bin/activate && ./migrate.py
+      become: true
+      become_user: filmlog
+
+    - name: Restart Apache
+      shell: apachectl graceful
+      become: true
+      become_user: root
