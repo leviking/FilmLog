@@ -15,4 +15,5 @@ if not db_url:
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 engine = create_engine(db_url,
-                       pool_recycle=config.getint('database', 'pool_recycle'))
+                       pool_recycle=config.getint('database', 'pool_recycle'),
+                       pool_size=config.getint('database', 'pool_size'))
