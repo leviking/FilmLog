@@ -79,8 +79,14 @@ def get_cameras(connection):
         FROM Cameras
         WHERE userID = :userID
         AND status = 'Active'""")
-    return connection.execute(qry,
-                              userID=userID).fetchall()
+    result = connection.execute(qry, userID=userID).fetchall()
+    list_result = []
+    for row in result:
+        item = (row[0], row[1])
+        list_result.append(item)
+    return list_result
+    #return connection.execute(qry,
+    #                          userID=userID).fetchall()
 
 def get_lenses(connection, cameraID):
     """ Get the user's lenses for a camera. """
@@ -91,9 +97,17 @@ def get_lenses(connection, cameraID):
             AND Lenses.userID = CameraLenses.userID
         WHERE CameraLenses.cameraID = :cameraID
         AND CameraLenses.userID = :userID""")
-    return connection.execute(qry,
+    result = connection.execute(qry,
                               userID=userID,
                               cameraID=cameraID).fetchall()
+    list_result = []
+    for row in result:
+        item = (row[0], row[1])
+        list_result.append(item)
+    return list_result
+    #return connection.execute(qry,
+    #                          userID=userID,
+    #                          cameraID=cameraID).fetchall()
 
 def get_filters(connection):
     """ Get the user's filters. """
@@ -102,8 +116,15 @@ def get_filters(connection):
         FROM Filters
         WHERE userID = :userID
         ORDER BY code""")
-    return connection.execute(qry,
+    result = connection.execute(qry,
                               userID=userID).fetchall()
+    list_result = []
+    for row in result:
+        item = (row[0], row[1])
+        list_result.append(item)
+    return list_result
+    #return connection.execute(qry,
+    #                          userID=userID).fetchall()
 
 def get_holders(connection):
     """ Get the user's large format film holders. """
