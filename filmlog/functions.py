@@ -30,17 +30,33 @@ def get_film_types(connection):
     """ Get a friendly output of the film types (e.g. Kodak T-Max 100) """
     userID = current_user.get_id()
     qry = text("""SELECT filmTypeID,
-        CONCAT(name, " ", iso)
+        CONCAT(name, " ", iso) AS name
         FROM FilmTypes
         WHERE userID = :userID
         ORDER BY name""")
-    return connection.execute(qry, userID=userID).fetchall()
+    # All this is stupid. The original return used to work but now it doesn't.
+    result = connection.execute(qry, userID=userID).fetchall()
+    list_result = []
+    for row in result:
+        item = (row[0], row[1])
+        list_result.append(item)
+    return list_result
+    # Used to work now broke
+    #return connection.execute(qry, userID=userID).fetchall()
 
 def get_film_sizes(connection):
     """ Get all the available film sizes (e.g. 35mm, 4x5) """
     qry = text("""SELECT filmSizeID, size
         FROM FilmSizes""")
-    return connection.execute(qry).fetchall()
+    # All this is stupid. The original return used to work but now it doesn't.
+    result = connection.execute(qry).fetchall()
+    list_result = []
+    for row in result:
+        item = (row[0], row[1])
+        list_result.append(item)
+    return list_result
+    # Used to work now broke
+    #return connection.execute(qry).fetchall()
 
 def get_film_details(connection, binderID, projectID, filmID):
     """ Get detailed informatiln of a particular film shot.
