@@ -6,16 +6,16 @@
   <div class="sidebar-sticky">
     <ul class="nav flex-column">
       <li class="nav-item">
-        <a class="nav-link" href="#donate">Donate</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#buyprint">Buy a Print</a>
-      </li>
-      <li class="nav-item">
         <a class="nav-link" href="#logabug">Log a Bug</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="#development">Development</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#donate">Donate</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#buyprint">Buy a Print</a>
       </li>
     </ul>
   </div>
@@ -25,34 +25,6 @@
     <h1 class="page-header">Contributing</h1>
     <p>If you like The Film Log and are intersted in helping out,
     there are a number of ways to do so, such as:
-    <h2 id="donate">Making a Monetary Donation</h2>
-    <p>This helps cover the monthly hosting fees for the public website,
-       keeps the website ad-free and also helps cover my time to
-       work on new features. Occasionally I also need to purchase
-       materials to help test or improve a new or existing feature
-       and this would help here as well.</p>
-    <p>The important takeaway is I want the film log to be free.
-       The codebase itself is open source, though maintaining the
-       public website does have recurring costs. The public website
-       avoids folks needing to run their own version on theier
-       own server (be it on a Raspberry Pi or on a cloud server).</p>
-
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-        <input type="hidden" name="cmd" value="_s-xclick" />
-        <input type="hidden" name="hosted_button_id" value="9QEPBUF2H8R7G" />
-        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-        <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
-    </form>
-    <br />
-
-    <h2 id="buyprint">Buying a Print</h2>
-    <p>Instead of making a straight up donation, you can also buy
-       one of my prints, which are available
-       <a href="https://www.bitbybitphoto.com/black-and-white">here</a>.
-       If you want to make sure the proceeds go towards The Film
-       Log, be sure to mention that in the order comments. All of the prints
-       were made on film. I also hand print the black and white prints in
-       my own darkroom.</p>
 
     <h2 id="logabug">Log a Bug / Feature</h2>
     <p>See something on the website which is busted? Consider logging
@@ -65,8 +37,41 @@
        to The Film Log project directly. The code is all open
        source (GPLv3) and is available on
        <a href="https://gitlab.com/m00dawg/FilmLog">GitLab</a>.
-       The core technologies used are Python (Flask), MariaDB,
+       The core technologies used are Python (Flask), MariaDB/MySQL,
        JavaScript/jQuery, and CSS/HTML. A full mobile app is
-       planned though not currently being developed.</p>
+       planned though not currently being developed, though work is
+       being done to make an API that could be use for a native mobile app
+       in the future.</p>
+
+    <h2 id="buyprint">Buying a Print</h2>
+    <p>You can also buy
+       one of my prints, which are available
+       <a href="https://www.bitbybitphoto.com/black-and-white">here</a>.
+       If you want to make sure the proceeds go towards The Film
+       Log, be sure to mention that in the order comments. All of the prints
+       were made on film. I also hand print the black and white prints in
+       my own darkroom and will soon hand make prints made from color negatives.</p>
+
+    <h2 id="donate">Making a Direct Monetary Donation</h2>
+    <p>While I have been able to reduce hosting fees, for now, a direct donation
+       can still help with potential future hosting fees as the site grows,
+       budget for purchasing any materials for testing and to help create a new
+       feature or improve upon an existing features, and helps justify work
+       done in my spare time.</p>
+
+    <p>The important takeaway is I want the film log to be free.
+       The codebase itself is open source but the cost of development and
+       host of hosting player a role. The public website
+       avoids folks needing to run their own version on their
+       own server (be it on a Raspberry Pi or something else).</p>
+
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+        <input type="hidden" name="cmd" value="_s-xclick" />
+        <input type="hidden" name="hosted_button_id" value="9QEPBUF2H8R7G" />
+        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+        <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+    </form>
+    <br />
+
 </div>
 {% endblock %}
