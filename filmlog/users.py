@@ -167,10 +167,11 @@ def register():
                 #    password=generate_password_hash(form.password.data),
                 #    registrationCode=generate_registration_code())
                 qry = text("""INSERT INTO Users
-                    (username, password, createdOn)
-                    VALUES (:username, :password, NOW())""")
+                    (username, email, password, createdOn)
+                    VALUES (:username, :email, :password, NOW())""")
                 engine.execute(qry,
                                username=form.username.data,
+                               email=form.email.data,
                                password=generate_password_hash(form.password.data))
                 return render_template("users/post_registration.html",
                                        username=form.username.data)
