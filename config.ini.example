@@ -10,6 +10,7 @@ server_name="filmlog"
 url=mysql+mysqldb://user:pass@host/db?charset=utf
 pool_recycle=3600
 pool_size=10
+pool_pre_ping=True
 
 [files]
 user_files=files
