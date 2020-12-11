@@ -30,8 +30,8 @@ function getCamera() {
       } else {
         $('#noteDiv').prop('hidden', true);
       }
+      $('#lenses').empty();
       $.each(camera.lenses, (i, lens) => {
-        $('#lenses').empty();
         $('#lenses').append($(`<li>${lens.name}</li>`));
       });
       if (camera.integratedShutter === 'Yes' && camera.shutterSpeeds.length > 0) {
