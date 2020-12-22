@@ -126,7 +126,8 @@ def insert(connection, qry, item, **args):
         An error causes an implicit rollback. """
     try:
         connection.execute(qry, args)
-    except IntegrityError:
+    except IntegrityError as e:
+        app.logger.debug(e)
         flash(item + " of the same name already exists.")
 
 def delete(connection, qry, item, **args):

@@ -54,9 +54,16 @@ def get_exposures(connection, filmID):
         FROM Exposures
         WHERE userID = :userID
         AND filmID = :filmID""")
-    return connection.execute(qry,
+
+    result = connection.execute(qry,
                               userID=userID,
                               filmID=filmID).fetchall()
+    list_result = []
+    for row in result:
+        item = (row[0], row[1])
+        list_result.append(item)
+    return list_result
+
 
 def check_for_print_file(connection, printID):
     """ Check if a print has an associated image/file """
