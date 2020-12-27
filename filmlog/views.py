@@ -327,6 +327,11 @@ def thankyou():
     """ Thank you page (return page from donations) """
     return render_template('/public/thankyou.html')
 
+@app.route('/news', methods=['GET'])
+def news():
+    """ Public News Page """
+    return render_template('/public/news.html')
+
 # Binder List
 @app.route('/binders', methods=['GET'])
 @login_required
