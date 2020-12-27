@@ -66,6 +66,13 @@
           </li>
         {% endfor %}
       {% endif %}
+    </ul>
+    <ul class="navbar-nav mr-right">
+      <li class="nav-item"><a class="nav-link
+        {% if '/news' in request.path %}
+          active
+        {% endif %}"
+        href="/news">News</a></li>
       <li class="nav-item"><a class="nav-link
         {% if '/help' in request.path %}
           active
@@ -77,11 +84,12 @@
         {% endif %}"
         href="/contribute">Contribute</a></li>
       <li class="nav-item"><a class="nav-link" href="https://gitlab.com/m00dawg/FilmLog/issues">Log a Bug</a></li>
-    </ul>
-    <ul class="navbar-nav mr-right">
-      <li class="nav-item"><a class="nav-link" href="/news">News</a></li>
       {% if current_user.is_authenticated %}
-        <li class="nav-item"><a class="nav-link" href="/user/preferences">Preferences</a></li>
+        <li class="nav-item"><a class="nav-link
+        {% if '/user/preferences' in request.path %}
+          active
+        {% endif %}"
+        href="/user/preferences">Preferences</a></li>
         <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
       {% else %}
         <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
