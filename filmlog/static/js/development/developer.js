@@ -24,6 +24,11 @@ function getDeveloper() {
         $('#lastReplenishedUl').show();
       }
 
+      if (developer['kind'] === 'One-Shot') {
+        $('#remaining').html(`${developer['remaining']} ml`);
+        $('#remainingLi').show();
+      }
+
       $('#state').html(developer['state']);
       if (developer['state'] == 'Retired') {
         $('#state').addClass('developerRetired');

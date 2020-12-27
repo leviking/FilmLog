@@ -32,6 +32,7 @@ def get_all(connection):
 def get(connection, developerID):
     """ Get a developer """
     last_replenished = None
+    remaining = None
     userID = current_user.get_id()
     qry = text("""SELECT developerID, name, mixedOn, type, kind, state,
         capacity, notes
@@ -57,6 +58,20 @@ def get(connection, developerID):
         if last_replenished_query:
             last_replenished = last_replenished_query['last_replenished']
 
+    # If it's one-shot, figure out how much is left
+    if developer_query['kind'] == 'One-Shot':
+        qry = text("""SELECT capacity - SUM(mlUsed) AS remaining
+            FROM DeveloperLogs
+            JOIN Developers ON Developers.developerID = DeveloperLogs.developerID
+            AND Developers.userID = DeveloperLogs.userID
+            WHERE DeveloperLogs.userID = :userID
+            AND DeveloperLogs.developerID = :developerID""")
+        remaining_query = connection.execute(qry,
+                                             userID=userID,
+                                             developerID=developerID).fetchone()
+        if remaining_query:
+            remaining = remaining_query['remaining']
+
     qry = text("""SELECT DATEDIFF(NOW(), mixedOn) AS days_old
         FROM Developers
         WHERE userID = :userID
@@ -77,6 +92,7 @@ def get(connection, developerID):
             "capacity" : developer_query['capacity'],
             "days_old" : days_old,
             "last_replenished" : last_replenished,
+            "remaining" : round(remaining),
             "notes" : developer_query['notes']
         }
     }
