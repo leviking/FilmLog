@@ -14,8 +14,8 @@ function displayBinderRow(binder) {
 /* Manipulation functions */
 function addBinder() {
   const name = $('#binderNameInput').val();
-  const notes = $('#binderNotesTextArea').val()
-  const binder = { data: { name,notes } };
+  const notes = $('#binderNotesTextArea').val();
+  const binder = { data: { name, notes } };
 
   if (!$('#binderNameInput').val()) {
     showAlert('Cannot Add Binder', 'It needs a name.', 'danger');

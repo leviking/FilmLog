@@ -57,7 +57,7 @@ function deleteProject(projectID) {
 
 /* Ajax and Events */
 // Make a call to pull a the current binder the projects reside under
-function getBinder(binderID) {
+function getBinder() {
   jQuery.ajax({
     type: 'GET',
     url: `/api/v1/binders/${binderID}`,
@@ -76,7 +76,7 @@ function getBinder(binderID) {
 }
 
 // Make a call for the projcts under the current binder
-function getProjects(binderID) {
+function getProjects() {
   jQuery.ajax({
     type: 'GET',
     url: `/api/v1/binders/${binderID}/projects`,
@@ -95,7 +95,6 @@ function updateBinder() {
   const notes = $('#binderNotesTextArea').val();
   const binder = { data: { name, notes } };
 
-  console.log(name);
   jQuery.ajax({
     type: 'PATCH',
     url: `/api/v1/binders/${binderID}`,
@@ -121,7 +120,7 @@ function deleteBinder() {
     contentType: 'application/json',
     dataType: 'json',
     success() {
-      window.location.replace(`/binders`);
+      window.location.replace('/binders');
     },
     // eslint-disable-next-line no-unused-vars
     statusCode: { 403() { showAlert('Cannot Remove Binder', 'Binder has projects in it.', 'warning'); } },
@@ -129,9 +128,8 @@ function deleteBinder() {
 }
 
 $(document).ready(() => {
-  console.log("HERE");
-  getBinder(binderID);
-  getProjects(binderID);
+  getBinder();
+  getProjects();
   $('#editBinderForm').submit(false);
 });
 
