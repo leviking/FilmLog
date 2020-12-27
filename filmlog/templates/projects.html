@@ -28,7 +28,7 @@
     </div>
     <div><br /></div>
   </div>
-  
+
   <div class="card">
     <div class="card-header"><strong>Add Project</strong></div>
     <div class="card-body">
@@ -52,5 +52,30 @@
       </form>
     </div>
   </div>
-
+  <div><br /></div>
+  <div class="card">
+    <div class="card-header"><strong>Edit Binder</strong></div>
+    <div class="card-body">
+      <form method="post" action="#" id="editBinderForm">
+        <div class="form-group row">
+          <div class="col-sm-4">
+            <label for="binderNameInput">Name</label>
+            <input type="text" class="form-control" id="binderNameInput"
+                   maxlength="64" placeholder="My Binder" required />
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-4">
+            <label for="binderNotesTextArea">Notes</label>
+            <textarea class="form-control" id="binderNotesTextArea"></textarea>
+          </div>
+        </div>
+        <div class="button-bar">
+            <button class="btn btn-success" onclick="updateBinder()">Update</button>
+            <button class="btn btn-danger" onclick="deleteBinder()">Delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div><br /></div>
 {% endblock %}

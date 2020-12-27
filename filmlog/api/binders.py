@@ -35,12 +35,13 @@ def post(connection):
     json = request.get_json()
     nextBinderID = next_id(connection, 'binderID', 'Binders')
     qry = text("""INSERT INTO Binders
-        (binderID, userID, name) VALUES (:binderID, :userID, :name)""")
+        (binderID, userID, name, notes) VALUES (:binderID, :userID, :name, :notes)""")
     try:
         connection.execute(qry,
                            binderID=nextBinderID,
                            userID=userID,
-                           name=json['data']['name'])
+                           name=json['data']['name'],
+                           notes=json['data']['notes'])
     except IntegrityError:
         return "FAILED", status.HTTP_409_CONFLICT
     json['data']['id'] = str(nextBinderID)
@@ -74,18 +75,22 @@ def patch(connection, binderID):
     """ Update a binder """
     userID = current_user.get_id()
     json = request.get_json()
-    qry = text("""UPDATE Binders SET name = :name
-        WHERE userID = :userID AND binderID = :binderID""")
+    qry = text("""UPDATE Binders
+                  SET name = :name,
+                      notes = :notes
+                  WHERE userID = :userID
+                  AND binderID = :binderID""")
     try:
         connection.execute(qry,
                            name=json['data']['name'],
+                           notes=json['data']['notes'],
                            userID=userID,
                            binderID=binderID)
     except IntegrityError:
         return "FAILED", status.HTTP_409_CONFLICT
     resp = make_response(jsonify(json))
     resp.headers['Location'] = "/binders/" + str(binderID)
-    return resp, status.HTTP_200_OK
+    return resp, status.HTTP_204_NO_CONTENT
 
 def delete(connection, binderID):
     """ Delete a binder """

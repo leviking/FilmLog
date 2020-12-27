@@ -125,6 +125,21 @@ function updateProject() {
   });
 }
 
+// Delete Film
+// Called from HTML
+// eslint-disable-next-line no-unused-vars
+function deleteProject() {
+  jQuery.ajax({
+    type: 'DELETE',
+    url: `/api/v1/binders/${binderID}/projects/${projectID}`,
+    contentType: 'application/json',
+    dataType: 'json',
+    success() {
+      window.location.replace(`/binders/${binderID}/projects`);
+    },
+  });
+}
+
 $(document).ready(() => {
   /* Fancy Calendar */
   $('#fileDate').datepicker({ dateFormat: 'yy-mm-dd' });
@@ -156,33 +171,8 @@ $(document).ready(() => {
   $('#editProjectForm').submit(false);
 });
 
-// Delete Film
-// Called from HTML
-// eslint-disable-next-line no-unused-vars
-function deleteProject() {
-  jQuery.ajax({
-    type: 'DELETE',
-    url: `/api/v1/binders/${binderID}/projects/${projectID}`,
-    contentType: 'application/json',
-    dataType: 'json',
-    success() {
-      console.log("yeah");
-      window.location.replace(`/binders/${binderID}/projects`);
-    },
-  });
-}
-
-/* Ajax and Events */
-
 // Add Film on form submission
 $('#filmForm').on('submit', (e) => {
   e.preventDefault();
   addFilm();
 });
-
-/*
-$('#editProjectForm').on('submit', (e) => {
-  e.preventDefault();
-  updateProject();
-});
-*/

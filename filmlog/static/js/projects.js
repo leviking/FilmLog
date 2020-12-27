@@ -57,29 +57,82 @@ function deleteProject(projectID) {
 
 /* Ajax and Events */
 // Make a call to pull a the current binder the projects reside under
-jQuery.ajax({
-  type: 'GET',
-  url: `/api/v1/binders/${binderID}`,
-  contentType: 'application/json',
-  dataType: 'json',
-  success(data) {
-    $('#binderName').html(data.data.name);
-    if (data.data.notes) {
-      $('#binderNotes').html(data.data.notes);
-      $('#binderNotesDiv').show();
-    }
-  },
-});
+function getBinder(binderID) {
+  jQuery.ajax({
+    type: 'GET',
+    url: `/api/v1/binders/${binderID}`,
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      $('#binderName').html(data.data.name);
+      $('#binderNameInput').val(data.data.name);
+      if (data.data.notes) {
+        $('#binderNotes').html(data.data.notes);
+        $('#binderNotesTextArea').html(data.data.notes);
+        $('#binderNotesDiv').show();
+      }
+    },
+  });
+}
 
 // Make a call for the projcts under the current binder
-jQuery.ajax({
-  type: 'GET',
-  url: `/api/v1/binders/${binderID}/projects`,
-  contentType: 'application/json',
-  dataType: 'json',
-  success(data) {
-    jQuery(data.data).each((i, project) => { displayProjectRow(project); });
-  },
+function getProjects(binderID) {
+  jQuery.ajax({
+    type: 'GET',
+    url: `/api/v1/binders/${binderID}/projects`,
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      jQuery(data.data).each((i, project) => { displayProjectRow(project); });
+    },
+  });
+}
+
+// This function is used on the HTML side
+// eslint-disable-next-line no-unused-vars
+function updateBinder() {
+  const name = $('#binderNameInput').val();
+  const notes = $('#binderNotesTextArea').val();
+  const binder = { data: { name, notes } };
+
+  console.log(name);
+  jQuery.ajax({
+    type: 'PATCH',
+    url: `/api/v1/binders/${binderID}`,
+    data: JSON.stringify(binder),
+    contentType: 'application/json',
+    dataType: 'json',
+    statusCode: {
+      204() {
+        getBinder(binderID);
+        window.scrollTo(0, 0);
+      },
+      400() { showAlert('Cannot Update Binder', 'Bad data', 'danger'); },
+    },
+  });
+}
+
+// This function is used on the HTML side
+// eslint-disable-next-line no-unused-vars
+function deleteBinder() {
+  jQuery.ajax({
+    type: 'DELETE',
+    url: `/api/v1/binders/${binderID}`,
+    contentType: 'application/json',
+    dataType: 'json',
+    success() {
+      window.location.replace(`/binders`);
+    },
+    // eslint-disable-next-line no-unused-vars
+    statusCode: { 403() { showAlert('Cannot Remove Binder', 'Binder has projects in it.', 'warning'); } },
+  });
+}
+
+$(document).ready(() => {
+  console.log("HERE");
+  getBinder(binderID);
+  getProjects(binderID);
+  $('#editBinderForm').submit(false);
 });
 
 // Add Project on form submission
