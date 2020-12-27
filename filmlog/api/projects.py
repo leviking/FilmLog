@@ -68,14 +68,15 @@ def post(connection, binderID):
     json = request.get_json()
     nextProjectID = next_id(connection, 'projectID', 'Projects')
     qry = text("""INSERT INTO Projects
-        (projectID, binderID, userID, name)
-        VALUES (:projectID, :binderID, :userID, :name)""")
+        (projectID, binderID, userID, name, notes)
+        VALUES (:projectID, :binderID, :userID, :name, :notes)""")
     try:
         connection.execute(qry,
                            projectID=nextProjectID,
                            binderID=binderID,
                            userID=userID,
-                           name=json['data']['name'])
+                           name=json['data']['name'],
+                           notes=json['data']['notes'])
     except IntegrityError:
         return "FAILED", status.HTTP_409_CONFLICT
     json['data']['id'] = str(nextProjectID)
@@ -83,6 +84,31 @@ def post(connection, binderID):
     json['data']['created_on'] = datetime.datetime.now()
     resp = make_response(jsonify(json))
     return resp, status.HTTP_201_CREATED
+
+def patch(connection, binderID, projectID):
+    """ Update a project """
+    userID = current_user.get_id()
+    json = request.get_json()
+    print(json)
+
+    qry = text("""UPDATE Projects
+        SET name = :name,
+            notes = :notes
+        WHERE userID = :userID
+        AND binderID = :binderID
+        AND projectID = :projectID""")
+    try:
+        connection.execute(qry,
+                           name=json['data']['name'],
+                           notes=json['data']['notes'],
+                           binderID=binderID,
+                           projectID=projectID,
+                           userID=userID)
+    except IntegrityError:
+        return "FAILED", status.HTTP_409_CONFLICT
+
+    resp = make_response(jsonify(json))
+    return resp, status.HTTP_204_NO_CONTENT
 
 def delete(connection, binderID, projectID):
     """ Delete a project """

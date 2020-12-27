@@ -87,7 +87,7 @@ function addFilm() {
 }
 
 // This function is used on the HTML side
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-lfunction uine no-unused-vars
 function deleteFilm(filmID) {
   jQuery.ajax({
     type: 'DELETE',
@@ -99,6 +99,27 @@ function deleteFilm(filmID) {
       $(tr).remove();
     },
     statusCode: { 403() { showAlert('Cannot Delete Film', 'It has films in it.', 'danger'); } },
+  });
+}
+
+function updateProject() {
+  const name = $('#projectNameInput').val();
+  const notes = $('#projectNotesTextArea').val();
+  const project = { data: { name, notes } };
+
+  jQuery.ajax({
+    type: 'PATCH',
+    url: `/api/v1/binders/${binderID}/projects/${projectID}`,
+    data: JSON.stringify(project),
+    contentType: 'application/json',
+    dataType: 'json',
+    statusCode: {
+      204() {
+        getProject(binderID, projectID);
+        window.scrollTo(0, 0);
+      },
+      400() { showAlert('Cannot Update Project', 'Bad data', 'danger'); },
+    },
   });
 }
 

@@ -19,7 +19,8 @@ function displayProjectRow(project) {
 /* Manipulation functions */
 function addProject() {
   const name = $('#projectName').val();
-  const project = { data: { name } };
+  const notes = $('#projectNotes').val();
+  const project = { data: { name, notes } };
 
   if (!$('#projectName').val()) {
     showAlert('Cannot Add Project', 'It needs a name.', 'danger');
@@ -35,7 +36,7 @@ function addProject() {
     success(data) { displayProjectRow(data.data); },
     statusCode: { 409() { showAlert('Cannot Add Project', 'It already exists.', 'warning'); } },
   });
-  $('#projectForm')[0].reset();
+  $('#addProjectForm')[0].reset();
 }
 
 // This function is used on the HTML side
@@ -82,7 +83,7 @@ jQuery.ajax({
 });
 
 // Add Project on form submission
-$('#projectForm').on('submit', (e) => {
+$('#addProjectForm').on('submit', (e) => {
   e.preventDefault();
   addProject();
 });

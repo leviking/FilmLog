@@ -17,7 +17,7 @@ function getProject(binderID, projectID) {
       }
 
       $('#projectNameInput').val(data.data.name);
-      $('#projectNotesTextarea').html(data.data.notes);
+      $('#projectNotesTextArea').html(data.data.notes);
     },
   });
 }

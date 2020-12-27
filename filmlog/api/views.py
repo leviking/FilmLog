@@ -150,7 +150,7 @@ def projects_all(binderID):
     return return_status
 
 @api_blueprint.route('/binders/<int:binderID>/projects/<int:projectID>',
-                     methods=['GET', 'DELETE'])
+                     methods=['GET', 'DELETE', 'PATCH'])
 @login_required
 def project_details(binderID, projectID):
     """ Get details of a project """
@@ -161,6 +161,8 @@ def project_details(binderID, projectID):
         return_status = projects.get(connection, binderID, projectID)
     elif request.method == 'DELETE':
         return_status = projects.delete(connection, binderID, projectID)
+    elif request.method == 'PATCH':
+        return_status = projects.patch(connection, binderID, projectID)
     transaction.commit()
     return return_status
 
