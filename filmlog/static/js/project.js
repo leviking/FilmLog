@@ -122,6 +122,7 @@ $(document).ready(() => {
     dataType: 'json',
     success(data) {
       $('#cameraID').append($('<option value="0">None</option>'));
+
       jQuery(data.data).each((i, camera) => {
         $('#cameraID').append($(`<option value="${camera.id}">${camera.name}</option>`));
       });

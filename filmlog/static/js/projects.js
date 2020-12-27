@@ -63,7 +63,7 @@ jQuery.ajax({
   dataType: 'json',
   success(data) {
     $('#binderName').html(data.data.name);
-    if(data.data.notes) {
+    if (data.data.notes) {
       $('#binderNotes').html(data.data.notes);
       $('#binderNotesDiv').show();
     }

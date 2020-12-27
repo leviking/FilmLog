@@ -11,7 +11,11 @@ function getProject(binderID, projectID) {
     dataType: 'json',
     success(data) {
       $('#projectName').html(data.data.name);
-      $('#projectNotes').html(data.data.notes);
+      if (data.data.notes) {
+        $('#projectNotesDiv').show();
+        $('#projectNotes').html(data.data.notes);
+      }
+
       $('#projectNameInput').val(data.data.name);
       $('#projectNotesTextarea').html(data.data.notes);
     },
