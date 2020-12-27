@@ -89,7 +89,6 @@ def patch(connection, binderID, projectID):
     """ Update a project """
     userID = current_user.get_id()
     json = request.get_json()
-    print(json)
 
     qry = text("""UPDATE Projects
         SET name = :name,

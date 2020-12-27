@@ -151,7 +151,26 @@ $(document).ready(() => {
   });
 
   getFilms();
+
+  $('#editProjectForm').submit(false);
+
 });
+
+// Delete Film
+// Called from HTML
+// eslint-disable-next-line no-unused-vars
+function deleteProject() {
+  jQuery.ajax({
+    type: 'DELETE',
+    url: `/api/v1/binders/${binderID}/projects/${projectID}`,
+    contentType: 'application/json',
+    dataType: 'json',
+    success() {
+      console.log("yeah");
+      window.location.replace(`/binders/${binderID}/projects`);
+    },
+  });
+}
 
 /* Ajax and Events */
 
@@ -161,7 +180,9 @@ $('#filmForm').on('submit', (e) => {
   addFilm();
 });
 
+/*
 $('#editProjectForm').on('submit', (e) => {
   e.preventDefault();
   updateProject();
 });
+*/
