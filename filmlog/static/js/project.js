@@ -87,7 +87,7 @@ function addFilm() {
 }
 
 // This function is used on the HTML side
-// eslint-disable-next-lfunction uine no-unused-vars
+// eslint-disable-next-line no-unused-vars
 function deleteFilm(filmID) {
   jQuery.ajax({
     type: 'DELETE',
@@ -102,6 +102,8 @@ function deleteFilm(filmID) {
   });
 }
 
+// This function is used on the HTML side
+// eslint-disable-next-line no-unused-vars
 function updateProject() {
   const name = $('#projectNameInput').val();
   const notes = $('#projectNotesTextArea').val();
@@ -151,9 +153,7 @@ $(document).ready(() => {
   });
 
   getFilms();
-
   $('#editProjectForm').submit(false);
-
 });
 
 // Delete Film
