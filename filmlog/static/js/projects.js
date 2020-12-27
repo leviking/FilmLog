@@ -61,7 +61,13 @@ jQuery.ajax({
   url: `/api/v1/binders/${binderID}`,
   contentType: 'application/json',
   dataType: 'json',
-  success(data) { $('#binderName').html(data.data.name); },
+  success(data) {
+    $('#binderName').html(data.data.name);
+    if(data.data.notes) {
+      $('#binderNotes').html(data.data.notes);
+      $('#binderNotesDiv').show();
+    }
+  },
 });
 
 // Make a call for the projcts under the current binder

@@ -53,7 +53,7 @@ def post(connection):
 def get(connection, binderID):
     """ Get a binder """
     userID = current_user.get_id()
-    qry = text("""SELECT binderID, name, projectCount, createdOn
+    qry = text("""SELECT binderID, name, projectCount, createdOn, notes
         FROM Binders WHERE userID = :userID AND binderID = :binderID""")
     binder_query = connection.execute(qry,
                                       userID=userID,
@@ -64,7 +64,8 @@ def get(connection, binderID):
             "id" : str(binderID),
             "name" : binder_query['name'],
             "project_count" : binder_query['projectCount'],
-            "created_on" : binder_query['createdOn']
+            "created_on" : binder_query['createdOn'],
+            "notes" : binder_query['notes']
         }
     }
     return jsonify(binder), status.HTTP_200_OK

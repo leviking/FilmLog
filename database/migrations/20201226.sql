@@ -1,0 +1,2 @@
+ALTER TABLE Binders
+ADD COLUMN notes TEXT DEFAULT NULL AFTER createdOn;
