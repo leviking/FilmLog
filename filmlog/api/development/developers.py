@@ -70,7 +70,7 @@ def get(connection, developerID):
                                              userID=userID,
                                              developerID=developerID).fetchone()
         if remaining_query:
-            remaining = remaining_query['remaining']
+            remaining = round(remaining_query['remaining'])
 
     qry = text("""SELECT DATEDIFF(NOW(), mixedOn) AS days_old
         FROM Developers
@@ -92,7 +92,7 @@ def get(connection, developerID):
             "capacity" : developer_query['capacity'],
             "days_old" : days_old,
             "last_replenished" : last_replenished,
-            "remaining" : round(remaining),
+            "remaining" : remaining,
             "notes" : developer_query['notes']
         }
     }
