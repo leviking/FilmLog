@@ -18,11 +18,11 @@ function displayProjectRow(project) {
 
 /* Manipulation functions */
 function addProject() {
-  const name = $('#projectName').val();
-  const notes = $('#projectNotes').val();
+  const name = $('#projectNameInput').val();
+  const notes = $('#projectNotesTextArea').val();
   const project = { data: { name, notes } };
 
-  if (!$('#projectName').val()) {
+  if (!$('#projectNameInput').val()) {
     showAlert('Cannot Add Project', 'It needs a name.', 'danger');
     return;
   }
