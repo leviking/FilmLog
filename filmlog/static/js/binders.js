@@ -1,8 +1,7 @@
 let numBinders = 0;
 
 // Helper function to display no binders found message
-function noBindersFound()
-{
+function noBindersFound() {
   noRowsFound('#bindersTableBody', 4, 'Binders');
 }
 

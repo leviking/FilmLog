@@ -4,8 +4,7 @@ const binderID = currentURL.split('/')[4];
 let numProjects = 0;
 
 // Helper function to display no projects found message
-function noProjectsFound()
-{
+function noProjectsFound() {
   noRowsFound('#projectsTableBody', 4, 'Projects');
 }
 
