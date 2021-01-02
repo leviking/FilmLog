@@ -3,6 +3,13 @@ const currentURL = $(location).attr('href');
 const binderID = currentURL.split('/')[4];
 const projectID = currentURL.split('/')[6];
 
+let numFilms = 0;
+
+// Helper function to display no films found message
+function noFilmsFound() {
+  noRowsFound('#filmsTableBody', 6, 'Films');
+}
+
 /* Helper Functions */
 // Helper function to create project rows in table
 function displayFilmRow(film) {
@@ -48,7 +55,11 @@ function getFilms() {
     contentType: 'application/json',
     dataType: 'json',
     success(data) {
-      jQuery(data.data).each((i, film) => { displayFilmRow(film); });
+      if (data.data.length > 0) {
+        jQuery(data.data).each((i, film) => { displayFilmRow(film); });
+      } else {
+        noFilmsFound();
+      }
     },
   });
 }
@@ -81,6 +92,7 @@ function addFilm() {
       // We re-generate the table so it sorts properly
       getFilms(data.data);
       $('#filmForm')[0].reset();
+      numFilms += 1;
     },
     statusCode: { 409() { showAlert('Cannot Add Film', 'It already exists', 'warning'); } },
   });
@@ -97,6 +109,10 @@ function deleteFilm(filmID) {
     success() {
       const tr = `#rowFilmID${filmID}`;
       $(tr).remove();
+      numFilms -= 1;
+      if (numFilms === 0) {
+        noFilmsFound();
+      }
     },
     statusCode: { 403() { showAlert('Cannot Delete Film', 'It has films in it.', 'danger'); } },
   });
