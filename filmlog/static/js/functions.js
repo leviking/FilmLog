@@ -1,6 +1,13 @@
 // Shared Functions for other JavaScript files
 /* eslint no-unused-vars: 0 */
 
+// Helper Function When No Items Are Found
+function noRowsFound(dom, colspan, item) {
+    $(dom).empty();
+    let row = `<tr><td colspan="${colspan}">No ${item} Found</td></tr>`;
+    $(dom).append($(row));
+}
+
 // Shared Gets
 // Get Project
 function getProject(binderID, projectID) {

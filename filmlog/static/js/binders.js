@@ -1,3 +1,5 @@
+var numBinders = 0;
+
 // Helper function to create binder rows in table
 function displayBinderRow(binder) {
   const createdOn = formatDate(binder.created_on);
@@ -29,8 +31,11 @@ function addBinder() {
     contentType: 'application/json',
     dataType: 'json',
     success(data) {
+      if(numBinders == 0)
+        $('#bindersTableBody').empty();
       displayBinderRow(data.data);
       $('#binderForm')[0].reset();
+      numBinders++;
     },
     statusCode: { 409() { showAlert('Cannot Add Binder', 'It already exists', 'danger'); } },
   });
@@ -47,6 +52,9 @@ function deleteBinder(binderID) {
     success() {
       const tr = `#rowBinderID${binderID}`;
       $(tr).remove();
+      numBinders--;
+      if(numBinders == 0)
+        noRowsFound('#bindersTableBody', 4, 'Binders');
     },
     // eslint-disable-next-line no-unused-vars
     statusCode: { 403() { showAlert('Cannot Remove Binder', 'Binder has projects in it.', 'warning'); } },
@@ -60,7 +68,11 @@ jQuery.ajax({
   contentType: 'application/json',
   dataType: 'json',
   success(data) {
-    jQuery(data.data).each((i, binder) => { displayBinderRow(binder); });
+    numBinders = data.data.length;
+    if(numBinders > 0)
+      jQuery(data.data).each((i, binder) => { displayBinderRow(binder); });
+    else
+      noRowsFound('#bindersTableBody', 4, 'Binders');
   },
 });
 
