@@ -3,9 +3,8 @@
 
 // Helper Function When No Items Are Found
 function noRowsFound(dom, colspan, item) {
-    $(dom).empty();
-    let row = `<tr><td colspan="${colspan}">No ${item} Found</td></tr>`;
-    $(dom).append($(row));
+  $(dom).empty();
+  $(dom).append($(`<tr><td colspan="${colspan}">No ${item} Found</td></tr>`));
 }
 
 // Shared Gets

@@ -1,4 +1,10 @@
-var numBinders = 0;
+let numBinders = 0;
+
+// Helper function to display no binders found message
+function noBindersFound()
+{
+  noRowsFound('#bindersTableBody', 4, 'Binders');
+}
 
 // Helper function to create binder rows in table
 function displayBinderRow(binder) {
@@ -31,11 +37,12 @@ function addBinder() {
     contentType: 'application/json',
     dataType: 'json',
     success(data) {
-      if(numBinders == 0)
+      if (numBinders === 0) {
         $('#bindersTableBody').empty();
+      }
       displayBinderRow(data.data);
       $('#binderForm')[0].reset();
-      numBinders++;
+      numBinders += 1;
     },
     statusCode: { 409() { showAlert('Cannot Add Binder', 'It already exists', 'danger'); } },
   });
@@ -52,9 +59,10 @@ function deleteBinder(binderID) {
     success() {
       const tr = `#rowBinderID${binderID}`;
       $(tr).remove();
-      numBinders--;
-      if(numBinders == 0)
-        noRowsFound('#bindersTableBody', 4, 'Binders');
+      numBinders -= 1;
+      if (numBinders === 0) {
+        noBindersFound();
+      }
     },
     // eslint-disable-next-line no-unused-vars
     statusCode: { 403() { showAlert('Cannot Remove Binder', 'Binder has projects in it.', 'warning'); } },
@@ -69,10 +77,11 @@ jQuery.ajax({
   dataType: 'json',
   success(data) {
     numBinders = data.data.length;
-    if(numBinders > 0)
+    if (numBinders > 0) {
       jQuery(data.data).each((i, binder) => { displayBinderRow(binder); });
-    else
-      noRowsFound('#bindersTableBody', 4, 'Binders');
+    } else {
+      noBindersFound();
+    }
   },
 });
 

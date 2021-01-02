@@ -1,6 +1,13 @@
 /* Figure out the URL parameters */
 const currentURL = $(location).attr('href');
 const binderID = currentURL.split('/')[4];
+let numProjects = 0;
+
+// Helper function to display no projects found message
+function noProjectsFound()
+{
+  noRowsFound('#projectsTableBody', 4, 'Projects');
+}
 
 /* Helper Functions */
 // Helper function to create project rows in table
@@ -33,10 +40,16 @@ function addProject() {
     data: JSON.stringify(project),
     contentType: 'application/json',
     dataType: 'json',
-    success(data) { displayProjectRow(data.data); },
+    success(data) {
+      if (numProjects === 0) {
+        $('#projectsTableBody').empty();
+      }
+      displayProjectRow(data.data);
+      $('#addProjectForm')[0].reset();
+      numProjects += 1;
+    },
     statusCode: { 409() { showAlert('Cannot Add Project', 'It already exists.', 'warning'); } },
   });
-  $('#addProjectForm')[0].reset();
 }
 
 // This function is used on the HTML side
@@ -50,6 +63,10 @@ function deleteProject(projectID) {
     success() {
       const tr = `#rowProjectID${projectID}`;
       $(tr).remove();
+      numProjects -= 1;
+      if (numProjects === 0) {
+        noProjectsFound();
+      }
     },
     statusCode: { 403() { showAlert('Cannot Delete Project', 'It has films in it.', 'danger'); } },
   });
@@ -83,7 +100,12 @@ function getProjects() {
     contentType: 'application/json',
     dataType: 'json',
     success(data) {
-      jQuery(data.data).each((i, project) => { displayProjectRow(project); });
+      numProjects = data.data.length;
+      if (numProjects > 0) {
+        jQuery(data.data).each((i, project) => { displayProjectRow(project); });
+      } else {
+        noProjectsFound();
+      }
     },
   });
 }
