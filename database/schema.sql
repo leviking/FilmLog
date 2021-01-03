@@ -521,7 +521,7 @@ CREATE VIEW FilmTestsView AS
 SELECT FilmTests.filmTestID, FilmTypes.name AS filmName, FilmTypes.iso AS filmISO,
 filmSize, developer, SEC_TO_TIME(time) AS devTime, Filters.code AS filter,
 lux, fstop,
-gamma, contrastIndex
+gamma, contrastIndex, kodakISO
 FROM FilmTests
 JOIN DevRecipes ON DevRecipes.userID = FilmTests.userID
     AND DevRecipes.devRecipeID = FilmTests.devRecipeID
