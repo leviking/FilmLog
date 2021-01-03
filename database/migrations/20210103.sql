@@ -1,0 +1,2 @@
+ALTER TABLE FilmTests
+ADD COLUMN kodakISO SMALLINT UNSIGNED AFTER contrastIndex; 
