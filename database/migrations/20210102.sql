@@ -1,0 +1,2 @@
+ALTER TABLE DevRecipes
+MODIFY COLUMN temperature DECIMAL(3,1);

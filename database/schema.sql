@@ -448,7 +448,7 @@ CREATE TABLE DevRecipes (
     type ENUM ('Black and White', 'C-41', 'ECN2', 'E-6') NOT NULL DEFAULT 'Black and White',
     dilution TINYINT NOT NULL DEFAULT 0,
     time SMALLINT UNSIGNED NOT NULL,
-    temperature TINYINT UNSIGNED NOT NULL,
+    temperature DECIMAL(3,1) UNSIGNED NOT NULL,
     prebath ENUM('No', 'Water') NOT NULL DEFAULT 'No',
     stop ENUM('Stop Bath', 'Water') NOT NULL DEFAULT 'Stop Bath',
     agitation ENUM('Rotary', 'Hand-Inversions', 'Dip and Dunk', 'Tray') NOT NULL DEFAULT 'Hand-Inversions',
