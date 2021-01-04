@@ -6,7 +6,7 @@ from flask_api import status
 from sqlalchemy.sql import text
 from sqlalchemy.exc import IntegrityError
 
-from filmlog.functions import next_id
+from filmlog.functions import next_id, log
 
 ## Binders
 def get_all(connection):
@@ -43,11 +43,13 @@ def post(connection):
                            name=json['data']['name'],
                            notes=json['data']['notes'])
     except IntegrityError:
+        log("Failed to create new binder via API")
         return "FAILED", status.HTTP_409_CONFLICT
     json['data']['id'] = str(nextBinderID)
     json['data']['project_count'] = str(0)
     json['data']['created_on'] = datetime.datetime.now()
     resp = make_response(jsonify(json))
+    log("Created new binder via API")
     return resp, status.HTTP_201_CREATED
 
 ## Binder (Singular)
@@ -87,6 +89,7 @@ def patch(connection, binderID):
                            userID=userID,
                            binderID=binderID)
     except IntegrityError:
+        log("Failed to update binder via API")
         return "FAILED", status.HTTP_409_CONFLICT
     resp = make_response(jsonify(json))
     resp.headers['Location'] = "/binders/" + str(binderID)
@@ -101,5 +104,7 @@ def delete(connection, binderID):
                            binderID=binderID,
                            userID=userID)
     except IntegrityError:
+        log("Failed to delete binder via API")
         return "FAILED", status.HTTP_403_FORBIDDEN
+    log("Deleted binder via API")
     return "OK", status.HTTP_204_NO_CONTENT

@@ -12,6 +12,16 @@ pool_recycle=3600
 pool_size=10
 pool_pre_ping=True
 
+[kafka]
+enabled=False
+topic=FilmLog
+bootstrap_servers=localhost:9092
+
+[logging]
+use_flask=True
+use_kafka=False
+kafka_key=AppLog
+
 [files]
 user_files=files
 thumbnail_size=480

@@ -23,6 +23,13 @@ app.debug = config.getboolean('app', 'debug')
 user_files = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                           config.get('files', 'user_files'))
 
+kafka_enabled = config.getboolean('kafka', 'enabled')
+kafka_topic = config.get('kafka', 'topic')
+logging_use_flask = config.getboolean('logging', 'use_flask')
+logging_use_kafka = config.getboolean('logging', 'use_kafka')
+logging_kafka_key = config.get('logging', 'kafka_key')
+
+
 app.config['ALLOWED_EXTENSIONS'] = set(['jpg', 'jpeg'])
 app.config['UPLOAD_FOLDER'] = user_files
 app.config['THUMBNAIL_SIZE'] = config.get('files', 'thumbnail_size')
@@ -32,3 +39,8 @@ app.config['RECAPTCHA_PRIVATE_KEY'] = config.get('recaptcha', 'private_key')
 
 # Global CSRF Protection
 csrf = CSRFProtect(app)
+
+kafka_producer = None
+if kafka_enabled:
+    from kafka import KafkaProducer
+    kafka_producer = KafkaProducer(bootstrap_servers=config.get('kafka', 'bootstrap_servers'))

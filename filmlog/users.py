@@ -14,6 +14,7 @@ from wtforms.validators import Length
 
 # Filmlog
 from filmlog.config import app, engine
+from filmlog.functions import log
 
 ### Functions
 # def generate_registration_code(size=64, chars=string.ascii_lowercase + \
@@ -102,6 +103,7 @@ def login():
                         WHERE userID = :userID""")
                     connection.execute(qry, userID=user.userID)
                     transaction.commit()
+                    log("User logged in")
                     return redirect("/")
             transaction.rollback()
     return render_template('users/login.html', form=form)
@@ -173,9 +175,10 @@ def register():
                                username=form.username.data,
                                email=form.email.data,
                                password=generate_password_hash(form.password.data))
+                log('New user registered')
                 return render_template("users/post_registration.html",
                                        username=form.username.data)
         else:
-            app.logger.info('User registration form has invalid data')
+            log('User registration form has invalid data')
             flash("Looks like you did something wrong.")
     return render_template('users/register.html', form=form)
