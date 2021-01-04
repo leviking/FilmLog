@@ -18,4 +18,4 @@ click
 Pillow
 wtforms
 python-dateutil
-kafka
+kafka-python
