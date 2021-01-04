@@ -169,11 +169,10 @@ def validate_exposure_time(form, field):
 
 def log(message):
     """ Log a message to configured methods """
-    if config.logging_use_flask == True:
+    if config.logging_use_flask:
         app.logger.info("log enabled?")
         app.logger.info(message)
-    if config.logging_use_kafka == True and config.kafka_enabled == True:
-        try:
-            kafka_producer.send(config.kafka_topic, key=config.logging_kafka_key.encode('utf-8'), value=message.encode('utf-8'))
-        except Error as e:
-            app.logger.info(e)
+    if config.logging_use_kafka and config.kafka_enabled:
+        kafka_producer.send(config.kafka_topic,
+                            key=config.logging_kafka_key.encode('utf-8'),
+                            value=message.encode('utf-8'))
