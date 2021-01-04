@@ -1,4 +1,6 @@
 #!/bin/bash
 . venv/bin/activate
+git pull
 pip install --upgrade -r requirements.txt
-git pull && ./migrate.sh && sudo apachectl graceful
+./migrate.sh 
+sudo apachectl graceful
