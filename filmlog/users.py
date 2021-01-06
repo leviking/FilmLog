@@ -120,12 +120,6 @@ def preferences():
     """ User Preferences Pane """
     return render_template('users/preferences.html')
 
-@app.route('/user/films', methods=['GET'])
-@login_required
-def films():
-    """ User Films"""
-    return render_template('users/films.html')
-
 @app.route('/user/papers', methods=['GET'])
 @login_required
 def papers():

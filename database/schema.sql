@@ -441,23 +441,6 @@ CREATE TABLE DeveloperLogFilms(
     REFERENCES FilmSizes (filmSizeID) ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
-CREATE TABLE DevRecipes (
-    userID INT UNSIGNED NOT NULL,
-    devRecipeID SMALLINT UNSIGNED NOT NULL,
-    developer VARCHAR(32) NOT NULL,
-    type ENUM ('Black and White', 'C-41', 'ECN2', 'E-6') NOT NULL DEFAULT 'Black and White',
-    dilution TINYINT NOT NULL DEFAULT 0,
-    time SMALLINT UNSIGNED NOT NULL,
-    temperature DECIMAL(3,1) UNSIGNED NOT NULL,
-    prebath ENUM('No', 'Water') NOT NULL DEFAULT 'No',
-    stop ENUM('Stop Bath', 'Water') NOT NULL DEFAULT 'Stop Bath',
-    agitation ENUM('Rotary', 'Hand-Inversions', 'Dip and Dunk', 'Tray') NOT NULL DEFAULT 'Hand-Inversions',
-    rotaryRPM TINYINT UNSIGNED DEFAULT NULL,
-    notes TEXT,
-    PRIMARY KEY (userID, devRecipeID),
-    CONSTRAINT DevRecipes_Users_fk FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE='InnoDB';
-
 CREATE TABLE StepTablets (
   userID INT UNSIGNED NOT NULL,
   stepTabletID TINYINT UNSIGNED NOT NULL,
@@ -492,12 +475,19 @@ CREATE TABLE FilmTests (
   lux TINYINT UNSIGNED NOT NULL,
   fstop DECIMAL (3,1) UNSIGNED NOT NULL,
   exposureTime SMALLINT DEFAULT NULL,
+  devTime SMALLINT UNSIGNED NOT NULL,
+  devTemperature DECIMAL(3,1) UNSIGNED NOT NULL,
+  prebath ENUM('No','Water') NOT NULL DEFAULT 'No',
+  stop ENUM('Stop Bath','Water') NOT NULL DEFAULT 'Stop Bath',
+  agitation ENUM('Rotary','Hand-Inversions','Dip and Dunk','Tray') NOT NULL DEFAULT 'Hand-Inversions',
+  rotaryRPM TINYINT UNSIGNED DEFAULT NULL,
   baseFog DECIMAL (3,2) UNSIGNED DEFAULT NULL,
   dMax DECIMAL(3,2) UNSIGNED DEFAULT NULL;
   gamma DECIMAL(3,2) UNSIGNED DEFAULT NULL,
   contrastIndex DECIMAL(3,2) UNSIGNED DEFAULT NULL,
   kodakISO SMALLINT UNSIGNED DEFAULT NULL,
   expLog DECIMAL (3,2) UNSIGNED AS (ROUND(LOG10(lux * exposureTime * 1000), 2)) VIRTUAL,
+  developer VARCHAR(32) NOT NULL,
   notes TEXT DEFAULT NULL,
   PRIMARY KEY (userID, filmTestID),
   CONSTRAINT FilmTests_DevRecipes_fk FOREIGN KEY (userID, devRecipeID) REFERENCES DevRecipes (userID, devRecipeID) ON DELETE RESTRICT ON UPDATE CASCADE,

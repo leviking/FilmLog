@@ -24,7 +24,7 @@ from filmlog.classes import MultiCheckboxField
 # Could be a better way to do this, but these are used to section out parts
 # of the app into logical groupings (e.g. darkroom is for /darkroom)
 # Blueprints may be the answer here.
-from filmlog import users, filmstock, darkroom, files, gear, docs, \
+from filmlog import users, films, darkroom, files, gear, docs, \
     search, developing
 
 ## Blueprints

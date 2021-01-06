@@ -40,21 +40,6 @@
               active
             {% endif %}"
             href="/binders">Binders</a></li>
-        {% if binderID %}
-          <li class="nav-item"><a class="nav-link
-            {% if '/projects' in request.path
-              and '/films' not in request.path %}
-              active
-            {% endif %}"
-            href="/binders/{{ binderID }}/projects">Projects</a></li>
-          {% if projectID %}
-            <li class="nav-item"><a class="nav-link
-              {% if '/films' in request.path %}
-                active
-              {% endif %}"
-              href="/binders/{{ binderID }}/projects/{{ projectID }}">Films</a></li>
-          {% endif %}
-        {% endif %}
 
         {% for url,name in section_map %}
           <li class="nav-item">

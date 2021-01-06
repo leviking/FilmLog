@@ -93,15 +93,27 @@ def film_type_details(filmTypeID):
     transaction.commit()
     return return_status
 
-@api_blueprint.route('/film/<int:filmTypeID>/tests',
+@api_blueprint.route('/films/tests',
                       methods=['GET'])
 @login_required
-def film_tests(filmTypeID):
-    """ Get user's film types """
+def film_tests():
+    """ Get all user's film tests """
     connection = engine.connect()
     transaction = connection.begin()
     if request.method == 'GET':
-        return_status = films.get_film_tests(connection, filmTypeID)
+        return_status = films.get_film_tests(connection)
+    transaction.commit()
+    return return_status
+
+@api_blueprint.route('/films/<int:filmTypeID>/test',
+                      methods=['GET'])
+@login_required
+def film_test(filmTypeID):
+    """ Get user's film test for specific film """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = films.get_film_test(connection, filmTypeID)
     transaction.commit()
     return return_status
 
