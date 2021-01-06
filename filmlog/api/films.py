@@ -278,13 +278,12 @@ def add_film_type(connection):
 def get_film_tests(connection):
     """ Get all film tests """
     userID = current_user.get_id()
-    qry = text("""SELECT FilmTests.filmTestID, DevRecipes.devRecipeID,
+    qry = text("""SELECT FilmTests.filmTestID,
+    testedOn,
     FilmTypes.name AS filmName, FilmTypes.iso,
-    developer, time AS devTime,
+    kodakISO, developer, SECONDS_TO_DURATION(devTime) AS devTime,
     filmSize, baseFog, dMax, gamma, contrastIndex
     FROM FilmTests
-    JOIN DevRecipes ON DevRecipes.userID = FilmTests.userID
-        AND DevRecipes.devRecipeID = FilmTests.devRecipeID
     JOIN FilmTypes ON FilmTypes.userID = FilmTests.userID
         AND FilmTypes.filmTypeID = FilmTests.filmTypeID
     WHERE FilmTests.userID = :userID
@@ -296,15 +295,14 @@ def get_film_tests(connection):
         "data": []
     }
 
-
-
     for row in films_query:
         film = {
             "id" : row['filmTestID'],
             "filmTestID" : row['filmTestID'],
-            "devRecipeID" : row['devRecipeID'],
+            "testedOn" : row['testedOn'],
             "filmName" : row['filmName'],
             "iso" : row['iso'],
+            "kodakISO" : row['kodakISO'],
             "developer": row['developer'],
             "devTime" : row['devTime'],
             "filmSize" : row['filmSize'],
@@ -320,12 +318,10 @@ def get_film_test(connection, filmTypeID):
     """ Get specific film test """
     userID = current_user.get_id()
     qry = text("""SELECT FilmTests.filmTestID, DevRecipes.devRecipeID,
-    FilmTypes.name AS filmName, FilmTypes.iso,
-    developer, time AS devTime,
+    FilmTypes.name AS filmName, FilmTypes.iso, kodakISO,
+    developer, devTime,
     filmSize, baseFog, dMax, gamma, contrastIndex
     FROM FilmTests
-    JOIN DevRecipes ON DevRecipes.userID = FilmTests.userID
-        AND DevRecipes.devRecipeID = FilmTests.devRecipeID
     JOIN FilmTypes ON FilmTypes.userID = FilmTests.userID
         AND FilmTypes.filmTypeID = FilmTests.filmTypeID
     WHERE FilmTests.userID = :userID
@@ -342,9 +338,9 @@ def get_film_test(connection, filmTypeID):
         film = {
             "id" : row['filmTestID'],
             "filmTestID" : row['filmTestID'],
-            "devRecipeID" : row['devRecipeID'],
             "filmName" : row['filmName'],
             "iso" : row['iso'],
+            "kodakISO" : row['kodakISO'],
             "developer": row['developer'],
             "devTime" : row['devTime'],
             "filmSize" : row['filmSize'],

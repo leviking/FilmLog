@@ -1,5 +1,3 @@
-// Make a call to pull user's preferences
-
 // Find Film Row
 function findFilmRow(filmTypeID) {
   // CSS.escape to add slashes to the colon stuff (was a pain to figure out)
