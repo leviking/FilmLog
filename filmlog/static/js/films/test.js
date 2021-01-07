@@ -31,6 +31,20 @@ function generateHDCurve(steps) {
     },
     options: {
       cubicInterpolationMode: 'default',
+      scales: {
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Density'
+          }
+        }],
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Log'
+          }
+        }]
+      }
     }
   });
 }
@@ -79,7 +93,7 @@ function getFilmTest() {
         });
         generateHDCurve(test.steps);
       } else {
-        let row = '<tr><td colspan="4">No Steps Entered</td></tr>';
+        let row = '<tr><td colspan="3">No Steps Entered</td></tr>';
         $('#stepsTableBody').append($(row));
       }
     },

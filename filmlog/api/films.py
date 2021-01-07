@@ -391,7 +391,7 @@ def get_film_test(connection, filmTypeID, filmTestID):
 
     qry = text("""SELECT FilmTests.filmTestID,
     FilmTypes.name AS filmName, FilmTypes.iso, kodakISO,
-    developer, devTime, testedOn,
+    developer, SECONDS_TO_DURATION(devTime) AS devTime, testedOn,
     filmSize, baseFog, dMax, gamma, contrastIndex, notes
     FROM FilmTests
     JOIN FilmTypes ON FilmTypes.userID = FilmTests.userID
