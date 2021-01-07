@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script src="/static/include/chart/Chart.bundle.min.js"></script>
+<script src="/static/js/films/test.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+{% include "films/sidebar.html" %}
+<div class="col-md-10 main">
+  <h1 class="page-header" id="name"></h1>
+  <ul>
+    <li><strong>Tested On:</strong> <span id="testedOn"></span></li>
+    <li><strong>Film Size:</strong> <span id="filmSize"></span></li>
+    <li><strong>Developer:</strong> <span id="developer"></span></li>
+    <li><strong>Development Time:</strong> <span id="devTime"></span></li>
+    <li><strong>Base Fog:</strong> <span id="baseFog"></span></li>
+    <li><strong>dMax:</strong> <span id="dMax"></span></li>
+    <li><strong>Gamma:</strong> <span id="gamma"></span></li>
+    <li><strong>Contrast Index</strong> <span id="contrastIndex"></span></li>
+  </ul>
+
+  <div id="notesDiv" hidden>
+    <h3>Notes</h3>
+    <div><pre><span id="notes"></span></pre></div>
+  </div>
+
+  <h3>Pretty Graph</h3>
+  <div class="card">
+    <canvas id="hdCurve" width="400" height="200"></canvas>
+  </div>
+
+  <h3>Steps</h3>
+  <div class="card">
+    <table class="table table-striped table-bordered" id="films">
+      <thead class="thead-light">
+        <tr>
+          <th>Step Number</th>
+          <th>Log<sub>e</sub></th>
+          <th>Film Density</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="stepsTableBody"></tbody>
+    </table>
+  </div>
+
+  <br />
+</div>
+{% endblock %}

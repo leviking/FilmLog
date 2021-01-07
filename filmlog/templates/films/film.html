@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script src="/static/js/films/film.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+{% include "films/sidebar.html" %}
+<div class="col-md-10 main">
+  <h1 class="page-header" id="name"></h1>
+  <ul>
+    <li><strong>Kind:</strong> <span id="kind"></span></li>
+    <li><strong>Number Rolls/Sheets:</strong> <span id="count"></span></li>
+  </ul>
+
+  <h3>Film Tests</h3>
+  <div class="card">
+    <table class="table table-striped table-bordered" id="films">
+      <thead class="thead-light">
+        <tr>
+          <th>Tested On</th>
+          <th>Film Size</th>
+          <th>Developer</th>
+          <th>Dev Time</th>
+          <th>Base Fog</th>
+          <th>dMax</th>
+          <th>Gamma</th>
+          <th>CI</th>
+          <th>Kodak ISO</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="filmTestsTableBody"></tbody>
+    </table>
+  </div>
+
+
+
+  <br />
+</div>
+{% endblock %}

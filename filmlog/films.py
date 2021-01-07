@@ -38,11 +38,26 @@ def films_index():
     """ Films Landing Page Index """
     return render_template('films/index.html')
 
+@app.route('/films/<int:filmTypeID>', methods=['GET'])
+@login_required
+def film_details(filmTypeID):
+    """ Get Film Details """
+    return render_template('films/film.html',
+                            filmTypeID=filmTypeID)
+
 @app.route('/films/tests', methods=['GET'])
 @login_required
 def film_tests():
     """ Film Tests Page """
     return render_template('films/tests.html')
+
+@app.route('/films/<int:filmTypeID>/tests/<int:filmTestID>', methods=['GET'])
+@login_required
+def film_test(filmTypeID, filmTestID):
+    """ Get Film Test Details """
+    return render_template('films/test.html',
+                            filmTypeID=filmTypeID,
+                            filmTestID=filmTestID)
 
 @app.route('/films/stock', methods=['GET', 'POST'])
 @login_required

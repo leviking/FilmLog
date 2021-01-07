@@ -29,7 +29,6 @@ def auto_decrement_film_stock(connection, filmTypeID, filmSizeID):
                            filmTypeID=filmTypeID,
                            filmSizeID=filmSizeID)
 
-
 ## Films
 def get_all(connection, binderID, projectID):
     """ Get all films of a project """
@@ -229,6 +228,7 @@ def get_film_types(connection):
     for row in films_query:
         film = {
             "id" : row['filmTypeID'],
+            "filmTypeID" : row['filmTypeID'],
             "name" : row['name'],
             "iso" : row['iso'],
             "kind" : row['kind'],
@@ -236,6 +236,34 @@ def get_film_types(connection):
         }
         films['data'].append(film)
     return jsonify(films), status.HTTP_200_OK
+
+def get_film_type(connection, filmTypeID):
+    """ Get film type details """
+    userID = current_user.get_id()
+    qry = text("""SELECT FilmTypes.filmTypeID, name, FilmTypes.iso, kind,
+        COUNT(Films.filmID) AS filmCount
+        FROM FilmTypes
+        LEFT OUTER JOIN Films ON Films.filmTypeID = FilmTypes.filmTypeID
+            AND Films.userID = FilmTypes.userID
+        WHERE FilmTypes.userID = :userID
+        AND FilmTypes.filmTypeID = :filmTypeID
+        GROUP BY FilmTypes.filmTypeID""")
+    film_query = connection.execute(qry,
+        userID=userID,
+        filmTypeID=filmTypeID).fetchone()
+
+    film = {
+        "data" : {
+            "id" : film_query['filmTypeID'],
+            "filmTypeID" : film_query['filmTypeID'],
+            "name" : film_query['name'],
+            "iso" : film_query['iso'],
+            "kind" : film_query['kind'],
+            "count" : film_query['filmCount']
+        }
+    }
+
+    return jsonify(film), status.HTTP_200_OK
 
 def delete_film_type(connection, filmTypeID):
     """ Delete a film type """
@@ -275,12 +303,12 @@ def add_film_type(connection):
     resp = make_response(jsonify(json))
     return resp, status.HTTP_201_CREATED
 
-def get_film_tests(connection):
+def get_all_film_tests(connection):
     """ Get all film tests """
     userID = current_user.get_id()
     qry = text("""SELECT FilmTests.filmTestID,
-    testedOn,
-    FilmTypes.name AS filmName, FilmTypes.iso,
+    FilmTypes.filmTypeID AS filmTypeID,
+    testedOn, FilmTypes.name AS filmName, FilmTypes.iso,
     kodakISO, developer, SECONDS_TO_DURATION(devTime) AS devTime,
     filmSize, baseFog, dMax, gamma, contrastIndex
     FROM FilmTests
@@ -299,6 +327,7 @@ def get_film_tests(connection):
         film = {
             "id" : row['filmTestID'],
             "filmTestID" : row['filmTestID'],
+            "filmTypeID" : row['filmTypeID'],
             "testedOn" : row['testedOn'],
             "filmName" : row['filmName'],
             "iso" : row['iso'],
@@ -314,12 +343,13 @@ def get_film_tests(connection):
         filmTests['data'].append(film)
     return jsonify(filmTests), status.HTTP_200_OK
 
-def get_film_test(connection, filmTypeID):
-    """ Get specific film test """
+def get_film_tests(connection, filmTypeID):
+    """ Get all tests for a film """
     userID = current_user.get_id()
-    qry = text("""SELECT FilmTests.filmTestID, DevRecipes.devRecipeID,
-    FilmTypes.name AS filmName, FilmTypes.iso, kodakISO,
-    developer, devTime,
+    qry = text("""SELECT FilmTests.filmTestID,
+    FilmTypes.filmTypeID AS filmTypeID, testedOn,
+    FilmTypes.name AS filmName, FilmTypes.iso,
+    kodakISO, developer, SECONDS_TO_DURATION(devTime) AS devTime,
     filmSize, baseFog, dMax, gamma, contrastIndex
     FROM FilmTests
     JOIN FilmTypes ON FilmTypes.userID = FilmTests.userID
@@ -334,20 +364,82 @@ def get_film_test(connection, filmTypeID):
     filmTests = {
         "data": []
     }
+
     for row in films_query:
         film = {
             "id" : row['filmTestID'],
             "filmTestID" : row['filmTestID'],
+            "filmTypeID" : row['filmTypeID'],
+            "testedOn" : row['testedOn'],
             "filmName" : row['filmName'],
             "iso" : row['iso'],
             "kodakISO" : row['kodakISO'],
             "developer": row['developer'],
             "devTime" : row['devTime'],
             "filmSize" : row['filmSize'],
-            "baseFog" : float(row['baseFog']),
-            "dMax" : float(row['dMax']),
-            "gamma" : float(row['gamma']),
-            "contrastIndex" : float(row['contrastIndex'])
+            "baseFog" : float(row['baseFog']) if row['baseFog'] else None,
+            "dMax" : float(row['dMax']) if row['dMax'] else None,
+            "gamma" : float(row['gamma']) if row['gamma'] else None,
+            "contrastIndex" : float(row['contrastIndex']) if row['contrastIndex'] else None
         }
         filmTests['data'].append(film)
     return jsonify(filmTests), status.HTTP_200_OK
+
+def get_film_test(connection, filmTypeID, filmTestID):
+    """ Get specific film test """
+    userID = current_user.get_id()
+
+    qry = text("""SELECT FilmTests.filmTestID,
+    FilmTypes.name AS filmName, FilmTypes.iso, kodakISO,
+    developer, devTime, testedOn,
+    filmSize, baseFog, dMax, gamma, contrastIndex, notes
+    FROM FilmTests
+    JOIN FilmTypes ON FilmTypes.userID = FilmTests.userID
+        AND FilmTypes.filmTypeID = FilmTests.filmTypeID
+    WHERE FilmTests.userID = :userID
+    AND FilmTests.filmTypeID = :filmTypeID
+    AND FilmTests.filmTestID = :filmTestID
+    ORDER BY filmName, iso, devTime""")
+    films_query = connection.execute(qry,
+        userID=userID,
+        filmTypeID=filmTypeID,
+        filmTestID=filmTestID).fetchone()
+
+    qry = text("""SELECT stepNumber, stepDensity, logE, filmDensity
+        FROM FilmTestStepsView WHERE filmTestID = :filmTestID""")
+    steps_query = connection.execute(qry,
+        userID=userID,
+        filmTestID=filmTestID)
+
+    steps = []
+    for row in steps_query:
+        step = {
+            "stepNumber": row['stepNumber'],
+            "stepDensity":float(row['stepDensity']),
+            "logE": float(row['logE']),
+            "filmDensity": float(row['filmDensity']),
+        }
+        steps.append(step)
+
+    filmTest = {
+        "data" : {
+            "id" : films_query['filmTestID'],
+            "filmTestID" : films_query['filmTestID'],
+            "testedOn" : films_query['testedOn'],
+            "filmName" : films_query['filmName'],
+            "iso" : films_query['iso'],
+            "kodakISO" : films_query['kodakISO'],
+            "developer": films_query['developer'],
+            "devTime" : films_query['devTime'],
+            "filmSize" : films_query['filmSize'],
+            "baseFog" : float(films_query['baseFog']) if films_query['baseFog'] else None,
+            "dMax" : float(films_query['dMax']) if films_query['dMax'] else None,
+            "gamma" : float(films_query['gamma']) if films_query['gamma'] else None,
+            "contrastIndex" : float(films_query['contrastIndex'])
+                if films_query['contrastIndex'] else None,
+            "notes" : films_query['notes'],
+            "steps": steps
+        }
+    }
+
+    return jsonify(filmTest), status.HTTP_200_OK

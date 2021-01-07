@@ -523,7 +523,7 @@ ORDER BY filmName, filmISO, devTime;
 
 CREATE VIEW FilmTestStepsView AS
 SELECT FilmTestSteps.userID, FilmTestSteps.filmTestID, FilmTestSteps.stepNumber, stepDensity,
-ROUND(LOG10(lux * 1/exposureTime * 1000) - stepDensity, 2) AS LogE, filmDensity
+ROUND(LOG10(lux * 1/exposureTime * 1000) - stepDensity, 2) AS logE, filmDensity
 FROM FilmTestSteps
 JOIN FilmTests ON FilmTests.filmTestID = FilmTestSteps.filmTestID
     AND FilmTests.userID = FilmTestSteps.userID

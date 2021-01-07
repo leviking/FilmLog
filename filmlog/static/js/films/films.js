@@ -22,7 +22,7 @@ function getFilms() {
       $('#filmsTableBody').empty();
       $.each(films, (i, film) => {
         let row = `<tr id="rowFilmType:${film.id}">`;
-        row += `<td>${film.name}</td>`;
+        row += `<td><a href="films/${film.id}">${film.name}</a></td>`;
         row += `<td>${film.iso}</td>`;
         row += `<td>${film.kind}</td>`;
         row += `<td>${film.count}</td>`;

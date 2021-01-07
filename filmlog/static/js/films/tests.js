@@ -8,7 +8,6 @@ function getFilmTests() {
     success(data) {
       const tests = data.data;
 
-
       $('#filmTestsTableBody').empty();
       $.each(tests, (i, test) => {
         let createdOn = formatDate(test.testedOn);
@@ -30,6 +29,5 @@ function getFilmTests() {
     },
   });
 }
-
 
 $(document).ready(() => { getFilmTests(); });

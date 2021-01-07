@@ -82,12 +82,14 @@ def films_list():
     return return_status
 
 @api_blueprint.route('/films/<int:filmTypeID>',
-                     methods=['DELETE'])
+                     methods=['GET', 'DELETE'])
 @login_required
 def film_type_details(filmTypeID):
     """ Get film type details """
     connection = engine.connect()
     transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = films.get_film_type(connection, filmTypeID)
     if request.method == 'DELETE':
         return_status = films.delete_film_type(connection, filmTypeID)
     transaction.commit()
@@ -96,24 +98,36 @@ def film_type_details(filmTypeID):
 @api_blueprint.route('/films/tests',
                       methods=['GET'])
 @login_required
-def film_tests():
+def all_film_tests():
     """ Get all user's film tests """
     connection = engine.connect()
     transaction = connection.begin()
     if request.method == 'GET':
-        return_status = films.get_film_tests(connection)
+        return_status = films.get_all_film_tests(connection)
     transaction.commit()
     return return_status
 
-@api_blueprint.route('/films/<int:filmTypeID>/test',
+@api_blueprint.route('/films/<int:filmTypeID>/tests',
                       methods=['GET'])
 @login_required
-def film_test(filmTypeID):
+def film_tests(filmTypeID):
+    """ Get user's film tests for specific film """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = films.get_film_tests(connection, filmTypeID)
+    transaction.commit()
+    return return_status
+
+@api_blueprint.route('/films/<int:filmTypeID>/tests/<int:filmTestID>',
+                      methods=['GET'])
+@login_required
+def film_test(filmTypeID, filmTestID):
     """ Get user's film test for specific film """
     connection = engine.connect()
     transaction = connection.begin()
     if request.method == 'GET':
-        return_status = films.get_film_test(connection, filmTypeID)
+        return_status = films.get_film_test(connection, filmTypeID, filmTestID)
     transaction.commit()
     return return_status
 
