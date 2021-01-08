@@ -150,11 +150,15 @@ def post(connection, projectID):
                            cameraID=zero_to_none(json['data']['cameraID']),
                            filmTypeID=filmTypeID,
                            filmSizeID=filmSizeID,
-                           iso=json['data']['shotISO'],
+                           iso=json['data']['shotISO']
+                                if json['data']['shotISO'] else None,
                            fileDate=fileDate,
-                           loaded=json['data']['loaded'],
-                           unloaded=json['data']['unloaded'],
-                           developed=json['data']['developed'],
+                           loaded=json['data']['loaded']
+                                if json['data']['loaded'] else None,
+                           unloaded=json['data']['unloaded']
+                                if json['data']['unloaded'] else None,
+                           developed=json['data']['developed']
+                                if json['data']['developed'] else None,
                            fileNo=json['data']['fileNo'],
                            title=json['data']['title'],
                            development=json['data']['development'],

@@ -497,11 +497,9 @@ def user_film(binderID, projectID, filmID):
         print_view = True
         if film.filmSizeType == 'Small':
             template = 'film/35mm-print.html'
-        if film.filmSizeType == 'Medium':
+        elif film.filmSizeType == 'Medium':
             template = 'film/120-print.html'
-        if film.size == '4x5':
-            template = 'film/lf-print.html'
-        if film.size == '8x10':
+        else:
             template = 'film/lf-print.html'
     elif request.args.get('edit'):
         film = get_film_details(connection, binderID, projectID, filmID)
@@ -517,11 +515,9 @@ def user_film(binderID, projectID, filmID):
         app.logger.debug("filmSizeType: %s", film.filmSizeType)
         if film.filmSizeType == 'Small':
             template = 'film/35mm.html'
-        if film.filmSizeType == 'Medium':
+        elif film.filmSizeType == 'Medium':
             template = 'film/120.html'
-        if film.size == '4x5':
-            template = 'film/lf.html'
-        if film.size == '8x10':
+        else:
             template = 'film/lf.html'
 
     form = ExposureForm()

@@ -61,6 +61,7 @@ class CameraForm(FlaskForm):
                                     ('120', '120'),
                                     ('220', '220'),
                                     ('4x5', '4x5'),
+                                    ('5x7', '5x7'),
                                     ('8x10', '8x10')])
     status = SelectField('Status',
                          validators=[DataRequired()],

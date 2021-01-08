@@ -76,7 +76,7 @@ CREATE TABLE Cameras (
     userID INT UNSIGNED NOT NULL,
     cameraID SMALLINT UNSIGNED NOT NULL,
     loadedFilmTypeID SMALLINT UNSIGNED DEFAULT NULL,
-    filmSize ENUM('35mm', '120', '220', '4x5', '8x10') NOT NULL,
+    filmSize ENUM('35mm', '120', '220', '4x5', '5x7', '8x10') NOT NULL,
     integratedShutter ENUM('Yes', 'No') DEFAULT 'No',
     status ENUM('Active', 'Inactive') DEFAULT 'Active',
     name varchar(64) NOT NULL,

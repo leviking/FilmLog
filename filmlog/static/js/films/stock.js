@@ -84,7 +84,7 @@ function buildStocks(data) {
       film35mm.push(stock);
     } else if (stock.size === '120' || stock.size === '220') {
       filmMediumFormat.push(stock);
-    } else if (stock.size === '4x5') {
+    } else {
       filmSheets.push(stock);
     }
   });
