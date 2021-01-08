@@ -29,6 +29,9 @@ function generateHDCurves(films) {
     },
     options: {
       cubicInterpolationMode: 'default',
+      legend: {
+        position: 'bottom'
+      },
       scales: {
         yAxes: [{
           scaleLabel: {

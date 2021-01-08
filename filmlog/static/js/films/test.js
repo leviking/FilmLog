@@ -31,6 +31,9 @@ function generateHDCurve(steps) {
     },
     options: {
       cubicInterpolationMode: 'default',
+      legend: {
+        position: 'bottom'
+      },
       scales: {
         yAxes: [{
           scaleLabel: {
