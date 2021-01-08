@@ -69,7 +69,6 @@ def filmstock():
     form = FilmStockForm(connection)
 
     if request.method == 'POST':
-        log("here")
         if request.form.get('button') == 'add':
             qty = request.form.get('qty')
             if request.form.get('filmTypeID') != '':
