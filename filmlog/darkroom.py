@@ -15,7 +15,7 @@ from filmlog import functions
 from filmlog import files
 from filmlog.config import app, engine
 from filmlog.functions import optional_choices, zero_to_none, insert, \
-                              get_enlargers
+                              get_enlargers, log
 
 ## Functions
 def get_papers(connection):
@@ -256,7 +256,7 @@ def user_prints(binderID, projectID, filmID):
         if request.form['button'] == 'addPrint':
             if form.validate_on_submit():
                 nextPrintID = functions.next_id(connection, 'printID', 'Prints')
-                app.logger.debug("Next Print ID: %s" % nextPrintID)
+                log("Next Print ID: %s" % nextPrintID)
                 # If user included a file, let's upload it. Otherwise skip it.
                 if form.file.data:
                     nextFileID = functions.next_id(connection, 'fileID', 'Files')
@@ -390,7 +390,6 @@ def print_exposure(binderID, projectID, filmID, printID):
                        printType=form.printType.data,
                        size=form.size.data,
                        notes=form.notes.data)
-                app.logger.debug(functions.time_to_seconds(form.exposureTime.data))
                 transaction.commit()
                 return redirect('/binders/' + str(binderID)
                                 + '/projects/' + str(projectID)
@@ -518,7 +517,6 @@ def contactsheet(binderID, projectID, filmID):
                                       binderID=binderID,
                                       filmID=filmID).fetchone()
     if contactSheet:
-        app.logger.debug("Existing Contact Sheet")
         form = ContactSheetForm(data=contactSheet)
         form.populate_select_fields(connection)
     transaction.commit()
