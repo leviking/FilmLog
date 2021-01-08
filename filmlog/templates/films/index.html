@@ -2,6 +2,7 @@
 
 {% block scripts %}
 <script src="/static/js/films/films.js"></script>
+<script src='/static/include/spectrum-1.8.1/spectrum.js'></script>
 {% endblock %}
 
 {% block content %}
@@ -34,13 +35,18 @@
             </div>
             <div class="col-sm-4">
                <label for="filmKind">Kind</label>
-               <select id="filmKind"class="form-control" >
+               <select id="filmKind" class="form-control" >
                 <option value="Black & White Negative">Black & White Negative</option>
                 <option value="Black & White Slide">Black & White Slide</option>
                 <option value="Color Negative">Color Negative</option>
                 <option value="Color Slide">Color Slide</option>
                 <option value="Motion Picture Color Negative">Motion Picture Color Negative</option>
               </select>
+            </div>
+            <div class="col-sm-2">
+               <label for="displayColor">Display Color</label>
+               <br />
+               <input type='text' id="displayColor" />
             </div>
           </div>
           <div class="button-bar">

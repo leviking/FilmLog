@@ -59,6 +59,7 @@ CREATE TABLE FilmTypes (
     name varchar(64) NOT NULL,
     iso smallint unsigned,
     kind enum('Color Negative','Black & White Negative','Color Slide','Black & White Slide', 'Motion Picture Color Negative') DEFAULT NULL,
+    displayColor INT UNSIGNED NOT NULL DEFAULT 0,
     PRIMARY KEY (userID, filmTypeID),
     UNIQUE KEY user_name_iso_uq (userID, name, iso),
     CONSTRAINT FilmTypes_userID FOREIGN KEY (userID) REFERENCES Users (userID) ON DELETE CASCADE ON UPDATE CASCADE

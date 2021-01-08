@@ -39,11 +39,19 @@ function getFilms() {
 function addFilmType() {
   const name = $('#filmName').val();
   const iso = $('#filmISO').val();
-  const kind = $('#filmKind').val()
-  const newFilmType = { data: {
+  const kind = $('#filmKind').val();
+  const displayColor = $('#displayColor').spectrum("get");
+
+  console.log(displayColor);
+  console.log(displayColor.toHex());
+  const newFilmType = {
+    data: {
       name: name,
       iso: iso,
-      kind: kind}};
+      kind: kind,
+      displayColor: displayColor.toHex()
+    }
+  };
 
   jQuery.ajax({
     type: 'POST',
@@ -76,7 +84,13 @@ function deleteFilmType(filmTypeID, count) {
   });
 }
 
-$(document).ready(() => { getFilms(); });
+$(document).ready(() => {
+  getFilms();
+  $("#displayColor").spectrum({
+    color: "#f00"
+});
+
+});
 
 // Add Film on form submission
 $('form').on('submit', (e) => {

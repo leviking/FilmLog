@@ -15,7 +15,7 @@ function generateHDCurves(films) {
       data: data,
       showLine: true,
       fill: false,
-      borderColor: `#${Math.floor(Math.random()*16777215).toString(16)}`
+      borderColor: film.displayColor
     }
     datasets.push(dataset);
   });

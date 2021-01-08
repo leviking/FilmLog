@@ -287,15 +287,18 @@ def add_film_type(connection):
     if int(json['data']['iso']) < 0:
         return "FAILED", status.HTTP_400_BAD_REQUEST
 
-    qry = text("""INSERT INTO FilmTypes (userID, filmTypeID, name, iso, kind)
-        VALUES (:userID, :filmTypeID, :name, :iso, :kind)""")
+    qry = text("""INSERT INTO FilmTypes
+        (userID, filmTypeID, name, iso, kind, displayColor)
+        VALUES (:userID, :filmTypeID, :name, :iso,
+                :kind, CONV(:displayColor, 16, 10))""")
     try:
         connection.execute(qry,
                            userID=userID,
                            filmTypeID=nextFilmTypeID,
-                           name=zero_to_none(json['data']['name']),
-                           iso=zero_to_none(json['data']['iso']),
-                           kind=zero_to_none(json['data']['kind']))
+                           name=json['data']['name'],
+                           iso=json['data']['iso'],
+                           kind=json['data']['kind'],
+                           displayColor=json['data']['displayColor'])
     except IntegrityError:
         return "FAILED", status.HTTP_409_CONFLICT
 
@@ -348,7 +351,8 @@ def get_all_film_test_curves(connection):
     userID = current_user.get_id()
     qry = text("""SELECT FilmTests.filmTestID,
     FilmTypes.filmTypeID AS filmTypeID,
-    FilmTypes.name AS filmName, FilmTypes.iso
+    FilmTypes.name AS filmName, FilmTypes.iso,
+    CONV(displayColor, 10, 16) AS displayColor
     FROM FilmTests
     JOIN FilmTypes ON FilmTypes.userID = FilmTests.userID
         AND FilmTypes.filmTypeID = FilmTests.filmTypeID
@@ -382,6 +386,7 @@ def get_all_film_test_curves(connection):
             "filmTypeID" : row['filmTypeID'],
             "filmName" : row['filmName'],
             "iso" : row['iso'],
+            "displayColor" : "#" + row['displayColor'].zfill(6),
             "steps" : steps
         }
         filmTests['data'].append(film)
