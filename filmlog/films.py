@@ -10,7 +10,7 @@ from wtforms.validators import DataRequired, Optional, NumberRange
 
 # Filmlog
 from filmlog.config import app, engine
-from filmlog.functions import get_film_types, get_film_sizes, log
+from filmlog.functions import get_film_types, get_film_sizes
 
 class FilmStockForm(FlaskForm):
     """ Film stock form """
