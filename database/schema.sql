@@ -487,6 +487,7 @@ CREATE TABLE FilmTests (
   contrastIndex DECIMAL(3,2) UNSIGNED DEFAULT NULL,
   kodakISO SMALLINT UNSIGNED DEFAULT NULL,
   expLog DECIMAL (3,2) UNSIGNED AS (ROUND(LOG10(lux * exposureTime * 1000), 2)) VIRTUAL,
+  graph ENUM('Yes', 'No') DEFAULT 'No',
   developer VARCHAR(32) NOT NULL,
   notes TEXT DEFAULT NULL,
   PRIMARY KEY (userID, filmTestID),

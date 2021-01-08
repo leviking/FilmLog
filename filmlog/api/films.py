@@ -343,6 +343,51 @@ def get_all_film_tests(connection):
         filmTests['data'].append(film)
     return jsonify(filmTests), status.HTTP_200_OK
 
+def get_all_film_test_curves(connection):
+    """ charts.js friendly data output of film test curves """
+    userID = current_user.get_id()
+    qry = text("""SELECT FilmTests.filmTestID,
+    FilmTypes.filmTypeID AS filmTypeID,
+    FilmTypes.name AS filmName, FilmTypes.iso
+    FROM FilmTests
+    JOIN FilmTypes ON FilmTypes.userID = FilmTests.userID
+        AND FilmTypes.filmTypeID = FilmTests.filmTypeID
+    WHERE FilmTests.userID = :userID
+    AND FilmTests.graph = 'Yes'""")
+    films_query = connection.execute(qry,
+        userID=userID).fetchall()
+
+    filmTests = {
+        "data": []
+    }
+
+    for row in films_query:
+        qry = text("""SELECT stepNumber, logE, filmDensity
+            FROM FilmTestStepsView WHERE filmTestID = :filmTestID""")
+        steps_query = connection.execute(qry,
+                                         userID=userID,
+                                         filmTestID=row['filmTestID']).fetchall()
+        steps = []
+        for step in steps_query:
+            step = {
+                "stepNumber": step['stepNumber'],
+                "logE": float(step['logE']),
+                "filmDensity": float(step['filmDensity']),
+            }
+            steps.append(step)
+
+        film = {
+            "id" : row['filmTestID'],
+            "filmTestID" : row['filmTestID'],
+            "filmTypeID" : row['filmTypeID'],
+            "filmName" : row['filmName'],
+            "iso" : row['iso'],
+            "steps" : steps
+        }
+        filmTests['data'].append(film)
+
+    return jsonify(filmTests), status.HTTP_200_OK
+
 def get_film_tests(connection, filmTypeID):
     """ Get all tests for a film """
     userID = current_user.get_id()

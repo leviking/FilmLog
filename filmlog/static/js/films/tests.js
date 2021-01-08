@@ -1,3 +1,63 @@
+function generateHDCurves(films) {
+  let canvas = $('#hdCurves');
+  let datasets = [];
+
+  $.each(films, (i, film) => {
+    let data = [];
+    $.each(film.steps, (i, step) => {
+      data.push({
+        x: step.logE,
+        y: step.filmDensity,
+      });
+    });
+    let dataset = {
+      label: `${film.filmName} ${film.iso}`,
+      data: data,
+      showLine: true,
+      fill: false,
+      borderColor: `#${Math.floor(Math.random()*16777215).toString(16)}`
+    }
+    datasets.push(dataset);
+  });
+
+  console.log(datasets);
+
+  let hdCurve = new Chart(canvas, {
+    type: 'scatter',
+    data: {
+        datasets: datasets,
+    },
+    options: {
+      cubicInterpolationMode: 'default',
+      scales: {
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Density'
+          }
+        }],
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Log'
+          }
+        }]
+      }
+    }
+  });
+}
+
+function getFilmTestCurves() {
+  jQuery.ajax({
+    type: 'GET',
+    url: '/api/v1/films/tests/curves',
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      generateHDCurves(data.data);
+    }
+  });
+}
 
 function getFilmTests() {
   jQuery.ajax({
@@ -30,4 +90,7 @@ function getFilmTests() {
   });
 }
 
-$(document).ready(() => { getFilmTests(); });
+$(document).ready(() => {
+  getFilmTests();
+  getFilmTestCurves();
+});

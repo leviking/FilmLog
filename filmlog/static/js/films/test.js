@@ -79,6 +79,7 @@ function getFilmTest() {
       $('#dMax').append(test.dMax);
       $('#gamma').append(test.gamma);
       $('#contrastIndex').append(test.contrastIndex);
+      $('#kodakISO').append(test.kodakISO);
       if (test.notes) {
         $('#notesDiv').prop('hidden', false);
         $('#notes').append(test.notes);

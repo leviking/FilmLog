@@ -107,6 +107,18 @@ def all_film_tests():
     transaction.commit()
     return return_status
 
+@api_blueprint.route('/films/tests/curves',
+                      methods=['GET'])
+@login_required
+def all_film_test_graphs():
+    """ Get all user's curves of film """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = films.get_all_film_test_curves(connection)
+    transaction.commit()
+    return return_status
+
 @api_blueprint.route('/films/<int:filmTypeID>/tests',
                       methods=['GET'])
 @login_required
