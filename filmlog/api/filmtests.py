@@ -158,22 +158,6 @@ def get_test(connection, filmTypeID, filmTestID):
         filmTypeID=filmTypeID,
         filmTestID=filmTestID).fetchone()
 
-    qry = text("""SELECT stepNumber, stepDensity, logE, filmDensity
-        FROM FilmTestStepsView WHERE filmTestID = :filmTestID""")
-    steps_query = connection.execute(qry,
-        userID=userID,
-        filmTestID=filmTestID)
-
-    steps = []
-    for row in steps_query:
-        step = {
-            "stepNumber": row['stepNumber'],
-            "stepDensity":float(row['stepDensity']),
-            "logE": float(row['logE']),
-            "filmDensity": float(row['filmDensity']),
-        }
-        steps.append(step)
-
     filmTest = {
         "data" : {
             "id" : films_query['filmTestID'],
@@ -191,11 +175,36 @@ def get_test(connection, filmTypeID, filmTestID):
             "contrastIndex" : float(films_query['contrastIndex'])
                 if films_query['contrastIndex'] else None,
             "notes" : films_query['notes'],
-            "steps": steps
         }
     }
 
     return jsonify(filmTest), status.HTTP_200_OK
+
+""" This is split out as it makes interacting with the steps easier
+    in JavaScript without having to re-request the bulk of the test data"""
+def get_test_steps(connection, filmTypeID, filmTestID):
+    """ Get specific film test steps """
+    userID = current_user.get_id()
+
+    qry = text("""SELECT stepNumber, stepDensity, logE, filmDensity
+        FROM FilmTestStepsView WHERE filmTestID = :filmTestID""")
+    steps_query = connection.execute(qry,
+        userID=userID,
+        filmTestID=filmTestID)
+
+    steps = {
+        "data": []
+    }
+
+    for row in steps_query:
+        step = {
+            "stepNumber": row['stepNumber'],
+            "stepDensity":float(row['stepDensity']),
+            "logE": float(row['logE']),
+            "filmDensity": float(row['filmDensity']),
+        }
+        steps['data'].append(step)
+    return jsonify(steps), status.HTTP_200_OK
 
 def add_test(connection, filmTypeID):
     """ Add a new film test """
@@ -250,8 +259,32 @@ def add_test(connection, filmTypeID):
     log("Created new film test via API")
     return resp, status.HTTP_201_CREATED
 
+def update_test_steps(connection, filmTypeID, filmTestID):
+    """ Update specific film test steps """
+    userID = current_user.get_id()
+    json = request.get_json()
+
+    qry = text("""REPLACE INTO FilmTestSteps
+                (userID, filmTestID, stepNumber, filmDensity)
+                VALUES (:userID, :filmTestID, :stepNumber, :filmDensity)""")
+
+    try:
+        for step in json['data']:
+            if step['stepNumber'] > 0 and step['stepNumber'] <= 21:
+                connection.execute(qry,
+                                   userID=userID,
+                                   filmTestID=filmTestID,
+                                   stepNumber=step['stepNumber'],
+                                   filmDensity=step['filmDensity'])
+            else:
+                raise IntegrityError
+    except IntegrityError:
+        return "FAILED", status.HTTP_409_CONFLICT
+    resp = make_response(jsonify(json))
+    return resp, status.HTTP_204_NO_CONTENT
+
 def get_step_tablets(connection):
-    """ Get all user's step tablets tests """
+    """ Get all user's step tablets """
     userID = current_user.get_id()
     qry = text("""SELECT stepTabletID, name
                   FROM StepTablets

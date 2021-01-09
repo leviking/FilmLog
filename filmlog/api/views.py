@@ -194,6 +194,20 @@ def film_test(filmTypeID, filmTestID):
     transaction.commit()
     return return_status
 
+@api_blueprint.route('/films/<int:filmTypeID>/tests/<int:filmTestID>/steps',
+                      methods=['GET', 'PATCH'])
+@login_required
+def film_test_steps(filmTypeID, filmTestID):
+    """ Get user's film test for specific film """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = filmtests.get_test_steps(connection, filmTypeID, filmTestID)
+    if request.method == 'PATCH':
+        return_status = filmtests.update_test_steps(connection, filmTypeID, filmTestID)
+    transaction.commit()
+    return return_status
+
 # Binders
 @api_blueprint.route('/binders', methods=['GET', 'POST'])
 @login_required
