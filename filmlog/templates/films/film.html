@@ -35,6 +35,127 @@
     </table>
   </div>
 
+  <div class="card">
+    <div class="card-header"><strong>Add Film Test</strong></div>
+    <div class="card-body">
+      <form method="post" action="#" id="filmTestForm">
+        <h5>Enlarger Info</h5>
+        <div class="form-group row">
+          <div class="col-sm-4">
+             <label for="enlargerID">Enlarger</label>
+             <select id="enlargerID" class="form-control" ></select>
+          </div>
+          <div class="col-sm-4">
+             <label for="enlargerLensID">Enlarger Lens</label>
+             <select id="enlargerLensID" class="form-control" ></select>
+          </div>
+          <div class="col-sm-4">
+             <label for="headHeight">Head Height</label>
+             <input id="headHeight" type="number" class="form-control"
+                    min="0" max="65535" />
+          </div>
+        </div>
+        <hr />
+
+        <h5>Exposure Info</h5>
+        <div class="form-group row">
+          <div class="col-sm-2">
+            <label for="filmSize">Size</label>
+            <select name="size" class="form-control" id="filmSize">
+              <option value="35mm">35mm</option>
+              <option value="120">120</option>
+              <option value="Sheet">Sheet</option>
+            </select>
+          </div>
+          <div class="col-sm-2">
+             <label for="stepTabletID">Step Tablet</label>
+             <select id="stepTabletID" class="form-control" ></select>
+          </div>
+          <div class="col-sm-2">
+             <label for="lux">Lux</label>
+             <input id="lux" type="number" class="form-control"
+                    min="0" max="255" placeholder="3" required />
+          </div>
+          <div class="col-sm-2">
+             <label for="fstop">fStop</label>
+             <input id="fstop" type="number" class="form-control"
+                    min="0" max="255" step="0.1" placeholder="5.6" required />
+          </div>
+          <div class="col-sm-2">
+             <label for="exposureTime">Exposure Time</label>
+             <input id="exposureTime" type="text" class="form-control"
+                    maxlength="8" placeholder="0.5" required />
+          </div>
+          <div class="col-sm-2">
+             <label for="filterID">Filter</label>
+             <select id="filterID" class="form-control" ></select>
+          </div>
+        </div>
+        <hr />
+
+        <h5>Dev Info</h5>
+        <div class="form-group row">
+          <div class="col-sm-4">
+             <label for="developer">Developer</label>
+             <input id="developer" type="text" class="form-control"
+                    maxlength="32" placeholder="XTOL" required />
+          </div>
+          <div class="col-sm-4">
+             <label for="devTime">Dev Time</label>
+             <input id="devTime" type="text" class="form-control"
+                    maxlength="32" placeholder="5:45" required />
+          </div>
+          <div class="col-sm-4">
+             <label for="devTemperature">Dev Temperature</label>
+             <input id="devTemperature" type="number" class="form-control"
+                    min="0" max="255" placeholder="20" required />
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-3">
+             <label for="prebath">Prebath</label>
+             <select name="size" class="form-control" id="prebath">
+               <option value="No">No</option>
+               <option value="Water">Water</option>
+            </select>
+          </div>
+          <div class="col-sm-3">
+             <label for="stop">Stop</label>
+             <select name="size" class="form-control" id="stop">
+               <option value="Stop Bath">Stop Bath</option>
+               <option value="Water">Water</option>
+            </select>
+          </div>
+          <div class="col-sm-3">
+             <label for="agitation">Agitation</label>
+             <select name="size" class="form-control" id="agitation">
+               <option value="Rotary">Rotary</option>
+               <option value="Hand-Inversions">Hand-Inversions</option>
+               <option value="Dip and Dunk">Dip and Dunk</option>
+               <option value="Tray">Tray</option>
+            </select>
+          </div>
+          <div class="col-sm-3">
+             <label for="rotaryRPM">Rotary RPM</label>
+             <input id="rotaryRPM" type="number" class="form-control"
+                    min="0" max="255" placeholder="45" />
+          </div>
+        </div>
+        <hr / >
+        <h5>Notes</h5>
+        <div class="form-group row">
+          <div class="col-sm-12">
+            <label for="notes">Notes</label>
+            <textarea class="form-control" id="notes" rows="8" columns="40"></textarea>
+          </div>
+        </div>
+
+        <div class="button-bar">
+          <button class="btn btn-success" type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
 
   <br />

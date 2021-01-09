@@ -4,7 +4,8 @@ from flask import request
 
 # Filmlog
 from filmlog.api import api_blueprint, binders, projects, filmstock, holders, \
-                        films, cameras, user, paper
+                        films, cameras, user, paper, filmtests, enlargers, \
+                        filters
 from filmlog.config import engine
 
 # http://jsonapi.org/format/
@@ -66,6 +67,41 @@ def load_camera(cameraID, filmTypeID):
     transaction.commit()
     return return_status
 
+# Enlargers
+@api_blueprint.route('/enlargers', methods=['GET'])
+@login_required
+def enlargers_all():
+    """ Get enlargers information """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = enlargers.get_all(connection)
+    transaction.commit()
+    return return_status
+
+@api_blueprint.route('/enlargers/lenses', methods=['GET'])
+@login_required
+def enlargers_lenses():
+    """ Get enlargers information """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = enlargers.get_all_lenses(connection)
+    transaction.commit()
+    return return_status
+
+# Filters
+@api_blueprint.route('/filters', methods=['GET'])
+@login_required
+def filters_all():
+    """ Get enlargers information """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = filters.get_all(connection)
+    transaction.commit()
+    return return_status
+
 # Films
 @api_blueprint.route('/films', methods=['GET', 'POST'])
 @login_required
@@ -95,6 +131,19 @@ def film_type_details(filmTypeID):
     transaction.commit()
     return return_status
 
+# Film Tests
+@api_blueprint.route('/steptablets',
+                      methods=['GET'])
+@login_required
+def step_tablets():
+    """ Get all user's step tablets """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = filmtests.get_step_tablets(connection)
+    transaction.commit()
+    return return_status
+
 @api_blueprint.route('/films/tests',
                       methods=['GET'])
 @login_required
@@ -103,7 +152,7 @@ def all_film_tests():
     connection = engine.connect()
     transaction = connection.begin()
     if request.method == 'GET':
-        return_status = films.get_all_film_tests(connection)
+        return_status = filmtests.get_all_tests(connection)
     transaction.commit()
     return return_status
 
@@ -115,19 +164,21 @@ def all_film_test_graphs():
     connection = engine.connect()
     transaction = connection.begin()
     if request.method == 'GET':
-        return_status = films.get_all_film_test_curves(connection)
+        return_status = filmtests.get_all_test_curves(connection)
     transaction.commit()
     return return_status
 
 @api_blueprint.route('/films/<int:filmTypeID>/tests',
-                      methods=['GET'])
+                      methods=['GET', 'POST'])
 @login_required
 def film_tests(filmTypeID):
     """ Get user's film tests for specific film """
     connection = engine.connect()
     transaction = connection.begin()
     if request.method == 'GET':
-        return_status = films.get_film_tests(connection, filmTypeID)
+        return_status = filmtests.get_tests(connection, filmTypeID)
+    if request.method == 'POST':
+        return_status = filmtests.add_test(connection, filmTypeID)
     transaction.commit()
     return return_status
 
@@ -139,7 +190,7 @@ def film_test(filmTypeID, filmTestID):
     connection = engine.connect()
     transaction = connection.begin()
     if request.method == 'GET':
-        return_status = films.get_film_test(connection, filmTypeID, filmTestID)
+        return_status = filmtests.get_test(connection, filmTypeID, filmTestID)
     transaction.commit()
     return return_status
 

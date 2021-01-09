@@ -118,7 +118,7 @@ def optional_choices(name, choices):
 
 def zero_to_none(value):
     """ Helper function to set 0 or '0' (the string) to None or null. """
-    if value in (0, '0'):
+    if value in (0, '0', ''):
         return None
     return value
 
@@ -163,9 +163,12 @@ def validate_exposure_time(form, field):
     except Exception:
         raise ValidationError('Time in wrong format, should be MM:SS.') from None
 
-# Unused (see SECONDS_TO_DURATION MySQL function instead)
-#def seconds_to_time(seconds):
-#    return str(int(seconds / 60)) + ":" + str(int(seconds % 60))
+def key_or_none(json, key):
+  try:
+    value = json['data'][key]
+  except KeyError:
+    value = None
+  return value
 
 def log(message):
     """ Log a message to configured methods """

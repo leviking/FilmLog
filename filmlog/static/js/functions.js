@@ -60,6 +60,68 @@ function getFilmTypes() {
   });
 }
 
+function getEnlargers() {
+  jQuery.ajax({
+    type: 'GET',
+    url: '/api/v1/enlargers',
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      $.each(data.data, (i, enlarger) => {
+        $('#enlargerID').append($(`<option value="${enlarger.id}">${enlarger.name}</option>`));
+      });
+    },
+  });
+}
+
+function getEnlargerLenses() {
+  jQuery.ajax({
+    type: 'GET',
+    url: '/api/v1/enlargers/lenses',
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      $.each(data.data, (i, enlargerLens) => {
+        $('#enlargerLensID').append($(`<option value="${enlargerLens.id}">${enlargerLens.name}</option>`));
+      });
+    },
+  });
+}
+
+function getFilters() {
+  jQuery.ajax({
+    type: 'GET',
+    url: '/api/v1/filters',
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      $.each(data.data, (i, filter) => {
+        $('#filterID').append($(`<option value="${filter.id}">${filter.code}</option>`));
+      });
+    },
+  });
+}
+
+
+
+// Land mine! We're setting values in the DOM directly because AJAX calls
+// are async normally and you can't pass data back without using a global
+// variable.
+// https://stackoverflow.com/questions/16805306/jquery-return-ajax-result-into-outside-variable/16805366
+function getStepTablets() {
+  jQuery.ajax({
+    type: 'GET',
+    url: '/api/v1/steptablets',
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      $.each(data.data, (i, tablet) => {
+        $('#stepTabletID').append($(`<option value="${tablet.id}">${tablet.name}</option>`));
+      });
+    },
+  });
+}
+
 // Show an alert within an alert div tag
 // (to be placed on the HTML page)
 function showAlert(strong, message, color) {

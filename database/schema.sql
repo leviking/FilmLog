@@ -475,7 +475,7 @@ CREATE TABLE FilmTests (
   filmSize ENUM ('35mm', '120', 'Sheet'),
   lux TINYINT UNSIGNED NOT NULL,
   fstop DECIMAL (3,1) UNSIGNED NOT NULL,
-  exposureTime SMALLINT DEFAULT NULL,
+  exposureTime DECIMAL(4,2) UNSIGNED NOT NULL,
   devTime SMALLINT UNSIGNED NOT NULL,
   devTemperature DECIMAL(3,1) UNSIGNED NOT NULL,
   prebath ENUM('No','Water') NOT NULL DEFAULT 'No',
@@ -523,7 +523,7 @@ ORDER BY filmName, filmISO, devTime;
 
 CREATE VIEW FilmTestStepsView AS
 SELECT FilmTestSteps.userID, FilmTestSteps.filmTestID, FilmTestSteps.stepNumber, stepDensity,
-ROUND(LOG10(lux * 1/exposureTime * 1000) - stepDensity, 2) AS logE, filmDensity
+ROUND(LOG10(lux * exposureTime * 1000) - stepDensity, 2) AS logE, filmDensity
 FROM FilmTestSteps
 JOIN FilmTests ON FilmTests.filmTestID = FilmTestSteps.filmTestID
     AND FilmTests.userID = FilmTestSteps.userID

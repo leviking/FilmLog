@@ -51,7 +51,58 @@ function getFilmTests() {
   });
 }
 
+function addTest() {
+  const test = {
+    data: {
+      enlargerID: $('#enlargerID').val(),
+      enlargerLensID: $('#enlargerLensID').val(),
+      headHeight: $('#headHeight').val(),
+      filmSize: $('#filmSize').val(),
+      stepTabletID: $('#stepTabletID').val(),
+      lux: $('#lux').val(),
+      fstop: $('#fstop').val(),
+      exposureTime: $('#exposureTime').val(),
+      filterID: $('#filterID').val(),
+      developer: $('#developer').val(),
+      devTime: $(`#devTime`).val(),
+      devTemperature: $(`#devTemperature`).val(),
+      prebath: $('#prebath').val(),
+      stop: $('#stop').val(),
+      agitation: $('#agitation').val(),
+      rotaryRPM: $('#rotaryRPM').val(),
+      notes: $('#notes').val(),
+    },
+  };
+  console.log(test);
+
+  jQuery.ajax({
+    type: 'POST',
+    url: `/api/v1/films/${filmTypeID}/tests`,
+    data: JSON.stringify(test),
+    contentType: 'application/json',
+    dataType: 'json',
+    statusCode: {
+        201() {
+          getFilmTests();
+          window.scrollTo(0, 0);
+          $('#filmTestForm')[0].reset();
+        },
+       409() { showAlert('Cannot Add Test', 'There was a problem.', 'warning'); } },
+  });
+}
+
 $(document).ready(() => {
   getFilm();
   getFilmTests();
+  getStepTablets();
+  getEnlargers();
+  getEnlargerLenses();
+  getFilters();
+  $('#filmTestForm').submit(false);
+});
+
+// Add Film on form submission
+$('#filmTestForm').on('submit', (e) => {
+  e.preventDefault();
+  addTest();
 });
