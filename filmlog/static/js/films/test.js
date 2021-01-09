@@ -74,19 +74,24 @@ function getFilmTest() {
     dataType: 'json',
     success(data) {
       const test = data.data;
-      $('#testedOn').append(formatDate(test.testedOn));
-      $('#filmSize').append(test.filmSize);
-      $('#developer').append(test.developer);
-      $('#devTime').append(test.devTime);
-      $('#baseFog').append(test.baseFog);
-      $('#dMax').append(test.dMax);
-      $('#gamma').append(test.gamma);
-      $('#contrastIndex').append(test.contrastIndex);
-      $('#kodakISO').append(test.kodakISO);
+      $('#testedOn').text(formatDate(test.testedOn));
+      $('#filmSize').text(test.filmSize);
+      $('#developer').text(test.developer);
+      $('#devTime').text(test.devTime);
+      $('#baseFog').text(test.baseFog);
+      $('#dMax').text(test.dMax);
+      $('#gamma').text(test.gamma);
+      $('#contrastIndex').text(test.contrastIndex);
+      $('#kodakISO').text(test.kodakISO);
       if (test.notes) {
         $('#notesDiv').prop('hidden', false);
-        $('#notes').append(test.notes);
+        $('#notes').text(test.notes);
       }
+      $('#baseFogInput').val(test.baseFog);
+      $('#dMaxInput').val(test.dMax);
+      $('#gammaInput').val(test.gamma);
+      $('#contrastIndexInput').val(test.contrastIndex);
+      $('#kodakISOInput').val(test.kodakISO);
     },
   });
 }
@@ -126,8 +131,34 @@ function getFilmTestSteps() {
     });
   }
 
-function updateTestSteps() {
+function updateTestResults() {
+  let results = {
+    "data" : {
+      "baseFog": $('#baseFogInput').val(),
+      "dMax": $('#dMaxInput').val(),
+      "gamma": $('#gammaInput').val(),
+      "contrastIndex": $('#contrastIndexInput').val(),
+      "kodakISO": $('#kodakISOInput').val()
+    }
+  }
 
+  jQuery.ajax({
+    type: 'PATCH',
+    url: `/api/v1/films/${filmTypeID}/tests/${filmTestID}/results`,
+    data: JSON.stringify(results),
+    contentType: 'application/json',
+    dataType: 'json',
+    statusCode: {
+      204() {
+        getFilmTest();
+        window.scrollTo(0, 0);
+      },
+      400() { showAlert('Cannot Update Steps', 'Bad data', 'danger'); },
+    },
+  });
+}
+
+function updateTestSteps() {
   let steps = {
     data: []
   }
@@ -153,7 +184,6 @@ function updateTestSteps() {
   });
 }
 
-
 $(document).ready(() => {
   getFilm();
   getFilmTest();
@@ -164,4 +194,10 @@ $(document).ready(() => {
 $('#stepsForm').on('submit', (e) => {
   e.preventDefault();
   updateTestSteps();
+});
+
+// Add Film on form submission
+$('#testResultsForm').on('submit', (e) => {
+  e.preventDefault();
+  updateTestResults();
 });

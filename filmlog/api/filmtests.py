@@ -151,8 +151,7 @@ def get_test(connection, filmTypeID, filmTestID):
         AND FilmTypes.filmTypeID = FilmTests.filmTypeID
     WHERE FilmTests.userID = :userID
     AND FilmTests.filmTypeID = :filmTypeID
-    AND FilmTests.filmTestID = :filmTestID
-    ORDER BY filmName, iso, devTime""")
+    AND FilmTests.filmTestID = :filmTestID""")
     films_query = connection.execute(qry,
         userID=userID,
         filmTypeID=filmTypeID,
@@ -177,8 +176,65 @@ def get_test(connection, filmTypeID, filmTestID):
             "notes" : films_query['notes'],
         }
     }
-
     return jsonify(filmTest), status.HTTP_200_OK
+
+def get_test_results(connection, filmTypeID, filmTestID):
+    """ Get film test results (dmax, CI, etc.)"""
+    userID = current_user.get_id()
+
+    qry = text("""SELECT filmTestID, baseFog, dMax, gamma,
+        contrastIndex, kodakISO
+        FROM FilmTests
+        JOIN FilmTypes ON FilmTypes.userID = FilmTests.userID
+            AND FilmTypes.filmTypeID = FilmTests.filmTypeID
+        WHERE FilmTests.userID = :userID
+        AND FilmTests.filmTypeID = :filmTypeID
+        AND FilmTests.filmTestID = :filmTestID""")
+    films_query = connection.execute(qry,
+        userID=userID,
+        filmTypeID=filmTypeID,
+        filmTestID=filmTestID).fetchone()
+
+    filmTest = {
+        "data" : {
+            "id" : films_query['filmTestID'],
+            "filmTestID" : films_query['filmTestID'],
+            "kodakISO" : films_query['kodakISO'],
+            "baseFog" : float(films_query['baseFog']) if films_query['baseFog'] else None,
+            "dMax" : float(films_query['dMax']) if films_query['dMax'] else None,
+            "gamma" : float(films_query['gamma']) if films_query['gamma'] else None,
+            "contrastIndex" : float(films_query['contrastIndex'])
+                if films_query['contrastIndex'] else None,
+        }
+    }
+    return jsonify(filmTest), status.HTTP_200_OK
+
+def update_test_results(connection, filmTypeID, filmTestID):
+    """ Update film test results (dmax, CI, etc.)"""
+    userID = current_user.get_id()
+    json = request.get_json()
+
+    qry = text("""UPDATE FilmTests
+        SET baseFog = :baseFog, dMax = :dMax, gamma = :gamma,
+        contrastIndex = :contrastIndex, kodakISO = :kodakISO
+        WHERE FilmTests.userID = :userID
+        AND FilmTests.filmTypeID = :filmTypeID
+        AND FilmTests.filmTestID = :filmTestID""")
+
+    try:
+        connection.execute(qry,
+            userID=userID,
+            filmTypeID=filmTypeID,
+            filmTestID=filmTestID,
+            baseFog=key_or_none(json, 'baseFog'),
+            dMax=key_or_none(json, 'dMax'),
+            gamma=key_or_none(json, 'gamma'),
+            contrastIndex=key_or_none(json, 'contrastIndex'),
+            kodakISO=key_or_none(json, 'kodakISO'))
+    except IntegrityError:
+        return "FAILED", status.HTTP_409_CONFLICT
+    resp = make_response(jsonify(json))
+    return resp, status.HTTP_204_NO_CONTENT
 
 # pylint: disable=pointless-string-statement
 """ This is split out as it makes interacting with the steps easier

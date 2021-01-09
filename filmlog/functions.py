@@ -167,6 +167,8 @@ def key_or_none(json, key):
     """ If a key does not exist, return none """
     try:
         value = json['data'][key]
+        if value == '':
+            value = None
     except KeyError:
         value = None
     return value
