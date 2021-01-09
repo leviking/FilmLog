@@ -1,11 +1,8 @@
 """ Filter interactions for API """
-from flask import jsonify, request, make_response
+from flask import jsonify
 from flask_api import status
 from flask_login import current_user
 from sqlalchemy.sql import text
-from sqlalchemy.exc import IntegrityError
-
-from filmlog.functions import next_id, zero_to_none
 
 def get_all(connection):
     """ Get all filters """
@@ -19,12 +16,12 @@ def get_all(connection):
         "data": []
     }
     for row in result:
-        filter = {
+        single_filter = {
             "id" : row['filterID'],
             "filterID" : row['filterID'],
             "name" : row['name'],
             "code" : row['code']
         }
-        filters['data'].append(filter)
+        filters['data'].append(single_filter)
 
     return jsonify(filters), status.HTTP_200_OK

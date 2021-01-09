@@ -199,12 +199,16 @@ def film_test(filmTypeID, filmTestID):
 @login_required
 def film_test_steps(filmTypeID, filmTestID):
     """ Get user's film test for specific film """
+    # pylint: disable=unused-argument
+    # Disabled because filmTypeID is involved in the URL but we don't
+    # need it to look-up the steps. I thought it'd be more confusing to
+    # change the URL.
     connection = engine.connect()
     transaction = connection.begin()
     if request.method == 'GET':
-        return_status = filmtests.get_test_steps(connection, filmTypeID, filmTestID)
+        return_status = filmtests.get_test_steps(connection, filmTestID)
     if request.method == 'PATCH':
-        return_status = filmtests.update_test_steps(connection, filmTypeID, filmTestID)
+        return_status = filmtests.update_test_steps(connection, filmTestID)
     transaction.commit()
     return return_status
 

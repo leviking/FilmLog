@@ -180,14 +180,17 @@ def get_test(connection, filmTypeID, filmTestID):
 
     return jsonify(filmTest), status.HTTP_200_OK
 
+# pylint: disable=pointless-string-statement
 """ This is split out as it makes interacting with the steps easier
-    in JavaScript without having to re-request the bulk of the test data"""
-def get_test_steps(connection, filmTypeID, filmTestID):
+    in JavaScript without having to re-request the bulk of the test data """
+def get_test_steps(connection, filmTestID):
     """ Get specific film test steps """
     userID = current_user.get_id()
 
     qry = text("""SELECT stepNumber, stepDensity, logE, filmDensity
-        FROM FilmTestStepsView WHERE filmTestID = :filmTestID""")
+        FROM FilmTestStepsView
+        WHERE userID = :userID
+        AND filmTestID = :filmTestID""")
     steps_query = connection.execute(qry,
         userID=userID,
         filmTestID=filmTestID)
@@ -211,12 +214,6 @@ def add_test(connection, filmTypeID):
     userID = current_user.get_id()
     json = request.get_json()
     nextFilmTestID = next_id(connection, 'filmTestID', 'FilmTests')
-
-    try:
-        exposureTime = json['data']['exposureTime']
-    except KeyError:
-        exposureTime = None
-
 
     qry = text("""INSERT INTO FilmTests
         (userID, filmTestID, filmTypeID, enlargerID, enlargerLensID, filterID,
@@ -259,7 +256,7 @@ def add_test(connection, filmTypeID):
     log("Created new film test via API")
     return resp, status.HTTP_201_CREATED
 
-def update_test_steps(connection, filmTypeID, filmTestID):
+def update_test_steps(connection, filmTestID):
     """ Update specific film test steps """
     userID = current_user.get_id()
     json = request.get_json()

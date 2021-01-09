@@ -102,8 +102,6 @@ function getFilters() {
   });
 }
 
-
-
 // Land mine! We're setting values in the DOM directly because AJAX calls
 // are async normally and you can't pass data back without using a global
 // variable.
@@ -169,7 +167,6 @@ function shutterSpeedDifferenceCSS(differenceStops, entity) {
     $(entity).addClass('shutterTestPoor');
   }
 }
-
 
 function subtractDays(date, days) {
   const newDate = new Date(date);

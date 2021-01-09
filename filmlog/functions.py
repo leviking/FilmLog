@@ -164,11 +164,12 @@ def validate_exposure_time(form, field):
         raise ValidationError('Time in wrong format, should be MM:SS.') from None
 
 def key_or_none(json, key):
-  try:
-    value = json['data'][key]
-  except KeyError:
-    value = None
-  return value
+    """ If a key does not exist, return none """
+    try:
+        value = json['data'][key]
+    except KeyError:
+        value = None
+    return value
 
 def log(message):
     """ Log a message to configured methods """
