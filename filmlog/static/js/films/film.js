@@ -73,7 +73,6 @@ function addTest() {
       notes: $('#notes').val(),
     },
   };
-  console.log(test);
 
   jQuery.ajax({
     type: 'POST',

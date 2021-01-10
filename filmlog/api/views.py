@@ -5,7 +5,7 @@ from flask import request
 # Filmlog
 from filmlog.api import api_blueprint, binders, projects, filmstock, holders, \
                         films, cameras, user, paper, filmtests, enlargers, \
-                        filters
+                        filters, steptablets
 from filmlog.config import engine
 
 # http://jsonapi.org/format/
@@ -131,19 +131,34 @@ def film_type_details(filmTypeID):
     transaction.commit()
     return return_status
 
-# Film Tests
+# Step Tablets
 @api_blueprint.route('/steptablets',
-                      methods=['GET'])
+                      methods=['GET', 'POST'])
 @login_required
 def step_tablets():
-    """ Get all user's step tablets """
+    """ Get all user's step tablets and add new ones"""
     connection = engine.connect()
     transaction = connection.begin()
     if request.method == 'GET':
-        return_status = filmtests.get_step_tablets(connection)
+        return_status = steptablets.get_step_tablets(connection)
+    if request.method == 'POST':
+        return_status = steptablets.add_step_tablet(connection)
     transaction.commit()
     return return_status
 
+@api_blueprint.route('/steptablets/<int:stepTabletID>',
+                      methods=['DELETE'])
+@login_required
+def step_tablet(stepTabletID):
+    """ Specifc step tablet interactions """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'DELETE':
+        return_status = steptablets.delete_step_tablet(connection, stepTabletID)
+    transaction.commit()
+    return return_status
+
+# Film Tests
 @api_blueprint.route('/films/tests',
                       methods=['GET'])
 @login_required

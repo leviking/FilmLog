@@ -51,6 +51,12 @@ def film_tests():
     """ Film Tests Page """
     return render_template('films/tests.html')
 
+@app.route('/films/steptablets', methods=['GET'])
+@login_required
+def film_steptablets():
+    """ Film Tests Page """
+    return render_template('films/steptablets.html')
+
 @app.route('/films/<int:filmTypeID>/tests/<int:filmTestID>', methods=['GET'])
 @login_required
 def film_test(filmTypeID, filmTestID):

@@ -304,7 +304,6 @@ def add_test(connection, filmTypeID):
                            notes=json['data']['notes'])
     except IntegrityError as e:
         log("Failed to create new film test via API")
-        print(e)
         return "FAILED", status.HTTP_409_CONFLICT
     json['data']['id'] = str(nextFilmTestID)
     json['data']['created_on'] = datetime.datetime.now()
@@ -335,25 +334,3 @@ def update_test_steps(connection, filmTestID):
         return "FAILED", status.HTTP_409_CONFLICT
     resp = make_response(jsonify(json))
     return resp, status.HTTP_204_NO_CONTENT
-
-def get_step_tablets(connection):
-    """ Get all user's step tablets """
-    userID = current_user.get_id()
-    qry = text("""SELECT stepTabletID, name
-                  FROM StepTablets
-                  WHERE StepTablets.userID = :userID""")
-    steps_query = connection.execute(qry,
-        userID=userID).fetchall()
-
-    stepTablets = {
-        "data": []
-    }
-
-    for step in steps_query:
-        step = {
-            "id" : step['stepTabletID'],
-            "stepTabletID" : step['stepTabletID'],
-            "name" : step['name']
-        }
-        stepTablets['data'].append(step)
-    return jsonify(stepTablets), status.HTTP_200_OK
