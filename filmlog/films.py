@@ -54,8 +54,16 @@ def film_tests():
 @app.route('/films/steptablets', methods=['GET'])
 @login_required
 def film_steptablets():
-    """ Film Tests Page """
+    """ User's Step Tablets Page """
     return render_template('films/steptablets.html')
+
+@app.route('/films/steptablets/<int:stepTabletID>', methods=['GET'])
+@login_required
+# pylint: disable=unused-argument
+# Argument needed by Javascript - html is just a template
+def film_steptablet(stepTabletID):
+    """ Step Tablet Details Page """
+    return render_template('films/steptablet.html')
 
 @app.route('/films/<int:filmTypeID>/tests/<int:filmTestID>', methods=['GET'])
 @login_required

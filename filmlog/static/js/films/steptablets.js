@@ -11,7 +11,7 @@ function getStepTablets() {
         $.each(tablets, (i, tablet) => {
           let createdOn = formatDate(tablet.createdOn);
           let row = `<tr id="stepTabletID:${tablet.stepTabletID}">`;
-          row += `<td><a href="/steptablets/${tablet.stepTabletID}">${tablet.name}</a></td>`;
+          row += `<td><a href="/films/steptablets/${tablet.stepTabletID}">${tablet.name}</a></td>`;
           row += `<td>${createdOn}</td>`;
           row += `<td><button class="btn btn-danger btn-sm" name="button" value="Delete" \
                      onclick="deleteStepTablet(${tablet.stepTabletID})">Delete</button></td></tr>`;

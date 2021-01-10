@@ -147,14 +147,30 @@ def step_tablets():
     return return_status
 
 @api_blueprint.route('/steptablets/<int:stepTabletID>',
-                      methods=['DELETE'])
+                      methods=['GET', 'DELETE'])
 @login_required
 def step_tablet(stepTabletID):
     """ Specifc step tablet interactions """
     connection = engine.connect()
     transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = steptablets.get_step_tablet(connection, stepTabletID)
     if request.method == 'DELETE':
         return_status = steptablets.delete_step_tablet(connection, stepTabletID)
+    transaction.commit()
+    return return_status
+
+@api_blueprint.route('/steptablets/<int:stepTabletID>/steps',
+                      methods=['GET', 'PATCH'])
+@login_required
+def step_tablet_steps(stepTabletID):
+    """ Specifc step tablet interactions """
+    connection = engine.connect()
+    transaction = connection.begin()
+    if request.method == 'GET':
+        return_status = steptablets.get_step_tablet_steps(connection, stepTabletID)
+    if request.method == 'PATCH':
+        return_status = steptablets.update_step_tablet_steps(connection, stepTabletID)
     transaction.commit()
     return return_status
 

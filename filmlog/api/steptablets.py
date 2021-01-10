@@ -14,9 +14,9 @@ def get_step_tablets(connection):
     userID = current_user.get_id()
     qry = text("""SELECT stepTabletID, name, createdOn
                   FROM StepTablets
-                  WHERE StepTablets.userID = :userID""")
+                  WHERE userID = :userID""")
     steps_query = connection.execute(qry,
-        userID=userID).fetchall()
+                                     userID=userID).fetchall()
 
     stepTablets = {
         "data": []
@@ -31,6 +31,51 @@ def get_step_tablets(connection):
         }
         stepTablets['data'].append(step)
     return jsonify(stepTablets), status.HTTP_200_OK
+
+def get_step_tablet(connection, stepTabletID):
+    """ Get specific step tablet """
+    userID = current_user.get_id()
+    qry = text("""SELECT stepTabletID, name, createdOn
+                  FROM StepTablets
+                  WHERE userID = :userID
+                  AND stepTabletID = :stepTabletID""")
+    steps_query = connection.execute(qry,
+                                     userID=userID,
+                                     stepTabletID=stepTabletID).fetchone()
+
+    stepTablet = {
+        "data" : {
+            "id" : stepTabletID,
+            "stepTabletID" : stepTabletID,
+            "name" : steps_query['name'],
+            "createdOn" : steps_query['createdOn']
+        }
+    }
+    return jsonify(stepTablet), status.HTTP_200_OK
+
+def get_step_tablet_steps(connection, stepTabletID):
+    """ Get specific step tablet """
+    userID = current_user.get_id()
+    qry = text("""SELECT stepNumber, stepDensity
+                  FROM StepTabletSteps
+                  WHERE userID = :userID
+                  AND stepTabletID = :stepTabletID""")
+    steps_query = connection.execute(qry,
+                                     userID=userID,
+                                     stepTabletID=stepTabletID).fetchall()
+    steps = {
+        "data": []
+    }
+
+    for step in steps_query:
+        step = {
+            "id" : step['stepNumber'],
+            "stepNumber" : step['stepNumber'],
+            "stepDensity" : float(step['stepDensity'])
+        }
+        steps['data'].append(step)
+    print(steps)
+    return jsonify(steps), status.HTTP_200_OK
 
 def add_step_tablet(connection):
     """ Add a new step tablet """
@@ -55,6 +100,30 @@ def add_step_tablet(connection):
     resp = make_response(jsonify(json))
     log("Created new step tablet via API")
     return resp, status.HTTP_201_CREATED
+
+def update_step_tablet_steps(connection, stepTabletID):
+    """ Update specific step tablet steps """
+    userID = current_user.get_id()
+    json = request.get_json()
+
+    qry = text("""REPLACE INTO StepTabletSteps
+                (userID, stepTabletID, stepNumber, stepDensity)
+                VALUES (:userID, :stepTabletID, :stepNumber, :stepDensity)""")
+
+    try:
+        for step in json['data']:
+            if step['stepNumber'] > 0 and step['stepNumber'] <= 21:
+                connection.execute(qry,
+                                   userID=userID,
+                                   stepTabletID=stepTabletID,
+                                   stepNumber=step['stepNumber'],
+                                   stepDensity=step['stepDensity'])
+            else:
+                raise IntegrityError
+    except IntegrityError:
+        return "FAILED", status.HTTP_409_CONFLICT
+    resp = make_response(jsonify(json))
+    return resp, status.HTTP_204_NO_CONTENT
 
 def delete_step_tablet(connection, stepTabletID):
     """ Delete a step tablet """
