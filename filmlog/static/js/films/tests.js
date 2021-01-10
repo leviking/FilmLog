@@ -20,8 +20,6 @@ function generateHDCurves(films) {
     datasets.push(dataset);
   });
 
-  console.log(datasets);
-
   let hdCurve = new Chart(canvas, {
     type: 'scatter',
     data: {
@@ -50,7 +48,7 @@ function generateHDCurves(films) {
   });
 }
 
-function getFilmTestCurves() {
+function getAllTestCurves() {
   jQuery.ajax({
     type: 'GET',
     url: '/api/v1/films/tests/curves',
@@ -95,5 +93,5 @@ function getFilmTests() {
 
 $(document).ready(() => {
   getFilmTests();
-  getFilmTestCurves();
+  getAllTestCurves();
 });

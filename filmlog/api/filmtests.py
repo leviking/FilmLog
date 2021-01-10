@@ -96,6 +96,56 @@ def get_all_test_curves(connection):
 
     return jsonify(filmTests), status.HTTP_200_OK
 
+def get_test_curves_from_film(connection, filmTypeID):
+    """ charts.js friendly data output of all of the film's test curves """
+    userID = current_user.get_id()
+    qry = text("""SELECT FilmTests.filmTestID,
+    FilmTypes.filmTypeID AS filmTypeID,
+    FilmTypes.name AS filmName, FilmTypes.iso,
+    CONV(displayColor, 10, 16) AS displayColor
+    FROM FilmTests
+    JOIN FilmTypes ON FilmTypes.userID = FilmTests.userID
+        AND FilmTypes.filmTypeID = FilmTests.filmTypeID
+    WHERE FilmTests.userID = :userID
+    AND FilmTests.filmTypeID = :filmTypeID""")
+    films_query = connection.execute(qry,
+                                     userID=userID,
+                                     filmTypeID=filmTypeID).fetchall()
+
+    print(films_query)
+
+    filmTests = {
+        "data": []
+    }
+
+    for row in films_query:
+        qry = text("""SELECT stepNumber, logE, filmDensity
+            FROM FilmTestStepsView WHERE filmTestID = :filmTestID""")
+        steps_query = connection.execute(qry,
+                                         userID=userID,
+                                         filmTestID=row['filmTestID']).fetchall()
+        steps = []
+        for step in steps_query:
+            step = {
+                "stepNumber": step['stepNumber'],
+                "logE": float(step['logE']),
+                "filmDensity": float(step['filmDensity']),
+            }
+            steps.append(step)
+
+        film = {
+            "id" : row['filmTestID'],
+            "filmTestID" : row['filmTestID'],
+            "filmTypeID" : row['filmTypeID'],
+            "filmName" : row['filmName'],
+            "iso" : row['iso'],
+            "displayColor" : "#" + row['displayColor'].zfill(6),
+            "steps" : steps
+        }
+        filmTests['data'].append(film)
+
+    return jsonify(filmTests), status.HTTP_200_OK
+
 def get_tests(connection, filmTypeID):
     """ Get all tests for a film """
     userID = current_user.get_id()

@@ -106,6 +106,70 @@ function deleteTest(filmTestID) {
   });
 }
 
+function generateHDCurves(films) {
+  let canvas = $('#hdCurves');
+  let datasets = [];
+
+  $.each(films, (i, film) => {
+    let data = [];
+    $.each(film.steps, (i, step) => {
+      data.push({
+        x: step.logE,
+        y: step.filmDensity,
+      });
+    });
+    let dataset = {
+      label: `${film.filmName} ${film.iso}`,
+      data: data,
+      showLine: true,
+      fill: false,
+      borderColor: film.displayColor
+    }
+    datasets.push(dataset);
+  });
+
+  console.log(datasets);
+
+  let hdCurve = new Chart(canvas, {
+    type: 'scatter',
+    data: {
+        datasets: datasets,
+    },
+    options: {
+      cubicInterpolationMode: 'default',
+      legend: {
+        display: false
+      },
+      scales: {
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Density'
+          }
+        }],
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Log'
+          }
+        }]
+      }
+    }
+  });
+}
+
+function getFilmTestCurves() {
+  jQuery.ajax({
+    type: 'GET',
+    url: `/api/v1/films/${filmTypeID}/tests/curves`,
+    contentType: 'application/json',
+    dataType: 'json',
+    success(data) {
+      generateHDCurves(data.data);
+    }
+  });
+}
+
 $(document).ready(() => {
   getFilm();
   getFilmTests();
@@ -113,6 +177,7 @@ $(document).ready(() => {
   getEnlargers();
   getEnlargerLenses();
   getFilters();
+  getFilmTestCurves();
   $('#filmTestForm').submit(false);
 });
 

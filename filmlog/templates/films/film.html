@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block scripts %}
+<script src="/static/include/chart/Chart.bundle.min.js"></script>
 <script src="/static/js/films/film.js"></script>
 {% endblock %}
 
@@ -13,6 +14,12 @@
     <li><strong>Kind:</strong> <span id="kind"></span></li>
     <li><strong>Number Rolls/Sheets:</strong> <span id="count"></span></li>
   </ul>
+
+  <h3>Test Curves</h3>
+  <div class="card">
+    <canvas id="hdCurves" width="400" height="200"></canvas>
+  </div>
+  <br />
 
   <h3>Film Tests</h3>
   <div class="card">
