@@ -302,7 +302,7 @@ def add_test(connection, filmTypeID):
                            agitation=json['data']['agitation'],
                            rotaryRPM=zero_to_none(json['data']['rotaryRPM']),
                            notes=json['data']['notes'])
-    except IntegrityError as e:
+    except IntegrityError:
         log("Failed to create new film test via API")
         return "FAILED", status.HTTP_409_CONFLICT
     json['data']['id'] = str(nextFilmTestID)
