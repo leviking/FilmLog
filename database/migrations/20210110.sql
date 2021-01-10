@@ -1,0 +1,5 @@
+SET FOREIGN_KEY_CHECKS=0;
+ALTER TABLE FilmTestSteps
+DROP FOREIGN KEY FilmTestSteps_FilmTests_fk,
+ADD CONSTRAINT FilmTestSteps_FilmTests_fk FOREIGN KEY (userID, filmTestID) REFERENCES FilmTests (userID, filmTestID)
+  ON DELETE CASCADE ON UPDATE CASCADE;

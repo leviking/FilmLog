@@ -507,6 +507,7 @@ CREATE TABLE FilmTestSteps (
   filmDensity DECIMAL(3,2) NOT NULL,
   PRIMARY KEY (userID, filmTestID, stepNumber),
   CONSTRAINT FilmTestSteps_FilmTests_fk FOREIGN KEY (userID, filmTestID) REFERENCES FilmTests (userID, filmTestID)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE='InnoDB';
 
 CREATE VIEW FilmTestsView AS

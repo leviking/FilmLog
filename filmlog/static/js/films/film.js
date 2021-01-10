@@ -39,7 +39,8 @@ function getFilmTests() {
           row += `<td>${test.gamma}</td>`;
           row += `<td>${test.contrastIndex}</td>`;
           row += `<td>${test.kodakISO}</td>`;
-          row += `<td></td>`;
+          row += `<td><button class="btn btn-danger btn-sm" name="button" value="Delete" \
+                     onclick="deleteTest(${test.id})">Delete</button></td>`;
           row += '</tr>';
           $('#filmTestsTableBody').append($(row));
         });
@@ -87,6 +88,21 @@ function addTest() {
           $('#filmTestForm')[0].reset();
         },
        409() { showAlert('Cannot Add Test', 'There was a problem.', 'warning'); } },
+  });
+}
+
+function deleteTest(filmTestID) {
+  jQuery.ajax({
+    type: 'DELETE',
+    url: `/api/v1/films/${filmTypeID}/tests/${filmTestID}`,
+    contentType: 'application/json',
+    dataType: 'json',
+    success() {
+      getFilmTests();
+    },
+    statusCode: {
+      403() { showAlert('Cannot Delete Test', 'Something is up.', 'danger'); }
+    },
   });
 }
 

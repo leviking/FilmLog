@@ -214,7 +214,7 @@ def film_tests(filmTypeID):
     return return_status
 
 @api_blueprint.route('/films/<int:filmTypeID>/tests/<int:filmTestID>',
-                      methods=['GET'])
+                      methods=['GET', 'DELETE'])
 @login_required
 def film_test(filmTypeID, filmTestID):
     """ Get user's film test for specific film """
@@ -222,6 +222,8 @@ def film_test(filmTypeID, filmTestID):
     transaction = connection.begin()
     if request.method == 'GET':
         return_status = filmtests.get_test(connection, filmTypeID, filmTestID)
+    if request.method == 'DELETE':
+        return_status = filmtests.delete_test(connection, filmTypeID, filmTestID)
     transaction.commit()
     return return_status
 

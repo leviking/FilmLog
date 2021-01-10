@@ -334,3 +334,20 @@ def update_test_steps(connection, filmTestID):
         return "FAILED", status.HTTP_409_CONFLICT
     resp = make_response(jsonify(json))
     return resp, status.HTTP_204_NO_CONTENT
+
+def delete_test(connection, filmTypeID, filmTestID):
+    """ Delete a film test """
+
+    userID = current_user.get_id()
+    qry = text("""DELETE FROM FilmTests
+        WHERE userID = :userID
+        AND filmTypeID = :filmTypeID
+        AND filmTestID = :filmTestID""")
+    try:
+        connection.execute(qry,
+                           userID=userID,
+                           filmTypeID=filmTypeID,
+                           filmTestID=filmTestID)
+    except IntegrityError:
+        return "FAILED", status.HTTP_403_FORBIDDEN
+    return "OK", status.HTTP_204_NO_CONTENT
