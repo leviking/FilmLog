@@ -182,3 +182,7 @@ def log(message):
         kafka_producer.send(config.kafka_topic,
                             key=config.logging_kafka_key.encode('utf-8'),
                             value=message.encode('utf-8'))
+
+def format_hex_color(color):
+    """ Format hex converted value from DB """
+    return "#" + color.zfill(6),

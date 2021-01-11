@@ -3,6 +3,8 @@ const currentURL = $(location).attr('href');
 const filmTypeID = currentURL.split('/')[4];
 const filmTestID = currentURL.split('/')[6];
 
+let linecolor = "#000000"
+
 let filmName;
 
 function generateHDCurve(steps) {
@@ -26,13 +28,13 @@ function generateHDCurve(steps) {
           showLine: true,
           fill: false,
           //borderColor: "#882222"
-          borderColor: `#${Math.floor(Math.random()*16777215).toString(16)}`
+          borderColor: linecolor
         }]
     },
     options: {
       cubicInterpolationMode: 'default',
       legend: {
-        position: 'bottom'
+        display: false
       },
       scales: {
         yAxes: [{
@@ -61,6 +63,8 @@ function getFilm() {
     success(data) {
       const film = data.data;
       filmName = film.name;
+      linecolor = film.displayColor;
+      console.log(linecolor);
       $('#name').append(`${film['name']} ${film['iso']} Film Test`);
     },
   });

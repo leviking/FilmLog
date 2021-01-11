@@ -5,7 +5,7 @@ from flask_login import current_user
 from sqlalchemy.sql import text
 from sqlalchemy.exc import IntegrityError
 
-from filmlog.functions import next_id, zero_to_none
+from filmlog.functions import next_id, zero_to_none, format_hex_color
 
 ## Helper Functions
 def auto_decrement_film_stock(connection, filmTypeID, filmSizeID):
@@ -245,6 +245,7 @@ def get_film_type(connection, filmTypeID):
     """ Get film type details """
     userID = current_user.get_id()
     qry = text("""SELECT FilmTypes.filmTypeID, name, FilmTypes.iso, kind,
+        CONV(displayColor, 10, 16) AS displayColor,
         COUNT(Films.filmID) AS filmCount
         FROM FilmTypes
         LEFT OUTER JOIN Films ON Films.filmTypeID = FilmTypes.filmTypeID
@@ -263,6 +264,7 @@ def get_film_type(connection, filmTypeID):
             "name" : film_query['name'],
             "iso" : film_query['iso'],
             "kind" : film_query['kind'],
+            "displayColor": format_hex_color(film_query['displayColor']),
             "count" : film_query['filmCount']
         }
     }

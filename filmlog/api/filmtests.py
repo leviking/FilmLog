@@ -7,7 +7,7 @@ from sqlalchemy.sql import text
 from sqlalchemy.exc import IntegrityError
 
 from filmlog.functions import next_id, zero_to_none, key_or_none, \
-                              time_to_seconds, log
+                              time_to_seconds, log, format_hex_color
 
 def get_all_tests(connection):
     """ Get all film tests """
@@ -139,7 +139,7 @@ def get_test_curves_from_film(connection, filmTypeID):
             "filmTypeID" : row['filmTypeID'],
             "filmName" : row['filmName'],
             "iso" : row['iso'],
-            "displayColor" : "#" + row['displayColor'].zfill(6),
+            "displayColor" : format_hex_color(row['displayColor']),
             "steps" : steps
         }
         filmTests['data'].append(film)
