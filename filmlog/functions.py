@@ -185,4 +185,4 @@ def log(message):
 
 def format_hex_color(color):
     """ Format hex converted value from DB """
-    return "#" + color.zfill(6),
+    return "#" + color.zfill(6)

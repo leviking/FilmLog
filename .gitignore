@@ -5,3 +5,4 @@ venv*
 filmlog/files/*
 database/users.sql
 node_modules
+__pycache__
